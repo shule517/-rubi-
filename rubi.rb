@@ -13,18 +13,13 @@ def parse_lisp(tokens)
   until tokens.empty? do
     token = tokens.shift
 
-    if token == :"("
-      puts "( -> parse_lisp(#{tokens}) を 実行はじめます"
-      result = parse_lisp(tokens)
-      puts "-> parse_lisp(#{tokens}) -> result: #{result}"
-      list << result
-      puts "list: #{list}"
+    if token != :"(" && token != :")"
+      list << token # ()の中を追加していく
     elsif token == :")"
-      puts ") -> list: #{list}"
-      return list
-    else
-      list << token
-      puts "list: #{list}"
+      return list # )で終了
+    elsif token == :"("
+      result = parse_lisp(tokens) # 次の()へ
+      list << result # ()の中身を追加
     end
   end
 
