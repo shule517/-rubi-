@@ -69,4 +69,38 @@ describe '#eval_lisp' do
       it { is_expected.to eq -53 }
     end
   end
+
+  context '*' do
+    context '()１つ' do
+      let(:str) { "(* 2 3)" }
+      it { is_expected.to eq 6 }
+    end
+
+    context '()２つ' do
+      let(:str) { "(* (* 2 3) 3)" }
+      it { is_expected.to eq 18 }
+    end
+
+    context '引数が３つ以上' do
+      let(:str) { "(* 2 3 4)" }
+      it { is_expected.to eq 24 }
+    end
+  end
+
+  context '/' do
+    context '()１つ' do
+      let(:str) { "(/ 4 2)" }
+      it { is_expected.to eq 2 }
+    end
+
+    context '()２つ' do
+      let(:str) { "(/ 4 (/ 4 2))" }
+      it { is_expected.to eq 2 }
+    end
+
+    context '引数が３つ以上' do
+      let(:str) { "(/ 32 4 4)" }
+      it { is_expected.to eq 2 }
+    end
+  end
 end
