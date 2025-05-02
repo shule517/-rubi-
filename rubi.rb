@@ -25,3 +25,32 @@ def parse_lisp(tokens)
 
   list[0]
 end
+
+def eval_lisp(ast)
+  pp ast: ast
+  function = ast.shift
+
+  if function == :+
+    ast.map do |a|
+      if a.instance_of?(Array)
+        eval_lisp(a)
+      else
+        a
+      end
+    end.sum
+  elsif function == :-
+    a = ast.shift
+    if a.instance_of?(Array)
+      a = eval_lisp(a)
+    end
+    ast.each do |b|
+      b = if b.instance_of?(Array)
+        eval_lisp(b)
+      else
+        b
+          end
+      a -= b
+    end
+    a
+  end
+end
