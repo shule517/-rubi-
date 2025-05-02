@@ -52,11 +52,6 @@ class Rubi
       pp params: ast
       ast.map do |a|
         Integer(a) rescue eval_lisp(a)
-        # if a.instance_of?(Array)
-        #   eval_lisp(a)
-        # else
-        #   a
-        # end
       end.sum
     elsif function == :-
       puts "--- - ---"
@@ -66,16 +61,13 @@ class Rubi
       end
       ast.each do |b|
         b = if b.instance_of?(Array)
-          eval_lisp(b)
-        else
-          b
+              eval_lisp(b)
+            else
+              b
             end
         a -= b
       end
       a
-    else
-      a = ast.shift
-      hash[a]
     end
   end
 end
