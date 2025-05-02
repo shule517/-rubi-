@@ -8,21 +8,25 @@ def split_tokens(str)
 end
 
 def parse_lisp(tokens)
-  @nest_index ||= -1
-  @nest_index += 1
-  nest = "   " * @nest_index
-  token = tokens.shift
+  list = []
 
-  if token == :"("
-    list = []
-    puts "#{nest}parse_lisp(#{tokens})"
-    while tokens.first != :")"
-      list << parse_lisp(tokens)
+  until tokens.empty? do
+    token = tokens.shift
+
+    if token == :"("
+      puts "( -> parse_lisp(#{tokens}) を 実行はじめます"
+      result = parse_lisp(tokens)
+      puts "-> parse_lisp(#{tokens}) -> result: #{result}"
+      list << result
+      puts "list: #{list}"
+    elsif token == :")"
+      puts ") -> list: #{list}"
+      return list
+    else
+      list << token
+      puts "list: #{list}"
     end
-    puts "#{nest}list: #{list}"
-    tokens.shift
-    list  # 完成したリストを返す
-  else
-    token # トークンが整数またはシンボルの場合はそのまま返す
   end
+
+  list[0]
 end
