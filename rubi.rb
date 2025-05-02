@@ -30,7 +30,9 @@ def eval_lisp(ast)
   pp ast: ast
   function = ast.shift
 
-  if function == :+
+  if function == :define
+
+  elsif function == :+
     ast.map do |a|
       if a.instance_of?(Array)
         eval_lisp(a)
