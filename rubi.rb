@@ -1,8 +1,9 @@
 class Rubi
-  attr_reader :hash
+  attr_reader :hash, :func_hash
 
   def initialize
     @hash = {}
+    @func_hash = {}
   end
 
   def split_tokens(str)
@@ -45,8 +46,18 @@ class Rubi
     if function == :define
       puts "--- define ---"
       a = ast.shift
-      b = ast.shift
-      hash[a] = b
+      if a.instance_of?(Array)
+        # 関数定義
+        function_name = a[0]
+        x = a[1]
+        formula = ast.shift
+        func_hash[function_name] = { x => formula }
+        pp func_hash: func_hash
+      else
+        # 変数定義
+        b = ast.shift
+        hash[a] = b
+      end
     elsif function == :+
       puts "--- + ---"
       pp params: ast

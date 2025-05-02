@@ -6,23 +6,35 @@ describe '#eval_lisp' do
 
   context 'define' do
     context '変数宣言' do
-      let(:str) do
-        <<~LISP
-          (define x 3)
-          x
-        LISP
+      context '変数を評価' do
+        let(:str) do
+          <<~LISP
+            (define x 3)
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
       end
-      it { is_expected.to eq 3 }
-    end
 
-    context '変数宣言で足し算' do
-      let(:str) do
-        <<~LISP
+      context '変数宣言で足し算' do
+        let(:str) do
+          <<~LISP
           (define x 3)
           (+ x 4)
+          LISP
+        end
+        it { is_expected.to eq 7 }
+      end
+    end
+
+    context '関数定義' do
+      let(:str) do
+        <<~LISP
+          (define (square x) (* x x))
+          (square 4)
         LISP
       end
-      it { is_expected.to eq 7 }
+      it { is_expected.to eq 16 }
     end
   end
 
