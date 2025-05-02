@@ -13,7 +13,7 @@ def parse_lisp(tokens)
   until tokens.empty? do
     token = tokens.shift
 
-    if token != :"(" && token != :")"
+    if ![:"(", :")"].include?(token)
       list << token # ()の中を追加していく
     elsif token == :")"
       return list # )で終了
