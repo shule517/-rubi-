@@ -1,8 +1,8 @@
 class Rubi
-  attr_reader :hash, :func_hash
+  attr_reader :var_hash, :func_hash
 
   def initialize
-    @hash = {}
+    @var_hash = {}
     @func_hash = {}
   end
 
@@ -43,8 +43,8 @@ class Rubi
 
   def eval_lisp(ast)
     if ast.is_a?(Symbol)
-      if hash.key?(ast)
-        return hash[ast] # 変数を参照する
+      if var_hash.key?(ast)
+        return var_hash[ast] # 変数を参照する
       else
         return ast # シンボルを返す
       end
@@ -69,7 +69,7 @@ class Rubi
       else
         # 変数定義
         b = ast.shift
-        hash[a] = b
+        var_hash[a] = b
       end
     elsif function == :+
       ast.map { |a| eval_lisp(a) }.sum
