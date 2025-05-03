@@ -43,17 +43,13 @@ class Rubi
 
   def eval_lisp(ast)
     if ast.is_a?(Symbol)
-      # 変数を参照
-      pp "#{ast} : #{hash[ast]}"
-
       if hash.key?(ast)
-        return hash[ast]
+        return hash[ast] # 変数を参照する
       else
-        return ast
+        return ast # シンボルを返す
       end
     elsif atom?(ast)
-      # 値を返す
-      return ast
+      return ast # 値を返す
     end
 
     pp ast: ast
@@ -76,16 +72,12 @@ class Rubi
         hash[a] = b
       end
     elsif function == :+
-      puts "--- + ---"
       ast.map { |a| eval_lisp(a) }.sum
     elsif function == :-
-      puts "--- - ---"
       ast.map { |a| eval_lisp(a) }.reduce(:-)
     elsif function == :*
-      puts "--- * ---"
       ast.map { |a| eval_lisp(a) }.reduce(:*)
     elsif function == :/
-      puts "--- / ---"
       ast.map { |a| eval_lisp(a) }.reduce(:/)
     end
   end
