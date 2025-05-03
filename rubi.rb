@@ -77,54 +77,16 @@ class Rubi
       end
     elsif function == :+
       puts "--- + ---"
-      ast.map do |a|
-        eval_lisp(a)
-      end.sum
+      ast.map { |a| eval_lisp(a) }.sum
     elsif function == :-
       puts "--- - ---"
-      a = ast.shift
-      if a.instance_of?(Array)
-        a = eval_lisp(a)
-      end
-      ast.each do |b|
-        b = if b.instance_of?(Array)
-              eval_lisp(b)
-            else
-              b
-            end
-        a -= b
-      end
-      a
+      ast.map { |a| eval_lisp(a) }.reduce(:-)
     elsif function == :*
       puts "--- * ---"
-      a = ast.shift
-      if a.instance_of?(Array)
-        a = eval_lisp(a)
-      end
-      ast.each do |b|
-        b = if b.instance_of?(Array)
-              eval_lisp(b)
-            else
-              b
-            end
-        a *= b
-      end
-      a
+      ast.map { |a| eval_lisp(a) }.reduce(:*)
     elsif function == :/
       puts "--- / ---"
-      a = ast.shift
-      if a.instance_of?(Array)
-        a = eval_lisp(a)
-      end
-      ast.each do |b|
-        b = if b.instance_of?(Array)
-              eval_lisp(b)
-            else
-              b
-            end
-        a /= b
-      end
-      a
+      ast.map { |a| eval_lisp(a) }.reduce(:/)
     end
   end
 end
