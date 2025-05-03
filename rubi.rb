@@ -11,7 +11,15 @@ class Rubi
       .gsub("(", " ( ")
       .gsub(")", " ) ")
       .split
-      .map { |c| Integer(c) rescue Float(c) rescue c.to_sym }
+      .map { |c| atom(c) }
+  end
+
+  def atom(c)
+    Integer(c) rescue Float(c) rescue c.to_sym
+  end
+
+  def atom?(ast)
+    !ast.is_a?(Array)
   end
 
   def parse_lisp(tokens)
@@ -31,10 +39,6 @@ class Rubi
     end
 
     list
-  end
-
-  def atom?(ast)
-    !ast.is_a?(Array)
   end
 
   def eval_lisp(ast)
