@@ -22,7 +22,7 @@ class Rubi
     !ast.is_a?(Array)
   end
 
-  def parse_lisp(tokens)
+  def parse(tokens)
     list = []
 
     until tokens.empty? do
@@ -33,7 +33,7 @@ class Rubi
       elsif token == :")"
         return list # )で終了
       elsif token == :"("
-        result = parse_lisp(tokens) # 次の()へ
+        result = parse(tokens) # 次の()へ
         list << result # ()の中身を追加
       end
     end
@@ -41,7 +41,7 @@ class Rubi
     list
   end
 
-  def eval_lisp(ast)
+  def eval(ast)
     if ast.is_a?(Symbol)
       if var_hash.key?(ast)
         return var_hash[ast] # 変数を参照する
@@ -72,13 +72,13 @@ class Rubi
         var_hash[a] = b
       end
     elsif function == :+
-      ast.map { |a| eval_lisp(a) }.sum
+      ast.map { |a| eval(a) }.sum
     elsif function == :-
-      ast.map { |a| eval_lisp(a) }.reduce(:-)
+      ast.map { |a| eval(a) }.reduce(:-)
     elsif function == :*
-      ast.map { |a| eval_lisp(a) }.reduce(:*)
+      ast.map { |a| eval(a) }.reduce(:*)
     elsif function == :/
-      ast.map { |a| eval_lisp(a) }.reduce(:/)
+      ast.map { |a| eval(a) }.reduce(:/)
     end
   end
 end

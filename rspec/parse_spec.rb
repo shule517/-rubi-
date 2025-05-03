@@ -1,7 +1,7 @@
 require_relative '../rubi.rb'
 
-describe '#parse_lisp' do
-  subject { rubi.parse_lisp(rubi.split_tokens(str)) }
+describe '#parse' do
+  subject { rubi.parse(rubi.split_tokens(str)) }
   let(:rubi) { Rubi.new }
 
   context '()*1' do

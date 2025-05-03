@@ -1,7 +1,7 @@
 require_relative '../rubi.rb'
 
-describe '#eval_lisp' do
-  subject { rubi.parse_lisp(rubi.split_tokens(str)).map { |code| pp code: code; rubi.eval_lisp(code) }.last }
+describe '#eval' do
+  subject { rubi.parse(rubi.split_tokens(str)).map { |code| pp code: code; rubi.eval(code) }.last }
   let(:rubi) { Rubi.new }
 
   context 'define' do
