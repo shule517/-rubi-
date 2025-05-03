@@ -33,10 +33,23 @@ class Rubi
     list
   end
 
+  def atom?(ast)
+    !ast.is_a?(Array)
+  end
+
   def eval_lisp(ast)
     if ast.is_a?(Symbol)
+      # 変数を参照
       pp "#{ast} : #{hash[ast]}"
-      return hash[ast]
+
+      if hash.key?(ast)
+        return hash[ast]
+      else
+        return ast
+      end
+    elsif atom?(ast)
+      # 値を返す
+      return ast
     end
 
     pp ast: ast

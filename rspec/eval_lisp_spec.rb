@@ -38,6 +38,18 @@ describe '#eval_lisp' do
     end
   end
 
+  context '値' do
+    context '数値' do
+      let(:str) { "1" }
+      it { is_expected.to eq 1 }
+    end
+
+    context '文字列' do
+      let(:str) { "あいうえお" }
+      it { is_expected.to eq :"あいうえお" }
+    end
+  end
+
   context '+' do
     context '()１つ' do
       let(:str) { "(+ 1 2)" }
