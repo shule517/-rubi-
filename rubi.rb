@@ -11,7 +11,7 @@ class Rubi
       .gsub("(", " ( ")
       .gsub(")", " ) ")
       .split
-      .map { |c| Integer(c) rescue c.to_sym }
+      .map { |c| Integer(c) rescue Float(c) rescue c.to_sym }
   end
 
   def parse_lisp(tokens)
@@ -73,9 +73,8 @@ class Rubi
       end
     elsif function == :+
       puts "--- + ---"
-      pp params: ast
       ast.map do |a|
-        Integer(a) rescue eval_lisp(a)
+        eval_lisp(a)
       end.sum
     elsif function == :-
       puts "--- - ---"
