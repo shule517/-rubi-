@@ -97,13 +97,13 @@ module Rubi
     def eval_atom(ast, lexical_hash, nest)
       if lexical_hash.key?(ast)
         puts "#{nest}-> ローカル変数を返す #{lexical_hash[ast]}"
-        return lexical_hash[ast] # レキシカルスコープの変数を参照する
+        lexical_hash[ast] # レキシカルスコープの変数を参照する
       elsif var_hash.key?(ast)
         puts "#{nest}-> グローバル変数を返す #{var_hash[ast]}"
-        return var_hash[ast] # グローバル変数を参照する
+        var_hash[ast] # グローバル変数を参照する
       else
         puts "#{nest}-> シンボルor値を返す #{ast}"
-        return ast # シンボルor値を返す
+        ast # シンボルor値を返す
       end
     end
   end
