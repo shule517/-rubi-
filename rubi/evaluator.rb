@@ -12,6 +12,7 @@ module Rubi
     end
 
     def eval(ast, lexical_hash, stack_count)
+      raise "スタック多すぎ問題" if stack_count > 100
       nest = "  " * (stack_count + 1)
       # puts "#{nest}--- eval ---"
       puts "#{nest}eval(ast: #{ast}, lexical_hash: #{lexical_hash})"
@@ -53,8 +54,8 @@ module Rubi
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
         var_hash[var_name] = eval(value, {}, stack_count + 1)
       elsif function == :lambda
-        puts "#{nest}#{function}()"
-        Proc.new { 1 + 2 }
+        puts "#{nest}#{function}(!!!!!!!!!!!!!!!!)"
+        Proc.new { 1 + 2 } # TODO: lambdaが固定
       elsif function == :defun # 関数定義
         func_name = ast.shift
         params, expression = ast
@@ -75,14 +76,19 @@ module Rubi
       elsif function == :/
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
+      elsif function.instance_of?(Array) # lambdaの実行
+        puts "#{nest}式を評価後に戻り値を関数として実行します(function: #{function}, (params: #{ast}, lexical_hash: #{lexical_hash})"
+        expression = eval(function, lexical_hash, stack_count + 1)
+        expression.call # TODO: 引数ありに対応していない
       else
-        puts "#{nest}else/#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
-        puts "#{nest}func_hash: #{func_hash}"
         if func_hash.key?(function)
+          puts "#{nest}#{function}関数が見つかった(params: #{ast}, lexical_hash: #{lexical_hash})"
           func = func_hash[function]
           puts "#{nest}func_hash[function]: #{func}"
           puts "#{nest}params: #{ast}"
           return func.call(*ast) # 変数を参照する
+        else
+          puts "#{nest}TODO: else -> #{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         end
       end
     end
