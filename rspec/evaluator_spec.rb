@@ -8,7 +8,7 @@ describe Rubi::Evaluator do
     let(:ast) { Rubi::Parser.new.parse(tokens) }
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
-    context 'let' do
+    describe '#let' do
       context '変数１つ宣言' do
         let(:str) do
           <<~LISP
@@ -92,7 +92,8 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 1 }
       end
     end
-    context 'setq' do
+
+    describe '#setq' do
       context '変数を定義するだけ' do
         let(:str) do
           <<~LISP
@@ -123,7 +124,10 @@ describe Rubi::Evaluator do
       end
     end
 
-    context 'defun' do
+    describe '#lambda' do
+    end
+
+    describe '#defun' do
       context '関数の定義のみ' do
         let(:str) { "(defun double (x) (* x 2))" }
         it { is_expected.to eq :double }
@@ -170,7 +174,7 @@ describe Rubi::Evaluator do
     #   end
     end
 
-    context '値' do
+    describe '#値' do
       context '整数' do
         let(:str) { "1" }
         it { is_expected.to eq 1 }
@@ -187,7 +191,7 @@ describe Rubi::Evaluator do
       end
     end
 
-    context '+' do
+    describe '#+' do
       context '()１つ' do
         let(:str) { "(+ 1 2)" }
         it { is_expected.to eq 3 }
@@ -219,7 +223,7 @@ describe Rubi::Evaluator do
       end
     end
 
-    context '-' do
+    describe '#-' do
       context '()１つ' do
         let(:str) { "(- 2 1)" }
         it { is_expected.to eq 1 }
@@ -241,7 +245,7 @@ describe Rubi::Evaluator do
       end
     end
 
-    context '*' do
+    describe '#*' do
       context '()１つ' do
         let(:str) { "(* 2 3)" }
         it { is_expected.to eq 6 }
@@ -263,7 +267,7 @@ describe Rubi::Evaluator do
       end
     end
 
-    context '/' do
+    describe '#/' do
       context '()１つ' do
         let(:str) { "(/ 4 2)" }
         it { is_expected.to eq 2 }
