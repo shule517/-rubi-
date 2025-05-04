@@ -38,7 +38,10 @@ module Rubi
       function = ast.shift
       pp function: function
 
-      if function == :defun
+      if function == :setq # 変数定義
+        var_name, value = ast
+        var_hash[var_name] = eval(value)
+      elsif function == :defun # 関数定義
         pp defun_ast: ast
         func_name = ast.shift
         @func_hash[func_name] = lambda { |x| x * 2 }

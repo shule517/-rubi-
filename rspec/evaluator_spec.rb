@@ -8,32 +8,63 @@ describe Rubi::Evaluator do
     let(:ast) { Rubi::Parser.new.parse(tokens) }
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
-    context 'defun' do
-      context '関数の定義のみ' do
-        let(:str) { "(defun double (x) (* x 2))" }
-        it { is_expected.to eq :double }
-      end
-
-      context '関数を定義して実行する' do
+    context 'setq' do
+      context '変数を定義するだけ' do
         let(:str) do
           <<~LISP
-            (defun double (x) (* x 2))
-            (double 1)
+            (setq x 10)
           LISP
         end
-        it { is_expected.to eq 2 }
+        it { is_expected.to eq 10 }
       end
 
-      context '関数を定義して実行する' do
+      context '変数を定義して、評価' do
         let(:str) do
           <<~LISP
-            (defun square (x) (* x x))
-            (square 3)
+            (setq x 10)
+            x
           LISP
         end
-        it { is_expected.to eq 9 }
+        it { is_expected.to eq 10 }
+      end
+
+      context '変数に計算結果を保存する' do
+        let(:str) do
+          <<~LISP
+            (setq x (+ 1 2))
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
       end
     end
+
+    # context 'defun' do
+    #   context '関数の定義のみ' do
+    #     let(:str) { "(defun double (x) (* x 2))" }
+    #     it { is_expected.to eq :double }
+    #   end
+    #
+    #   context '関数を定義して実行する' do
+    #     let(:str) do
+    #       <<~LISP
+    #         (defun double (x) (* x 2))
+    #         (double 1)
+    #       LISP
+    #     end
+    #     it { is_expected.to eq 2 }
+    #   end
+    #
+    #   context '関数を定義して実行する' do
+    #     let(:str) do
+    #       <<~LISP
+    #         (defun square (x) (* x x))
+    #         (square 3)
+    #       LISP
+    #     end
+    #     it { is_expected.to eq 9 }
+    #   end
+    # end
 
     context '値' do
       context '整数' do
