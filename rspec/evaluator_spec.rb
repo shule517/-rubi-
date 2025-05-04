@@ -231,6 +231,26 @@ describe Rubi::Evaluator do
     #   end
     end
 
+    describe '#list' do
+      context '数値の配列' do
+        let(:str) do
+          <<~LISP
+            (list 1 2 3)
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3] }
+      end
+
+      context '関数呼び出しあり' do
+        let(:str) do
+          <<~LISP
+            (list 1 2 (+ 3 4))
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 7] }
+      end
+    end
+
     describe '#値' do
       context '整数' do
         let(:str) { "1" }

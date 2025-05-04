@@ -65,6 +65,9 @@ module Rubi
         # @func_hash[func_name] = lambda { eval(expression) }
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
+      elsif function == :list
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
+        ast.map { |a| eval(a, lexical_hash, stack_count + 1) }
       elsif function == :+
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.sum
@@ -80,7 +83,7 @@ module Rubi
       elsif function.instance_of?(Array) # lambdaの実行
         puts "#{nest}式を評価後に戻り値を関数として実行します(function: #{function}, (params: #{ast}, lexical_hash: #{lexical_hash})"
         expression = eval(function, lexical_hash, stack_count + 1)
-        expression.call # TODO: 引数ありに対応していない
+        expression.call(4) # TODO: 引数ありに対応していない
       else
         if func_hash.key?(function)
           puts "#{nest}#{function}関数が見つかった(params: #{ast}, lexical_hash: #{lexical_hash})"
