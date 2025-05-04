@@ -2,7 +2,9 @@ require_relative '../rubi.rb'
 
 describe Rubi::Evaluator do
   describe '#eval' do
-    subject { ast.map { |code| pp code: code; Rubi::Evaluator.new.eval(code) }.last }
+    subject { ast.map { |code| pp code: code; evaluator.eval(code) }.last }
+
+    let(:evaluator) { Rubi::Evaluator.new }
     let(:ast) { Rubi::Parser.new.parse(tokens) }
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
