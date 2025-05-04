@@ -1,3 +1,5 @@
-require_relative './rubi/tokenizer.rb'
-require_relative './rubi/parser.rb'
-require_relative './rubi/evaluator.rb'
+require_relative './rubi/tokenizer'
+require_relative './rubi/parser'
+require_relative './rubi/evaluator'
+
+require_relative './rubi/scheme/evaluator'

@@ -1,4 +1,4 @@
-module Rubi
+module Rubi::Scheme
   class Evaluator
     attr_reader :var_hash, :func_hash
 
@@ -29,7 +29,25 @@ module Rubi
       function = ast.shift
       pp function: function
 
-      if function == :+
+      if function == :define
+        puts "--- define ---"
+        a = ast.shift
+        if a.instance_of?(Array)
+          # 関数定義
+          puts "関数定義"
+          function_name = a[0]
+          x = a[1]
+          formula = ast.shift
+          func_hash[function_name] = { x => formula }
+          pp func_hash: func_hash
+        else
+          # 変数定義
+          puts "変数定義"
+          b = ast.shift
+          puts "var_hash[#{a}] = #{b}"
+          var_hash[a] = b
+        end
+      elsif function == :+
         ast.map { |a| eval(a) }.sum
       elsif function == :-
         ast.map { |a| eval(a) }.reduce(:-)

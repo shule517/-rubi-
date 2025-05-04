@@ -1,14 +1,45 @@
-require_relative '../rubi.rb'
+require_relative '../../rubi.rb'
 
 describe Rubi::Evaluator do
   describe '#eval' do
     subject { ast.map { |code| pp code: code; evaluator.eval(code) }.last }
 
-    let(:evaluator) { Rubi::Evaluator.new }
+    let(:evaluator) { Rubi::Scheme::Evaluator.new }
     let(:ast) { Rubi::Parser.new.parse(tokens) }
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
-    context 'defun' do
+    context 'define' do
+      context '変数宣言' do
+        context '変数を評価' do
+          let(:str) do
+            <<~LISP
+              (define x 3)
+              x
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context '変数宣言で足し算' do
+          let(:str) do
+            <<~LISP
+              (define x 3)
+              (+ x 4)
+            LISP
+          end
+          it { is_expected.to eq 7 }
+        end
+      end
+
+      # context '関数定義' do
+      #   let(:str) do
+      #     <<~LISP
+      #       (define (square x) (* x x))
+      #       (square 4)
+      #     LISP
+      #   end
+      #   it { is_expected.to eq 16 }
+      # end
     end
 
     context '値' do
