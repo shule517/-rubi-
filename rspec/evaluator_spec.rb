@@ -251,6 +251,35 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#quote' do
+      context 'シンボル' do
+        let(:str) do
+          <<~LISP
+            (quote a)
+          LISP
+        end
+        it { is_expected.to eq :a }
+      end
+
+      context '数値' do
+        let(:str) do
+          <<~LISP
+            (quote 1)
+          LISP
+        end
+        it { is_expected.to eq 1 }
+      end
+
+      context 'リスト' do
+        let(:str) do
+          <<~LISP
+            (quote (list 1 2 a))
+          LISP
+        end
+        it { is_expected.to eq [1, 2, :a] }
+      end
+    end
+
     describe '#値' do
       context '整数' do
         let(:str) { "1" }
