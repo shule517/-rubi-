@@ -55,16 +55,26 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
-    #   context '関数を定義して実行する' do
-    #     let(:str) do
-    #       <<~LISP
-    #         (defun double (x) (* x 2))
-    #         (double 1)
-    #       LISP
-    #     end
-    #     it { is_expected.to eq 2 }
-    #   end
-    #
+      context '引数ありの関数（引数を未使用）' do
+        let(:str) do
+          <<~LISP
+            (defun san (x) (+ 1 2))
+            (san 1)
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+
+      # context '関数を定義して実行する' do
+      #   let(:str) do
+      #     <<~LISP
+      #       (defun double (x) (* x 2))
+      #       (double 1)
+      #     LISP
+      #   end
+      #   it { is_expected.to eq 2 }
+      # end
+
     #   context '関数を定義して実行する' do
     #     let(:str) do
     #       <<~LISP

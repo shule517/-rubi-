@@ -48,7 +48,8 @@ module Rubi
         func_name = ast.shift
         params, expression = ast
         pp params: params, expression: expression
-        @func_hash[func_name] = lambda { eval(expression) }
+        @func_hash[func_name] = Proc.new { eval(expression) }
+        # @func_hash[func_name] = lambda { eval(expression) }
         pp func_hash: @func_hash
         func_name # 定義した関数名のシンボルを返す
       elsif function == :+
