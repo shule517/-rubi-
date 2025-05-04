@@ -30,4 +30,23 @@ describe Rubi::Parser do
       it { is_expected.to eq [[:define, :x, 3], [:+, :x, 4]] }
     end
   end
+
+  describe '#expand_syntactic_sugar' do
+    subject { pp ast; Rubi::Parser.new.expand_syntactic_sugar(ast) }
+
+    let(:ast) { Rubi::Parser.new.parse(tokens) }
+    let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
+
+    context 'quoteの糖衣構文' do
+      context 'シンボルの場合' do
+        let(:str) { "'a" }
+        it { is_expected.to eq [[:quote, :a]] }
+      end
+
+      context 'リストの場合' do
+        let(:str) { "'(1 a)" }
+        it { is_expected.to eq [[:quote, 1, :a]] }
+      end
+    end
+  end
 end

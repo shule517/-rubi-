@@ -18,5 +18,19 @@ module Rubi
 
       list
     end
+
+    def expand_syntactic_sugar(ast)
+      array = []
+      until ast.empty? do
+        token = ast.shift
+        if token == :"'"
+          token = ast.shift
+          array << [:quote, *token]
+        else
+          array << token
+        end
+      end
+      array
+    end
   end
 end
