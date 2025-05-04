@@ -1,13 +1,4 @@
 module Rubi
-  class Cons
-    attr_reader :car, :cdr
-
-    def initialize(car, cdr)
-      @car = car
-      @cdr = cdr
-    end
-  end
-
   class Evaluator
     attr_reader :var_hash, :func_hash
 
