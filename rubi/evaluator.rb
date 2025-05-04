@@ -50,26 +50,33 @@ module Rubi
         expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
       elsif function == :setq # 変数定義
         var_name, value = ast
+        puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
         var_hash[var_name] = eval(value, {}, stack_count + 1)
+      elsif function == :lambda
+        puts "#{nest}#{function}()"
+        Proc.new { 1 + 2 }
       elsif function == :defun # 関数定義
-        puts "#{nest}defun_ast: #{ast}"
         func_name = ast.shift
         params, expression = ast
-        puts "#{nest}params: #{params}, expression: #{expression}"
+        puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
         @func_hash[func_name] = Proc.new { eval(expression, lexical_hash, stack_count + 1) }
         # @func_hash[func_name] = lambda { eval(expression) }
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
       elsif function == :+
-        # pp ast_map: ast.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.sum
       elsif function == :-
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:-)
       elsif function == :*
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:*)
       elsif function == :/
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
       else
+        puts "#{nest}else/#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         puts "#{nest}func_hash: #{func_hash}"
         if func_hash.key?(function)
           func = func_hash[function]
