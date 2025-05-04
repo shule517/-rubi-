@@ -28,13 +28,13 @@ module Rubi
       until ast.empty? do
         token = ast.shift
         if atom?(token)
-          if token == :"'"
+          if token == :"'" || token == :"`"
             # [:"'", [1, 2, :a]]
             # ↓
             # [:quote, [1, 2, :a]]
             token = ast.shift
             array << [:quote, token]
-          elsif token.to_s.start_with?("'")
+          elsif token.to_s.start_with?("'") || token.to_s.start_with?("`")
             # [:"'a"]
             # ↓
             # [[:quote, :a]]
