@@ -8,6 +8,42 @@ describe Rubi::Evaluator do
     let(:ast) { Rubi::Parser.new.parse(tokens) }
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
+    context 'let' do
+      context '変数１つ宣言' do
+        let(:str) do
+          <<~LISP
+            (let
+              ((x 2))
+              x)
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context '変数２つ宣言' do
+        let(:str) do
+          <<~LISP
+            (let
+              ((x 2) (y 3))
+              (+ x y))
+          LISP
+        end
+        it { is_expected.to eq 5 }
+      end
+
+      # context 'グローバル変数 と ローカル変数で 同じ名前の変数を定義する' do
+      #   let(:str) do
+      #     <<~LISP
+      #       (setq x 3)
+      #       (let
+      #         ((x 2) (y 3))
+      #         (+ x y))
+      #       x
+      #     LISP
+      #   end
+      #   it { is_expected.to eq 3 }
+      # end
+    end
     context 'setq' do
       context '変数を定義するだけ' do
         let(:str) do

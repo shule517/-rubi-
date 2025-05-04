@@ -39,7 +39,14 @@ module Rubi
       function = ast.shift
       pp function: function
 
-      if function == :setq # 変数定義
+      if function == :let
+        a, b = ast
+        pp a: a, b: b
+        a.each do |var_name, value|
+          @var_hash[var_name] = eval(value)
+        end
+        eval(b)
+      elsif function == :setq # 変数定義
         var_name, value = ast
         var_hash[var_name] = eval(value)
       elsif function == :defun # 関数定義
