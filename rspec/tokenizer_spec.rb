@@ -23,5 +23,23 @@ describe Rubi::Tokenizer do
       end
       it { is_expected.to eq [:"(", :define, :x, 3, :")", :"(", :+, :x, 4, :")"] }
     end
+
+    context 'quote 1文字' do
+      let(:str) do
+        <<~LISP
+          'a
+        LISP
+      end
+      it { is_expected.to eq [:"'a"] }
+    end
+
+    context 'quote list' do
+      let(:str) do
+        <<~LISP
+          '(1 2 a)
+        LISP
+      end
+      it { is_expected.to eq [:"'", :"(", 1, 2, :a, :")"] }
+    end
   end
 end

@@ -24,8 +24,16 @@ module Rubi
       until ast.empty? do
         token = ast.shift
         if token == :"'"
+          # [:"'", [1, :a]]
+          # ↓
+          # [:quote, 1, :a]
           token = ast.shift
           array << [:quote, *token]
+        elsif token.to_s.start_with?("'")
+          # [:"'a"]
+          # ↓
+          # [[:quote, :a]]
+          array << [:quote, token[1..].to_sym]
         else
           array << token
         end
