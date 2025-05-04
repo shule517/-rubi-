@@ -16,7 +16,7 @@ module Rubi
       nest = "  " * (stack_count + 1)
       # puts "#{nest}--- eval ---"
       puts "#{nest}eval(ast: #{ast}, lexical_hash: #{lexical_hash})"
-      if ast.is_a?(Symbol)
+      if atom?(ast)
         # puts "#{nest}var_hash: #{var_hash}"
         if lexical_hash.key?(ast)
           puts "#{nest}-> ローカル変数を返す #{lexical_hash[ast]}"
@@ -25,12 +25,9 @@ module Rubi
           puts "#{nest}-> グローバル変数を返す #{var_hash[ast]}"
           return var_hash[ast] # グローバル変数を参照する
         else
-          puts "#{nest}-> シンボルを返す #{ast}"
-          return ast # シンボルを返す
+          puts "#{nest}-> シンボルor値を返す #{ast}"
+          return ast # シンボルor値を返す
         end
-      elsif atom?(ast)
-        puts "#{nest}-> 値を返す #{ast}"
-        return ast # 値を返す
       end
 
       function = ast.shift
@@ -75,6 +72,8 @@ module Rubi
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         array = ast.map { |a| eval(a, lexical_hash, stack_count + 1) }
         eval(array, lexical_hash, stack_count + 1)
+      # elsif function == :defmacro
+      #   puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
       elsif function == :+
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.sum
