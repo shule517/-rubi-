@@ -44,14 +44,27 @@ module Rubi
       pp function: function
 
       if function == :let
-        var_params, expression = ast
+        var_params = ast.shift
+        expression = ast
         pp var_params: var_params, expression: expression
         # レキシカル変数を定義する
+        puts "let: レキシカル変数を定義する"
         # lexical_hash = {}
         var_params.each do |var_name, value|
           lexical_hash[var_name] = eval(value, lexical_hash)
         end
-        eval(expression, lexical_hash)
+        pp lexical_hash: lexical_hash
+
+        puts "let: 式を実行する"
+        if atom?(expression)
+          puts "let: atom"
+          atom_result = eval(expression, lexical_hash)
+          pp atom_result: atom_result
+        else
+          puts "let: list"
+          pp expression: expression
+          expression.map { |e| eval(e, lexical_hash) }.last
+        end
       elsif function == :setq # 変数定義
         var_name, value = ast
         var_hash[var_name] = eval(value, lexical_hash)

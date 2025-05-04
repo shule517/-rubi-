@@ -20,6 +20,18 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 2 }
       end
 
+      context '式が２つ' do
+        let(:str) do
+          <<~LISP
+            (let
+              ((x 2))
+              (+ 1 x)
+              (+ 2 x))
+          LISP
+        end
+        it { is_expected.to eq 4 }
+      end
+
       context 'グローバルと同じ変数を宣言する' do
         let(:str) do
           <<~LISP
@@ -55,6 +67,19 @@ describe Rubi::Evaluator do
           LISP
         end
         it { is_expected.to eq 3 }
+      end
+
+      context 'letをネストした場合' do
+        let(:str) do
+          <<~LISP
+            (setq x 1)
+            (let ((x 2))
+              (let ((x 3))
+                x)
+              x)
+          LISP
+        end
+        it { is_expected.to eq 2 }
       end
     end
     context 'setq' do
