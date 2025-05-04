@@ -44,6 +44,12 @@ describe Rubi::Parser do
         it { is_expected.to eq [[:quote, :a]] }
       end
 
+      context '記号の場合' do
+        let(:str) { "(funcall '+ 1 2)" }
+        before { expect(ast).to eq [[:funcall, :"'+", 1, 2]] }
+        it { is_expected.to eq [[:funcall, [:quote, :+], 1, 2]] }
+      end
+
       context 'リストの場合' do
         let(:str) { "'(1 2 a)" }
         before { expect(ast).to eq [:"'", [1, 2, :a]] }
