@@ -23,13 +23,28 @@ module Rubi
         end
       elsif atom?(ast)
         return ast # 値を返す
+      # else
+      #   func_name = ast.shift
+      #   puts func_name: func_name
+      #   pp func_hash: func_hash
+      #   if func_hash.key?(func_name)
+      #     puts "func_hash[func_name]: #{func_hash[func_name]}"
+      #     pp params: ast
+      #     return func_hash[func_name].call(ast) # 変数を参照する
+      #   end
       end
 
       pp ast: ast
       function = ast.shift
       pp function: function
 
-      if function == :+
+      if function == :defun
+        pp defun_ast: ast
+        func_name = ast.shift
+        @func_hash[func_name] = lambda { |x| x * 2 }
+        pp func_hash: @func_hash
+        func_name # 定義した関数名のシンボルを返す
+      elsif function == :+
         ast.map { |a| eval(a) }.sum
       elsif function == :-
         ast.map { |a| eval(a) }.reduce(:-)
@@ -37,6 +52,15 @@ module Rubi
         ast.map { |a| eval(a) }.reduce(:*)
       elsif function == :/
         ast.map { |a| eval(a) }.reduce(:/)
+      else
+        puts func_name: function
+        pp func_hash: func_hash
+        if func_hash.key?(function)
+          func = func_hash[function]
+          puts "func_hash[function]: #{func}"
+          pp params: ast
+          return func.call(*ast) # 変数を参照する
+        end
       end
     end
   end

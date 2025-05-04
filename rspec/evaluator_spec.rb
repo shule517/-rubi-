@@ -9,6 +9,30 @@ describe Rubi::Evaluator do
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
     context 'defun' do
+      context '関数の定義のみ' do
+        let(:str) { "(defun double (x) (* x 2))" }
+        it { is_expected.to eq :double }
+      end
+
+      context '関数を定義して実行する' do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            (double 1)
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context '関数を定義して実行する' do
+        let(:str) do
+          <<~LISP
+            (defun square (x) (* x x))
+            (square 3)
+          LISP
+        end
+        it { is_expected.to eq 9 }
+      end
     end
 
     context '値' do
