@@ -40,21 +40,14 @@ module Rubi
         expression = ast
         puts "#{nest}#{function}(var_params: #{var_params}, expression: #{expression})"
         # レキシカル変数(next_lexical_hash)を定義する
-        puts "#{nest}レキシカル変数を定義する"
+        puts "#{nest}#レキシカル変数を定義する"
         next_lexical_hash = lexical_hash.dup
         var_params.each do |var_name, value|
           next_lexical_hash[var_name] = eval(value, next_lexical_hash, stack_count + 1)
         end
         puts "#{nest}-> next_lexical_hash: #{next_lexical_hash}"
-
-        if atom?(expression)
-          puts "#{nest}式を実行する(atom) - expression: #{expression}"
-          atom_result = eval(expression, next_lexical_hash, stack_count + 1)
-          puts "#{nest}atom_result: #{atom_result}"
-        else
-          puts "#{nest}式を実行する(list) - expression: #{expression}"
-          expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
-        end
+        puts "#{nest}#式を評価する - expression: #{expression}"
+        expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
       elsif function == :setq # 変数定義
         var_name, value = ast
         var_hash[var_name] = eval(value, {}, stack_count + 1)
