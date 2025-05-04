@@ -24,7 +24,6 @@ module Rubi
       end
 
       function = ast.shift
-      # puts "#{nest}--- #{function} ---"
 
       if function == :let
         var_params = ast.shift
@@ -46,13 +45,12 @@ module Rubi
       elsif function == :lambda
         params, expression = ast
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
-        Proc.new { eval(expression, lexical_hash, stack_count + 1) } # TODO: lambdaが引数に対応していない
+        Proc.new { |*params| eval(expression, lexical_hash, stack_count + 1) } # TODO: lambdaが引数に対応していない
       elsif function == :defun # 関数定義
         func_name = ast.shift
         params, expression = ast
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
-        @func_hash[func_name] = Proc.new { eval(expression, lexical_hash, stack_count + 1) }
-        # @func_hash[func_name] = lambda { eval(expression) }
+        @func_hash[func_name] = Proc.new { |*params| eval(expression, lexical_hash, stack_count + 1) } # TODO: 引数が実装できてない
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
       elsif function == :list
@@ -70,7 +68,6 @@ module Rubi
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         a = eval(ast[0], lexical_hash, stack_count + 1)
         b = eval(ast[1], lexical_hash, stack_count + 1)
-
         if b.nil?
           [a] # 末がnilのものは、配列
         elsif atom?(b)
