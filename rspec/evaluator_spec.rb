@@ -274,6 +274,35 @@ describe Rubi::Evaluator do
       it { is_expected.to eq [2, 3] }
     end
 
+    describe '#cons' do
+      let(:str) do
+        <<~LISP
+          (cons 0 '(1 2 3))
+        LISP
+      end
+      it { is_expected.to eq [0, 1, 2, 3] }
+    end
+
+    describe '#null' do
+      context 'リストが空の場合' do
+        let(:str) do
+          <<~LISP
+            (null '())
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+
+      context 'リストが空でない場合' do
+        let(:str) do
+          <<~LISP
+            (null '(1 2 3))
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+    end
+
     describe '#quote' do
       context 'シンボル' do
         let(:str) do

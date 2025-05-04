@@ -62,6 +62,10 @@ module Rubi
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         result = eval(ast.first, lexical_hash, stack_count + 1)
         result[1..]
+      elsif function == :null
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
+        result = eval(ast.first, lexical_hash, stack_count + 1)
+        true if result.empty?
       elsif function == :quote
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast[0] # quoteは評価しない
