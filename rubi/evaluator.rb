@@ -17,7 +17,11 @@ module Rubi
     end
 
     def atom?(ast)
-      !ast.is_a?(Array)
+      !list?(ast)
+    end
+
+    def list?(ast)
+      ast.is_a?(Array)
     end
 
     def eval(ast, lexical_hash, stack_count)
@@ -75,17 +79,14 @@ module Rubi
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         a = eval(ast[0], lexical_hash, stack_count + 1)
         b = eval(ast[1], lexical_hash, stack_count + 1)
-        if atom?(a) && b.nil?
-          [a]
-        elsif !atom?(a) && b.nil?
-          [a]
-        elsif atom?(a) && atom?(b)
-          Cons.new(a, b)
-        elsif atom?(a) && !atom?(b)
-          [a, *b]
-        elsif !atom?(a) && atom?(b)
-          Cons.new(a, b)
-        elsif !atom?(a) && !atom?(b)
+
+        if b.nil?
+          [a] # 末がnilのものは、配列
+        elsif atom?(b)
+          Cons.new(a, b) # 末がnilじゃないものは、cons
+        elsif atom?(a) && list?(b)
+          [a] + b
+        elsif list?(a) && list?(b)
           a + b
         end
       elsif function == :null
