@@ -2,7 +2,7 @@ require_relative '../rubi.rb'
 
 describe Rubi::Evaluator do
   describe '#eval' do
-    subject { ast.map { |code| pp code: code; evaluator.eval(code, {}) }.last }
+    subject { ast.map { |code| pp code: code; evaluator.eval(code, {}, 0) }.last }
 
     let(:evaluator) { Rubi::Evaluator.new }
     let(:ast) { Rubi::Parser.new.parse(tokens) }
@@ -69,17 +69,27 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
-      context 'letをネストした場合' do
+      context 'letをネストした場合①' do
         let(:str) do
           <<~LISP
-            (setq x 1)
-            (let ((x 2))
-              (let ((x 3))
+            (let ((x 1))
+              (let ((x 2))
+                x))
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context 'letをネストした場合②' do
+        let(:str) do
+          <<~LISP
+            (let ((x 1))
+              (let ((x 2))
                 x)
               x)
           LISP
         end
-        it { is_expected.to eq 2 }
+        it { is_expected.to eq 1 }
       end
     end
     context 'setq' do
