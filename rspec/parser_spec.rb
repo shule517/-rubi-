@@ -44,8 +44,8 @@ describe Rubi::Parser do
       end
 
       context 'リストの場合' do
-        let(:str) { "'(1 a)" }
-        it { is_expected.to eq [[:quote, 1, :a]] }
+        let(:str) { "'(1 2 a)" }
+        it { is_expected.to eq [[:quote, [1, 2, :a]]] }
       end
     end
   end
