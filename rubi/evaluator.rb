@@ -1,4 +1,13 @@
 module Rubi
+  class Cons
+    attr_reader :car, :cdr
+
+    def initialize(car, cdr)
+      @car = car
+      @cdr = cdr
+    end
+  end
+
   class Evaluator
     attr_reader :var_hash, :func_hash
 
@@ -62,6 +71,23 @@ module Rubi
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         result = eval(ast.first, lexical_hash, stack_count + 1)
         result[1..]
+      elsif function == :cons
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
+        a = eval(ast[0], lexical_hash, stack_count + 1)
+        b = eval(ast[1], lexical_hash, stack_count + 1)
+        if atom?(a) && b.nil?
+          [a]
+        elsif !atom?(a) && b.nil?
+          [a]
+        elsif atom?(a) && atom?(b)
+          Cons.new(a, b)
+        elsif atom?(a) && !atom?(b)
+          [a, *b]
+        elsif !atom?(a) && atom?(b)
+          Cons.new(a, b)
+        elsif !atom?(a) && !atom?(b)
+          a + b
+        end
       elsif function == :null
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         result = eval(ast.first, lexical_hash, stack_count + 1)
@@ -113,6 +139,10 @@ module Rubi
       elsif var_hash.key?(ast)
         puts "#{nest}-> グローバル変数を返す #{var_hash[ast]}"
         var_hash[ast] # グローバル変数を参照する
+      elsif ast == :t
+        true
+      elsif ast == :nil
+        nil
       else
         puts "#{nest}-> シンボルor値を返す #{ast}"
         ast # シンボルor値を返す

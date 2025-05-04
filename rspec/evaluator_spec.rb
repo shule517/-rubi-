@@ -275,12 +275,78 @@ describe Rubi::Evaluator do
     end
 
     describe '#cons' do
-      let(:str) do
-        <<~LISP
-          (cons 0 '(1 2 3))
-        LISP
+      context '(cons atom atom) ペアを作る' do
+        let(:str) do
+          <<~LISP
+            (cons 'a 'b)
+          LISP
+        end
+        it do
+          result = subject
+          expect(result).to be_instance_of(Rubi::Cons)
+          expect(result.car).to eq :a
+          expect(result.cdr).to eq :b
+        end
       end
-      it { is_expected.to eq [0, 1, 2, 3] }
+
+      context '(cons atom list)' do
+        let(:str) do
+          <<~LISP
+            (cons 0 '(1 2 3))
+          LISP
+        end
+        it { is_expected.to eq [0, 1, 2, 3] }
+      end
+
+      context '(cons atom nil)' do
+        let(:str) do
+          <<~LISP
+            (cons 0 nil)
+          LISP
+        end
+        it { is_expected.to eq [0] }
+      end
+
+      context '(cons list atom)' do
+        let(:str) do
+          <<~LISP
+            (cons '(1 2 3) 0)
+          LISP
+        end
+        it do
+          result = subject
+          expect(result).to be_instance_of(Rubi::Cons)
+          expect(result.car).to eq [1, 2, 3]
+          expect(result.cdr).to eq 0
+        end
+      end
+
+      context '(cons list list)' do
+        let(:str) do
+          <<~LISP
+            (cons '(1 2 3) '(4 5 6))
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3, 4, 5, 6] }
+      end
+
+      context '(cons list nil)' do
+        let(:str) do
+          <<~LISP
+            (cons '(1 2 3) nil)
+          LISP
+        end
+        it { is_expected.to eq [[1, 2, 3]] }
+      end
+
+      context 'リストを作る' do
+        let(:str) do
+          <<~LISP
+            (cons 1 (cons 2 (cons 3 nil)))
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3] }
+      end
     end
 
     describe '#null' do
@@ -411,6 +477,16 @@ describe Rubi::Evaluator do
 
       context '()' do
         let(:str) { "()" }
+        it { is_expected.to eq nil }
+      end
+
+      context 't' do
+        let(:str) { "t" }
+        it { is_expected.to eq true }
+      end
+
+      context 'nil' do
+        let(:str) { "nil" }
         it { is_expected.to eq nil }
       end
     end
