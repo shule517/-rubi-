@@ -2,7 +2,7 @@ require_relative '../rubi.rb'
 
 describe Rubi::Evaluator do
   describe '#eval' do
-    subject { ast.map { |code| pp code: code; evaluator.eval(code) }.last }
+    subject { ast.map { |code| pp code: code; evaluator.eval(code, {}) }.last }
 
     let(:evaluator) { Rubi::Evaluator.new }
     let(:ast) { Rubi::Parser.new.parse(tokens) }
@@ -20,6 +20,19 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 2 }
       end
 
+      context 'グローバルと同じ変数を宣言する' do
+        let(:str) do
+          <<~LISP
+            (setq x 3)
+            (let
+              ((x 2))
+              x)
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+
       context '変数２つ宣言' do
         let(:str) do
           <<~LISP
@@ -31,18 +44,18 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 5 }
       end
 
-      # context 'グローバル変数 と ローカル変数で 同じ名前の変数を定義する' do
-      #   let(:str) do
-      #     <<~LISP
-      #       (setq x 3)
-      #       (let
-      #         ((x 2) (y 3))
-      #         (+ x y))
-      #       x
-      #     LISP
-      #   end
-      #   it { is_expected.to eq 3 }
-      # end
+      context 'グローバル変数 と ローカル変数で 同じ名前の変数を定義する' do
+        let(:str) do
+          <<~LISP
+            (setq x 3)
+            (let
+              ((x 2) (y 3))
+              (+ x y))
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
     end
     context 'setq' do
       context '変数を定義するだけ' do
