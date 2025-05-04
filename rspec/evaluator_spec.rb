@@ -276,7 +276,16 @@ describe Rubi::Evaluator do
             (quote (list 1 2 a))
           LISP
         end
-        it { is_expected.to eq [1, 2, :a] }
+        it { is_expected.to eq [:list, 1, 2, :a] }
+      end
+
+      context 'quoteがネストしてる' do
+        let(:str) do
+          <<~LISP
+            (quote (quote a))
+          LISP
+        end
+        it { is_expected.to eq [:quote, :a] }
       end
     end
 
