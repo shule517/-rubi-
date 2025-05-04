@@ -69,7 +69,7 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
-      context 'letをネストした場合①' do
+      context 'letをネストして、2階層目の変数を評価' do
         let(:str) do
           <<~LISP
             (let ((x 1))
@@ -80,7 +80,7 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 2 }
       end
 
-      context 'letをネストした場合②' do
+      context 'letをネストして、1階層目の変数を評価' do
         let(:str) do
           <<~LISP
             (let ((x 1))
@@ -125,31 +125,62 @@ describe Rubi::Evaluator do
     end
 
     describe '#lambda' do
-      context '引数なしの関数定義' do
-        let(:str) do
-          <<~LISP
-            (lambda () (+ 1 2))
-          LISP
+      context '引数なし' do
+        context '引数なしの関数定義' do
+          let(:str) do
+            <<~LISP
+              (lambda () (+ 1 2))
+            LISP
+          end
+          it { is_expected.to be_instance_of(Proc) } # ラムダを返す
         end
-        it { is_expected.to be_instance_of(Proc) } # ラムダを返す
+
+        context '引数なしの関数定義＆実行①' do
+          let(:str) do
+            <<~LISP
+              ((lambda () (+ 1 2)))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context '引数なしの関数定義＆実行②' do
+          let(:str) do
+            <<~LISP
+              ((lambda () (+ 2 3)))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
       end
 
-      context '引数なしの関数定義＆実行①' do
-        let(:str) do
-          <<~LISP
-            ((lambda () (+ 1 2)))
-          LISP
+      context '引数あり' do
+        context '引数ありの関数定義' do
+          let(:str) do
+            <<~LISP
+              (lambda (x) (+ x 2))
+            LISP
+          end
+          it { is_expected.to be_instance_of(Proc) } # ラムダを返す
         end
-        it { is_expected.to eq 3 }
-      end
 
-      context '引数なしの関数定義＆実行②' do
-        let(:str) do
-          <<~LISP
-            ((lambda () (+ 2 3)))
-          LISP
+        context '引数ありの関数定義＆実行①' do
+          let(:str) do
+            <<~LISP
+              ((lambda (x) (+ x 2)) 4)
+            LISP
+          end
+          it { is_expected.to eq 6 }
         end
-        it { is_expected.to eq 5 }
+
+        context '引数ありの関数定義＆実行②' do
+          let(:str) do
+            <<~LISP
+              ((lambda (x) (+ 1 x)) 4)
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
       end
     end
 
