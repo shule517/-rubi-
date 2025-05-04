@@ -293,7 +293,7 @@ describe Rubi::Evaluator do
         it { is_expected.to eq [:quote, :a] }
       end
 
-      context '糖衣構文①' do
+      context '糖衣構文①：シンボル' do
         let(:str) do
           <<~LISP
             'a
@@ -302,7 +302,7 @@ describe Rubi::Evaluator do
         it { is_expected.to eq :a }
       end
 
-      context '糖衣構文②' do
+      context '糖衣構文②：配列' do
         let(:str) do
           <<~LISP
             '(1 2 a)

@@ -40,11 +40,13 @@ describe Rubi::Parser do
     context 'quoteの糖衣構文' do
       context 'シンボルの場合' do
         let(:str) { "'a" }
+        before { expect(ast).to eq [:"'a"] }
         it { is_expected.to eq [[:quote, :a]] }
       end
 
       context 'リストの場合' do
         let(:str) { "'(1 2 a)" }
+        before { expect(ast).to eq [:"'", [1, 2, :a]] }
         it { is_expected.to eq [[:quote, [1, 2, :a]]] }
       end
     end
