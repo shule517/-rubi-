@@ -54,6 +54,14 @@ module Rubi
       elsif function == :list
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }
+      elsif function == :car
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
+        result = eval(ast.first, lexical_hash, stack_count + 1)
+        result.first
+      elsif function == :cdr
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
+        result = eval(ast.first, lexical_hash, stack_count + 1)
+        result[1..]
       elsif function == :quote
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast[0] # quoteは評価しない

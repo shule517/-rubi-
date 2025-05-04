@@ -256,6 +256,24 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#car' do
+      let(:str) do
+        <<~LISP
+          (car '(1 2 3))
+        LISP
+      end
+      it { is_expected.to eq 1 }
+    end
+
+    describe '#cdr' do
+      let(:str) do
+        <<~LISP
+          (cdr '(1 2 3))
+        LISP
+      end
+      it { is_expected.to eq [2, 3] }
+    end
+
     describe '#quote' do
       context 'シンボル' do
         let(:str) do
