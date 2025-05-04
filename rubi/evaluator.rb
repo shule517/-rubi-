@@ -54,8 +54,9 @@ module Rubi
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
         var_hash[var_name] = eval(value, {}, stack_count + 1)
       elsif function == :lambda
-        puts "#{nest}#{function}(!!!!!!!!!!!!!!!!)"
-        Proc.new { 1 + 2 } # TODO: lambdaが固定
+        params, expression = ast
+        puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
+        Proc.new { eval(expression, lexical_hash, stack_count + 1) } # TODO: lambdaが引数に対応していない
       elsif function == :defun # 関数定義
         func_name = ast.shift
         params, expression = ast
