@@ -71,6 +71,10 @@ module Rubi
       elsif function == :quote
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         eval(ast[0], lexical_hash, stack_count + 1)
+      elsif function == :funcall
+        puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
+        array = ast.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        eval(array, lexical_hash, stack_count + 1)
       elsif function == :+
         puts "#{nest}#{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         ast.map { |a| eval(a, lexical_hash, stack_count + 1) }.sum

@@ -280,6 +280,17 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#funcall' do
+      context '(quote +)' do
+        let(:str) do
+          <<~LISP
+            (funcall (quote +) 1 2)
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+    end
+
     describe '#値' do
       context '整数' do
         let(:str) { "1" }
