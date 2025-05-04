@@ -125,6 +125,23 @@ describe Rubi::Evaluator do
     end
 
     describe '#lambda' do
+      context '引数なしの関数定義' do
+        let(:str) do
+          <<~LISP
+            (lambda () (+ 1 2))
+          LISP
+        end
+        it { is_expected.to be_instance_of(Proc) } # ラムダを返す
+      end
+
+      context '引数なしの関数定義＆実行' do
+        let(:str) do
+          <<~LISP
+            ((lambda () (+ 1 2)))
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
     end
 
     describe '#defun' do
@@ -188,6 +205,11 @@ describe Rubi::Evaluator do
       context '文字列' do
         let(:str) { "あいうえお" }
         it { is_expected.to eq :"あいうえお" }
+      end
+
+      context '()' do
+        let(:str) { "()" }
+        it { is_expected.to eq nil }
       end
     end
 
