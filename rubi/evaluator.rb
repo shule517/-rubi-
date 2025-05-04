@@ -40,12 +40,13 @@ module Rubi
       pp function: function
 
       if function == :let
-        a, b = ast
-        pp a: a, b: b
-        a.each do |var_name, value|
+        var_params, expression = ast
+        pp var_params: var_params, expression: expression
+        # レキシカル変数を定義する
+        var_params.each do |var_name, value|
           @var_hash[var_name] = eval(value)
         end
-        eval(b)
+        eval(expression)
       elsif function == :setq # 変数定義
         var_name, value = ast
         var_hash[var_name] = eval(value)
