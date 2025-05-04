@@ -12,6 +12,7 @@ module Rubi
     end
 
     def eval(ast)
+      puts "----"
       if ast.is_a?(Symbol)
         pp var_hash: var_hash
         if var_hash.key?(ast)
@@ -42,9 +43,12 @@ module Rubi
         var_name, value = ast
         var_hash[var_name] = eval(value)
       elsif function == :defun # 関数定義
+        puts "-- defun --"
         pp defun_ast: ast
         func_name = ast.shift
-        @func_hash[func_name] = lambda { |x| x * 2 }
+        params, expression = ast
+        pp params: params, expression: expression
+        @func_hash[func_name] = lambda { eval(expression) }
         pp func_hash: @func_hash
         func_name # 定義した関数名のシンボルを返す
       elsif function == :+
