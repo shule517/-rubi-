@@ -14,20 +14,9 @@ module Rubi
     def eval(ast, lexical_hash, stack_count)
       raise "スタック多すぎ問題" if stack_count > 100
       nest = "  " * (stack_count + 1)
-      # puts "#{nest}--- eval ---"
       puts "#{nest}eval(ast: #{ast}, lexical_hash: #{lexical_hash})"
       if atom?(ast)
-        # puts "#{nest}var_hash: #{var_hash}"
-        if lexical_hash.key?(ast)
-          puts "#{nest}-> ローカル変数を返す #{lexical_hash[ast]}"
-          return lexical_hash[ast] # レキシカルスコープの変数を参照する
-        elsif var_hash.key?(ast)
-          puts "#{nest}-> グローバル変数を返す #{var_hash[ast]}"
-          return var_hash[ast] # グローバル変数を参照する
-        else
-          puts "#{nest}-> シンボルor値を返す #{ast}"
-          return ast # シンボルor値を返す
-        end
+        return eval_atom(ast, lexical_hash, nest)
       end
 
       function = ast.shift
@@ -100,6 +89,21 @@ module Rubi
         else
           puts "#{nest}TODO: else -> #{function}(params: #{ast}, lexical_hash: #{lexical_hash})"
         end
+      end
+    end
+
+    private
+
+    def eval_atom(ast, lexical_hash, nest)
+      if lexical_hash.key?(ast)
+        puts "#{nest}-> ローカル変数を返す #{lexical_hash[ast]}"
+        return lexical_hash[ast] # レキシカルスコープの変数を参照する
+      elsif var_hash.key?(ast)
+        puts "#{nest}-> グローバル変数を返す #{var_hash[ast]}"
+        return var_hash[ast] # グローバル変数を参照する
+      else
+        puts "#{nest}-> シンボルor値を返す #{ast}"
+        return ast # シンボルor値を返す
       end
     end
   end
