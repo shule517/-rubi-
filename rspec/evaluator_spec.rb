@@ -475,17 +475,25 @@ describe Rubi::Evaluator do
     end
 
     describe '#defmacro' do
-      # TODO:
-      # context '(quote +)' do
-      #   let(:str) do
-      #     <<~LISP
-      #       (setq x 1)
-      #       (defmacro nil! (var) (list 'setq var nil))
-      #       x
-      #     LISP
-      #   end
-      #   it { is_expected.to eq nil }
-      # end
+      context 'マクロの定義のみ' do
+        let(:str) do
+          <<~LISP
+            (defmacro nil! (var) (list 'setq var nil))
+          LISP
+        end
+        it { is_expected.to eq :nil! }
+      end
+
+      context '(quote +)' do
+        let(:str) do
+          <<~LISP
+            (setq x 1)
+            (defmacro nil! (var) (list 'setq var nil))
+            x
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
     end
 
     describe '#値' do

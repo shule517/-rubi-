@@ -94,8 +94,10 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         array = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         eval(array, lexical_hash, stack_count + 1)
-      # elsif function == :defmacro
-      #   puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+      elsif function == :defmacro
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        macro_name = params.shift
+        macro_name
       elsif function == :+
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.sum
