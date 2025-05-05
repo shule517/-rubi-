@@ -168,24 +168,23 @@ describe Rubi::Evaluator do
           it { is_expected.to be_instance_of(Proc) } # ラムダを返す
         end
 
-        # TODO:
-        # context '引数ありの関数定義＆実行①' do
-        #   let(:str) do
-        #     <<~LISP
-        #       ((lambda (x) (+ x 2)) 4)
-        #     LISP
-        #   end
-        #   it { is_expected.to eq 6 }
-        # end
-        #
-        # context '引数ありの関数定義＆実行②' do
-        #   let(:str) do
-        #     <<~LISP
-        #       ((lambda (x) (+ 1 x)) 4)
-        #     LISP
-        #   end
-        #   it { is_expected.to eq 5 }
-        # end
+        context '引数ありの関数定義＆実行①' do
+          let(:str) do
+            <<~LISP
+              ((lambda (x) (+ x 2)) 4)
+            LISP
+          end
+          it { is_expected.to eq 6 }
+        end
+
+        context '引数ありの関数定義＆実行②' do
+          let(:str) do
+            <<~LISP
+              ((lambda (x) (+ 1 x)) 4)
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
       end
     end
 

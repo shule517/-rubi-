@@ -46,7 +46,12 @@ module Rubi
       elsif function == :lambda
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
-        Proc.new { |*params| eval(expression, lexical_hash, stack_count + 1) } # TODO: lambdaが引数に対応していない
+        Proc.new do |*proc_params|
+          puts "#{nest}lambdaの中 -> #{function}(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+          lexical_hash[params.first] = proc_params.first
+          puts "#{nest}lambdaの中 -> #{function}(lexical_hash: #{lexical_hash})"
+          eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
+        end
       elsif function == :defun # 関数定義
         func_name = params.shift
         params, expression = params
@@ -104,9 +109,11 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
       elsif function.instance_of?(Array) # 関数の実行
-        puts "#{nest}式を評価後に戻り値を関数として実行します(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
         expression = eval(function, lexical_hash, stack_count + 1)
-        expression.call(4) # TODO: 引数ありに対応していない
+        puts "#{nest}関数の実行:#{function}(expression: #{expression})"
+        puts "#{nest}関数の実行:#{function}(params: #{params})"
+        expression.call(*params)
       else
         if func_hash.key?(function)
           puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
