@@ -185,6 +185,15 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq 5 }
         end
+
+        context '引数複数の関数定義＆実行' do
+          let(:str) do
+            <<~LISP
+              ((lambda (x y) (* x y)) 3 4)
+            LISP
+          end
+          it { is_expected.to eq 12 }
+        end
       end
     end
 

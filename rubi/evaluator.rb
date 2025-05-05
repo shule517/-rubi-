@@ -48,7 +48,9 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
         Proc.new do |*proc_params|
           puts "#{nest}lambdaの中 -> #{function}(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
-          lexical_hash[params.first] = proc_params.first
+          params.each.with_index do |param, index|
+            lexical_hash[param] = proc_params[index]
+          end
           puts "#{nest}lambdaの中 -> #{function}(lexical_hash: #{lexical_hash})"
           eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
         end
