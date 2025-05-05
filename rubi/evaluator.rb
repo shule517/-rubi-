@@ -94,7 +94,7 @@ module Rubi
       elsif function == :null
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
-        true if result.empty?
+        true if result.empty? # falseの場合は、nilを返す
       elsif function == :quote
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params[0] # quoteは評価しない
@@ -137,13 +137,13 @@ module Rubi
         func = func_hash[function]
         puts "#{nest}func_hash[function]: #{func}"
         puts "#{nest}params: #{params}"
-        return func.call(*params)
+        func.call(*params)
       elsif macro_hash.key?(function)
         # 登録されているマクロを呼び出す
         puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
         expanded = macro_hash[function].call(*params)
         puts "#{nest}マクロで展開された式を実行する(expanded: #{expanded}, lexical_hash: #{lexical_hash})"
-        return eval(expanded, lexical_hash, stack_count + 1)
+        eval(expanded, lexical_hash, stack_count + 1)
       else
         puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         raise "対応する関数が見つかりません"
