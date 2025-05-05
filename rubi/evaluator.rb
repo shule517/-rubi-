@@ -48,28 +48,14 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
 
         # 関数定義
-        Proc.new do |*proc_params|
-          puts "#{nest}lambdaの中 -> #{function}(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
-          params.each.with_index do |param, index|
-            lexical_hash[param] = proc_params[index]
-          end
-          puts "#{nest}lambdaの中 -> #{function}(lexical_hash: #{lexical_hash})"
-          eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
-        end
+        build_lambda(params, expression, lexical_hash, stack_count, nest)
       elsif function == :defun # 関数定義
         func_name = params.shift
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
 
         # 関数定義
-        func_hash[func_name] = Proc.new do |*proc_params|
-          puts "#{nest}lambdaの中 -> #{function}(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
-          params.each.with_index do |param, index|
-            lexical_hash[param] = proc_params[index]
-          end
-          puts "#{nest}lambdaの中 -> #{function}(lexical_hash: #{lexical_hash})"
-          eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
-        end
+        func_hash[func_name] = build_lambda(params, expression, lexical_hash, stack_count, nest)
 
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
@@ -142,6 +128,18 @@ module Rubi
     end
 
     private
+
+    # 関数定義
+    def build_lambda(params, expression, lexical_hash, stack_count, nest)
+      Proc.new do |*proc_params|
+        puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+        params.each.with_index do |param, index|
+          lexical_hash[param] = proc_params[index]
+        end
+        puts "#{nest}lambdaの中(lexical_hash: #{lexical_hash})"
+        eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
+      end
+    end
 
     def eval_atom(ast, lexical_hash, nest)
       if lexical_hash.key?(ast)
