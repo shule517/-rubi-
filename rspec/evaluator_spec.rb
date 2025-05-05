@@ -4,7 +4,7 @@ describe Rubi::Evaluator do
   describe '#eval' do
     subject { ast.map { |code| puts "-----------"; puts "lisp: #{code}"; evaluator.eval(code, {}, 0) }.last }
 
-    let(:evaluator) { Rubi::Evaluator.new }
+    let(:evaluator) { Rubi::Evaluator.new(debug: true) }
     let(:ast) do
       parser = Rubi::Parser.new
       ast = parser.parse(tokens)

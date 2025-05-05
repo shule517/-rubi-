@@ -1,11 +1,12 @@
 module Rubi
   class Evaluator
-    attr_reader :var_hash, :func_hash, :macro_hash
+    attr_reader :var_hash, :func_hash, :macro_hash, :debug
 
-    def initialize
+    def initialize(debug: false)
       @var_hash = {}
       @func_hash = {}
       @macro_hash = {}
+      @debug = debug
     end
 
     def atom?(ast)
@@ -14,6 +15,10 @@ module Rubi
 
     def list?(ast)
       ast.is_a?(Array)
+    end
+
+    def puts(*args)
+      Kernel::puts(args) if debug
     end
 
     def eval(ast, lexical_hash, stack_count)
