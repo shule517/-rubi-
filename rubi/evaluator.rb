@@ -47,6 +47,8 @@ module Rubi
         var_name, value = params
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
         var_hash[var_name] = eval(value, {}, stack_count + 1)
+        puts "#{nest}-> var_hash: #{var_hash}"
+        var_hash[var_name]
       elsif function == :lambda
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
@@ -96,10 +98,31 @@ module Rubi
         array = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         eval(array, lexical_hash, stack_count + 1)
       elsif function == :defmacro
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         macro_name = params.shift
+        params, expression = params
+        puts "#{nest}#{function}(macro_name: #{macro_name}, params: #{params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
         # マクロ定義
-        macro_hash[macro_name] = Proc.new {} # TODO: いったんマクロの代わり
+        macro_hash[macro_name] = Proc.new do |*proc_params|
+          puts "#{nest}macroの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+          puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
+          params.each.with_index do |param, index|
+            # 変数を評価せずに展開する
+            # 例:
+            # (defmacro nil! (var) (list 'setq var nil))
+            # (nil! x)
+            # この時は、lexical_hash: {:var=>:x}) -> varをxに置き換えて実行する
+            lexical_hash[param] = proc_params[index]
+          end
+          puts "#{nest}-> lexical_hash: #{lexical_hash}"
+          puts "#{nest}2. macroの処理を実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
+          # result = eval(expression, lexical_hash, stack_count + 1)
+          result = expression
+          puts "#{nest}-> 展開した式: #{expression}"
+          result = eval(expression, lexical_hash, stack_count + 1)
+          puts "result: #{result}"
+          result
+        end
+        puts "#{nest}-> macro_hash: #{macro_hash}"
         macro_name
       elsif function == :+
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
@@ -128,7 +151,13 @@ module Rubi
         func = func_hash[function]
         puts "#{nest}func_hash[function]: #{func}"
         puts "#{nest}params: #{params}"
-        return func.call(*params) # 変数を参照する
+        return func.call(*params)
+      elsif macro_hash.key?(function)
+        # 登録されているマクロを呼び出す
+        puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
+        expanded = macro_hash[function].call(*params)
+        puts "expanded: #{expanded}"
+        return eval(expanded, lexical_hash, stack_count + 1)
       else
         puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         raise "対応する関数が見つかりません"
@@ -146,7 +175,7 @@ module Rubi
           lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 1)
         end
         puts "#{nest}lambdaの中(lexical_hash: #{lexical_hash})"
-        eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
+        eval(expression, lexical_hash, stack_count + 1)
       end
     end
 

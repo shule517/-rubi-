@@ -2,7 +2,7 @@ require_relative '../rubi.rb'
 
 describe Rubi::Evaluator do
   describe '#eval' do
-    subject { ast.map { |code| pp code: code; evaluator.eval(code, {}, 0) }.last }
+    subject { ast.map { |code| puts "-----------"; puts "lisp: #{code}"; evaluator.eval(code, {}, 0) }.last }
 
     let(:evaluator) { Rubi::Evaluator.new }
     let(:ast) do
@@ -484,11 +484,34 @@ describe Rubi::Evaluator do
         it { is_expected.to eq :nil! }
       end
 
+      context 'マクロの定義＆実行①' do
+        let(:str) do
+          <<~LISP
+            (setq x 1)
+            (defmacro nil! (var) (list 'setq var nil))
+            (nil! x)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'マクロの定義＆実行②' do
+        let(:str) do
+          <<~LISP
+            (setq x 0)
+            (defmacro 1! (var) (list 'setq var 1))
+            (1! x)
+          LISP
+        end
+        it { is_expected.to eq 1 }
+      end
+
       context '(quote +)' do
         let(:str) do
           <<~LISP
             (setq x 1)
             (defmacro nil! (var) (list 'setq var nil))
+            (nil! x)
             x
           LISP
         end
