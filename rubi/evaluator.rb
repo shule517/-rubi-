@@ -114,13 +114,10 @@ module Rubi
             lexical_hash[param] = proc_params[index]
           end
           puts "#{nest}-> lexical_hash: #{lexical_hash}"
-          puts "#{nest}2. macroの処理を実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
-          # result = eval(expression, lexical_hash, stack_count + 1)
-          result = expression
-          puts "#{nest}-> 展開した式: #{expression}"
-          result = eval(expression, lexical_hash, stack_count + 1)
-          puts "result: #{result}"
-          result
+          puts "#{nest}2. macroを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
+          expanded = eval(expression, lexical_hash, stack_count + 1)
+          puts "#{nest}-> 展開した式: #{expanded}"
+          expanded
         end
         puts "#{nest}-> macro_hash: #{macro_hash}"
         macro_name
@@ -156,7 +153,7 @@ module Rubi
         # 登録されているマクロを呼び出す
         puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
         expanded = macro_hash[function].call(*params)
-        puts "expanded: #{expanded}"
+        puts "#{nest}マクロで展開された式を実行する(expanded: #{expanded}, lexical_hash: #{lexical_hash})"
         return eval(expanded, lexical_hash, stack_count + 1)
       else
         puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
