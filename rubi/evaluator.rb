@@ -50,17 +50,14 @@ module Rubi
       elsif function == :lambda
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
-
         # 関数定義
         build_lambda(params, expression, lexical_hash, stack_count, nest)
       elsif function == :defun # 関数定義
         func_name = params.shift
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
-
         # 関数定義
         func_hash[func_name] = build_lambda(params, expression, lexical_hash, stack_count, nest)
-
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
       elsif function == :list
@@ -101,6 +98,8 @@ module Rubi
       elsif function == :defmacro
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         macro_name = params.shift
+        # マクロ定義
+        macro_hash[macro_name] = Proc.new {} # TODO: いったんマクロの代わり
         macro_name
       elsif function == :+
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
