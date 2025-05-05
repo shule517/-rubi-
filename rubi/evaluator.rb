@@ -21,6 +21,8 @@ module Rubi
       puts "#{nest}eval(ast: #{ast}, lexical_hash: #{lexical_hash})"
       if atom?(ast)
         return eval_atom(ast, lexical_hash, nest)
+      elsif ast == []
+        return nil # ()はnilになる
       end
 
       # リストのため、関数呼び出しをする
@@ -111,22 +113,25 @@ module Rubi
       elsif function == :/
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
-      elsif function.instance_of?(Array) # 関数の実行
+      elsif function.instance_of?(Array)
+        # 関数を返す式 を評価して、実行する
+        # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
+        # まずは第１引数を評価してから、実行する
         puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
         expression = eval(function, lexical_hash, stack_count + 1)
         puts "#{nest}関数の実行:#{function}(expression: #{expression})"
         puts "#{nest}関数の実行:#{function}(params: #{params})"
         expression.call(*params)
+      elsif func_hash.key?(function)
+        # 登録されている関数を呼び出す
+        puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
+        func = func_hash[function]
+        puts "#{nest}func_hash[function]: #{func}"
+        puts "#{nest}params: #{params}"
+        return func.call(*params) # 変数を参照する
       else
-        if func_hash.key?(function)
-          puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
-          func = func_hash[function]
-          puts "#{nest}func_hash[function]: #{func}"
-          puts "#{nest}params: #{params}"
-          return func.call(*params) # 変数を参照する
-        else
-          puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        end
+        puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        raise "対応する関数が見つかりません"
       end
     end
 
