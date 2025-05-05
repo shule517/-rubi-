@@ -41,7 +41,7 @@ module Rubi
           end
         else
           # リストの場合
-          # [[:funcall, :"'+", 1, 2]]
+          # [[:funcall, :"'", :+, 1, 2]]
           # ↓
           # [[:funcall, [:quote, :+], 1, 2]]
           array << expand_syntactic_sugar(token)
