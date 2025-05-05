@@ -242,6 +242,27 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq 9 }
       end
+
+      context '関数は参照しない' do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            double
+          LISP
+        end
+        it { expect { subject }.to raise_error }
+      end
+
+      context '関数と変数を区別する' do
+        let(:str) do
+          <<~LISP
+            (setq double 3)
+            (defun double (x) (* x 2))
+            (double double)
+          LISP
+        end
+        it { is_expected.to eq 6 }
+      end
     end
 
     describe '#list' do
@@ -479,8 +500,15 @@ describe Rubi::Evaluator do
       end
 
       context '文字列' do
-        let(:str) { "あいうえお" }
-        it { is_expected.to eq :"あいうえお" }
+        context 'quoteの場合' do
+          let(:str) { "`あいうえお" }
+          it { is_expected.to eq :"あいうえお" }
+        end
+
+        context '文字列そのままの場合' do
+          let(:str) { "あいうえお" }
+          it { expect { subject }.to raise_error }
+        end
       end
 
       context '()' do

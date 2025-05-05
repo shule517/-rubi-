@@ -154,8 +154,10 @@ module Rubi
         true
       elsif ast == :nil
         nil
+      elsif ast.is_a?(Symbol)
+        raise "#{ast}の値を評価できません"
       else
-        puts "#{nest}-> シンボルor値を返す #{ast}"
+        puts "#{nest}-> 値を返す #{ast}"
         ast # シンボルor値を返す
       end
     end
