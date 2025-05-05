@@ -151,11 +151,13 @@ module Rubi
     def build_lambda(params, expression, lexical_hash, stack_count, nest)
       Proc.new do |*proc_params|
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
         params.each.with_index do |param, index|
           # 変数を展開するために、評価する
           lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 1)
         end
-        puts "#{nest}lambdaの中(lexical_hash: #{lexical_hash})"
+        puts "#{nest}-> lexical_hash: #{lexical_hash}"
+        puts "#{nest}2. lambdaを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
         eval(expression, lexical_hash, stack_count + 1)
       end
     end
