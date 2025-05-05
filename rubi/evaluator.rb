@@ -1,10 +1,11 @@
 module Rubi
   class Evaluator
-    attr_reader :var_hash, :func_hash
+    attr_reader :var_hash, :func_hash, :macro_hash
 
     def initialize
       @var_hash = {}
       @func_hash = {}
+      @macro_hash = {}
     end
 
     def atom?(ast)
