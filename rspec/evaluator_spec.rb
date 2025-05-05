@@ -223,25 +223,25 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
-      # context '関数を定義して実行する' do
-      #   let(:str) do
-      #     <<~LISP
-      #       (defun double (x) (* x 2))
-      #       (double 1)
-      #     LISP
-      #   end
-      #   it { is_expected.to eq 2 }
-      # end
+      context '関数を定義して実行する' do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            (double 1)
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
 
-    #   context '関数を定義して実行する' do
-    #     let(:str) do
-    #       <<~LISP
-    #         (defun square (x) (* x x))
-    #         (square 3)
-    #       LISP
-    #     end
-    #     it { is_expected.to eq 9 }
-    #   end
+      context '関数を定義して実行する' do
+        let(:str) do
+          <<~LISP
+            (defun square (x) (* x x))
+            (square 3)
+          LISP
+        end
+        it { is_expected.to eq 9 }
+      end
     end
 
     describe '#list' do

@@ -46,6 +46,8 @@ module Rubi
       elsif function == :lambda
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
+
+        # 関数定義
         Proc.new do |*proc_params|
           puts "#{nest}lambdaの中 -> #{function}(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
           params.each.with_index do |param, index|
@@ -58,7 +60,17 @@ module Rubi
         func_name = params.shift
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
-        @func_hash[func_name] = Proc.new { |*params| eval(expression, lexical_hash, stack_count + 1) } # TODO: 引数が実装できてない
+
+        # 関数定義
+        func_hash[func_name] = Proc.new do |*proc_params|
+          puts "#{nest}lambdaの中 -> #{function}(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+          params.each.with_index do |param, index|
+            lexical_hash[param] = proc_params[index]
+          end
+          puts "#{nest}lambdaの中 -> #{function}(lexical_hash: #{lexical_hash})"
+          eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
+        end
+
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
       elsif function == :list
