@@ -23,6 +23,7 @@ module Rubi
         return eval_atom(ast, lexical_hash, nest)
       end
 
+      # リストのため、関数呼び出しをする
       function = ast.shift
       params = ast
 
