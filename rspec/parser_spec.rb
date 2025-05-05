@@ -41,13 +41,13 @@ describe Rubi::Parser do
       context "'の場合" do
         context 'シンボルの場合' do
           let(:str) { "'a" }
-          before { expect(ast).to eq [:"'a"] }
+          before { expect(ast).to eq [:"'", :a] }
           it { is_expected.to eq [[:quote, :a]] }
         end
 
         context '記号の場合' do
           let(:str) { "(funcall '+ 1 2)" }
-          before { expect(ast).to eq [[:funcall, :"'+", 1, 2]] }
+          before { expect(ast).to eq [[:funcall, :"'", :+, 1, 2]] }
           it { is_expected.to eq [[:funcall, [:quote, :+], 1, 2]] }
         end
 
@@ -61,13 +61,13 @@ describe Rubi::Parser do
       context "`の場合" do
         context 'シンボルの場合' do
           let(:str) { "`a" }
-          before { expect(ast).to eq [:"`a"] }
+          before { expect(ast).to eq [:`, :a] }
           it { is_expected.to eq [[:quote, :a]] }
         end
 
         context '記号の場合' do
           let(:str) { "(funcall `+ 1 2)" }
-          before { expect(ast).to eq [[:funcall, :"`+", 1, 2]] }
+          before { expect(ast).to eq [[:funcall, :`, :+, 1, 2]] }
           it { is_expected.to eq [[:funcall, [:quote, :+], 1, 2]] }
         end
 

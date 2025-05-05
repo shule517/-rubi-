@@ -29,20 +29,18 @@ module Rubi
         token = ast.shift
         if atom?(token)
           if token == :"'" || token == :"`"
+            # クォート、バッククォート を展開する
             # [:"'", [1, 2, :a]]
             # ↓
             # [:quote, [1, 2, :a]]
             token = ast.shift
             array << [:quote, token]
-          elsif token.to_s.start_with?("'") || token.to_s.start_with?("`")
-            # [:"'a"]
-            # ↓
-            # [[:quote, :a]]
-            array << [:quote, token[1..].to_sym]
           else
+            # 変更なし。そのまま追加する。
             array << token
           end
         else
+          # リストの場合
           # [[:funcall, :"'+", 1, 2]]
           # ↓
           # [[:funcall, [:quote, :+], 1, 2]]

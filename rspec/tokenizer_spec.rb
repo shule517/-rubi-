@@ -30,7 +30,7 @@ describe Rubi::Tokenizer do
           'a
         LISP
       end
-      it { is_expected.to eq [:"'a"] }
+      it { is_expected.to eq [:"'", :a] }
     end
 
     context 'quote list' do
