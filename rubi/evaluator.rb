@@ -102,23 +102,7 @@ module Rubi
         params, expression = params
         puts "#{nest}#{function}(macro_name: #{macro_name}, params: #{params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
         # マクロ定義
-        macro_hash[macro_name] = Proc.new do |*proc_params|
-          puts "#{nest}macroの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
-          puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
-          params.each.with_index do |param, index|
-            # 変数を評価せずに展開する
-            # 例:
-            # (defmacro nil! (var) (list 'setq var nil))
-            # (nil! x)
-            # この時は、lexical_hash: {:var=>:x}) -> varをxに置き換えて実行する
-            lexical_hash[param] = proc_params[index]
-          end
-          puts "#{nest}-> lexical_hash: #{lexical_hash}"
-          puts "#{nest}2. macroを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
-          expanded = eval(expression, lexical_hash, stack_count + 1)
-          puts "#{nest}-> 展開した式: #{expanded}"
-          expanded
-        end
+        macro_hash[macro_name] = build_macro(params, expression, lexical_hash, stack_count, nest)
         puts "#{nest}-> macro_hash: #{macro_hash}"
         macro_name
       elsif function == :+
@@ -173,6 +157,27 @@ module Rubi
         end
         puts "#{nest}lambdaの中(lexical_hash: #{lexical_hash})"
         eval(expression, lexical_hash, stack_count + 1)
+      end
+    end
+
+    # マクロ定義
+    def build_macro(params, expression, lexical_hash, stack_count, nest)
+      Proc.new do |*proc_params|
+        puts "#{nest}macroの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
+        params.each.with_index do |param, index|
+          # 変数を評価せずに展開する
+          # 例:
+          # (defmacro nil! (var) (list 'setq var nil))
+          # (nil! x)
+          # この時は、lexical_hash: {:var=>:x}) -> varをxに置き換えて実行する
+          lexical_hash[param] = proc_params[index]
+        end
+        puts "#{nest}-> lexical_hash: #{lexical_hash}"
+        puts "#{nest}2. macroを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
+        expanded = eval(expression, lexical_hash, stack_count + 1)
+        puts "#{nest}-> 展開した式: #{expanded}"
+        expanded
       end
     end
 
