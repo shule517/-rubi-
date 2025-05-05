@@ -134,7 +134,8 @@ module Rubi
       Proc.new do |*proc_params|
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
         params.each.with_index do |param, index|
-          lexical_hash[param] = proc_params[index]
+          # 変数を展開するために、評価する
+          lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 1)
         end
         puts "#{nest}lambdaの中(lexical_hash: #{lexical_hash})"
         eval(expression, lexical_hash, stack_count + 1) # TODO: lambdaが引数に対応していない
