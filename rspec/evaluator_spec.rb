@@ -2305,9 +2305,10 @@ describe Rubi::Evaluator do
             <<~LISP
               (setf (symbol-function 'double)
                 #'(lambda (x) (* x 2)))
+              (double 2)
             LISP
           end
-          it { is_expected.to be_instance_of Proc }
+          it { is_expected.to eq 4 }
         end
       end
 
