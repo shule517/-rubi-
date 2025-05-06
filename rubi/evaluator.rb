@@ -155,6 +155,16 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params
         true if a >= b # 不一致の場合は、nilを返す
+      elsif function == :not
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        a = params.shift
+        condition = eval(a, lexical_hash, stack_count + 1)
+        true if condition.nil? # nil以外の場合は、nilを返す
+      elsif function == :and
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        true if params.all? { |param| eval(param, lexical_hash, stack_count + 1) }
+      elsif function == :or
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
       elsif function == :if
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b, c = params

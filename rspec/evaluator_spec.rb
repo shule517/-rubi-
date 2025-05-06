@@ -1132,5 +1132,128 @@ describe Rubi::Evaluator do
         end
       end
     end
+
+    describe '#not' do
+      context '固定値の場合' do
+        context 'nilの場合' do
+          let(:str) do
+            <<~LISP
+              (not nil)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'trueの場合' do
+          let(:str) do
+            <<~LISP
+              (not t)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '数値の場合' do
+          let(:str) do
+            <<~LISP
+              (not 1)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context '式の場合' do
+        context 'nilの場合' do
+          let(:str) do
+            <<~LISP
+              (not (= 1 2))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'trueの場合' do
+          let(:str) do
+            <<~LISP
+              (not (= 1 1))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '数値の場合' do
+          let(:str) do
+            <<~LISP
+              (not (+ 1 2))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+    end
+
+    describe '#and' do
+      context '固定値の場合' do
+        context 'すべてtrueの場合' do
+          let(:str) do
+            <<~LISP
+              (and t t t)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'trueとfalseが混ざっている場合' do
+          let(:str) do
+            <<~LISP
+              (and t nil t)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context 'すべてがfalseの場合' do
+          let(:str) do
+            <<~LISP
+              (and nil nil nil)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context '式の場合' do
+        context 'すべてtrueの場合' do
+          let(:str) do
+            <<~LISP
+              (and (= 1 1) (= 2 2) (= 3 3))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'trueとfalseが混ざっている場合' do
+          let(:str) do
+            <<~LISP
+              (and (= 1 1) (= 2 3) (= 3 3))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context 'すべてがfalseの場合' do
+          let(:str) do
+            <<~LISP
+              (and (= 1 2) (= 2 3) (= 3 4))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+    end
+
+    describe '#or' do
+    end
   end
 end
