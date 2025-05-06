@@ -23,11 +23,20 @@ describe Rubi::Parser do
     context '複数行' do
       let(:str) do
         <<~LISP
-            (define x 3)
-            (+ x 4)
+          (define x 3)
+          (+ x 4)
         LISP
       end
       it { is_expected.to eq [[:define, :x, 3], [:+, :x, 4]] }
+    end
+
+    context '文字列の場合' do
+      let(:str) do
+        <<~LISP
+          "あ"
+        LISP
+      end
+      it { is_expected.to eq [:"\"あ\""] }
     end
   end
 

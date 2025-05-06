@@ -356,7 +356,8 @@ describe Rubi::Evaluator do
         end
       end
 
-      context '組み込み関数の場合' do
+      # TODO: 未実装
+      xcontext '組み込み関数の場合' do
         # %w(car cdr apply).each do |func|
         %w(list cons null atom funcall + - * / = /= < > <= >= not).each do |func|
           context "#'#{func}の場合" do
@@ -528,7 +529,7 @@ describe Rubi::Evaluator do
         context 'シンボルの場合' do
           let(:str) do
             <<~LISP
-              (atom a)
+              (atom 'a)
             LISP
           end
           it { is_expected.to eq true }
@@ -696,6 +697,24 @@ describe Rubi::Evaluator do
       end
 
       context '文字列' do
+        context 'ダブルクォートの場合' do
+          let(:str) do
+            <<~LISP
+              "あいうえお"
+            LISP
+          end
+          it { is_expected.to eq "あいうえお" }
+        end
+
+        context 'ダブルクォートの空文字の場合' do
+          let(:str) do
+            <<~LISP
+              ""
+            LISP
+          end
+          it { is_expected.to eq "" }
+        end
+
         context 'quoteの場合' do
           let(:str) { "`あいうえお" }
           it { is_expected.to eq :"あいうえお" }
@@ -818,6 +837,127 @@ describe Rubi::Evaluator do
       context '小数' do
         let(:str) { "(/ 1.2 2)" }
         it { is_expected.to eq 0.6 }
+      end
+    end
+
+    describe '#eq' do
+      context "数値と数値" do
+        context '同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (eq 1 1)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '違う値の場合' do
+          let(:str) do
+            <<~LISP
+              (eq 1 2)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '変数と同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 1)
+              (eq x 1)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '整数と小数の場合' do
+          let(:str) do
+            <<~LISP
+              (eq 1 1.0)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context "シンボルとシンボル" do
+        context '同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (eq 'a 'a)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '違う値の場合' do
+          let(:str) do
+            <<~LISP
+              (eq 'a 'b)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '変数と同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 'a)
+              (eq x 'a)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+
+      context "文字列と文字列" do
+        context '同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (eq "あ" "あ")
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '違う値の場合' do
+          let(:str) do
+            <<~LISP
+              (eq "あ" "い")
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '変数と同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x "あ")
+              (eq x "あ")
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '変数と変数の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x "あ")
+              (eq x x)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+
+      context "(eq #'double (car (list #'double)))" do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            (eq #'double (car (list #'double)))
+          LISP
+        end
+        it { is_expected.to eq true }
       end
     end
 

@@ -149,6 +149,11 @@ module Rubi
       elsif function == :/
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
+      elsif function == :eq
+        # オブジェクトが一致しているか
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        true if a.eql?(b) # 一致しない場合は、nilを返す
       elsif function == :"="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params
@@ -296,6 +301,11 @@ module Rubi
       elsif ast == :nil
         nil
       elsif ast.is_a?(Symbol)
+        str = ast.to_s
+        if str.start_with?('"') && str.end_with?('"')
+          # 文字列の場合 例: "あ"
+          return str[1...-1]
+        end
         raise "#{ast}の値を評価できません"
       else
         puts "#{nest}-> 値を返す #{ast}"
