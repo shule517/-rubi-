@@ -201,6 +201,88 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#setf' do
+      context '変数代入' do
+        context 'setqの場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 10)
+              x
+            LISP
+          end
+          it { is_expected.to eq 10}
+        end
+
+        context 'setfの場合' do
+          let(:str) do
+            <<~LISP
+              (setf x 10)
+              x
+            LISP
+          end
+          it { is_expected.to eq 10}
+        end
+      end
+
+      context 'listのcarに代入' do
+        context 'setqの場合' do
+          let(:str) do
+            <<~LISP
+              (setq my-cons (cons 1 2))
+              (setq (car my-cons) 42)
+            LISP
+          end
+          it { expect { subject }.to raise_error }
+        end
+
+        context 'setfの場合' do
+          let(:str) do
+            <<~LISP
+              (setq my-cons (cons 1 2))
+              (setf (car my-cons) 42)
+              my-cons
+            LISP
+          end
+          it do
+            cons = subject
+            expect(cons).to be_instance_of Rubi::Cons
+            expect(cons.car).to eq 42
+            expect(cons.cdr).to eq 2
+          end
+        end
+      end
+
+      # TODO: 未実装
+      xcontext 'listの要素に代入' do
+        context 'setqの場合' do
+          let(:str) do
+            <<~LISP
+              (setq arr (make-array 3))
+              (setq (aref arr 0) 99)
+            LISP
+          end
+          it { expect { subject }.to raise_error }
+        end
+
+        context 'setfの場合' do
+          let(:str) do
+            <<~LISP
+              (setq arr (make-array 3))
+              (setf (aref arr 0) 99)
+              arr
+            LISP
+          end
+          # it {}
+        end
+      end
+
+      # TODO: 未実装
+      xcontext '' do
+        # (setf (gethash 'foo table) 123)  ; ハッシュテーブルのキーに代入
+        # (setf (nth 1 my-list) 'apple)    ; リストの2番目の要素に代入
+      end
+    end
+
     describe '#lambda' do
       context '引数なし' do
         context '引数なしの関数定義' do
