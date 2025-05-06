@@ -1,12 +1,26 @@
 module Rubi
   class Evaluator
-    attr_reader :var_hash, :func_hash, :macro_hash, :debug
+    attr_reader :var_hash, :func_hash, :macro_hash, :built_system_func, :debug
 
     def initialize(debug: false)
       @var_hash = {}
       @func_hash = {}
       @macro_hash = {}
+      @built_system_func = false
       @debug = debug
+    end
+
+    def build_system_func(lexical_hash, stack_count, nest)
+      func_hash[:+] = Proc.new do |*params|
+        if params.empty?
+          0
+        else
+          params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(:+)
+        end
+      end
+
+      # システム関数を登録済み
+      @built_system_func = true
     end
 
     def atom?(ast)
@@ -24,6 +38,7 @@ module Rubi
     def eval(ast, lexical_hash, stack_count)
       raise "スタック多すぎ問題" if stack_count > 100
       nest = "  " * (stack_count + 1)
+      build_system_func(lexical_hash, stack_count + 1, nest) unless built_system_func
       puts "#{nest}eval(ast: #{ast}, lexical_hash: #{lexical_hash})"
       if atom?(ast)
         return eval_atom(ast, lexical_hash, nest)
@@ -189,8 +204,12 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params
         puts "#{nest}(a: #{a}, b: #{b})"
+        puts "#{nest}1. funcを評価する(a: #{a})"
         func = eval(a, lexical_hash, stack_count + 1)
+        puts "#{nest}-> (func: #{func})"
+        puts "#{nest}2. proc_paramsを評価する(b: #{b})"
         proc_params = eval(b, lexical_hash, stack_count + 1)
+        puts "#{nest}-> (proc_params: #{proc_params})"
         puts "#{nest}-> (func: #{func}, proc_params: #{proc_params})"
         func.call(*proc_params)
       elsif function.instance_of?(Array)

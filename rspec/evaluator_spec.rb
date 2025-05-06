@@ -1400,11 +1400,20 @@ describe Rubi::Evaluator do
     end
 
     describe '#apply' do
-      context '' do
+      context '定義した関数の場合' do
         let(:str) do
           <<~LISP
             (defun add (x y z) (+ x y z))
             (apply #'add '(1 2 3))
+          LISP
+        end
+        it { is_expected.to eq 6 }
+      end
+
+      context '組み込み関数の場合' do
+        let(:str) do
+          <<~LISP
+            (apply #'+ '(1 2 3))
           LISP
         end
         it { is_expected.to eq 6 }
