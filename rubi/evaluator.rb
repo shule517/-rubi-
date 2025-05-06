@@ -20,26 +20,18 @@ module Rubi
       end
 
       func_hash[:append] = Proc.new do |*params|
-        eval_params = params.map { |param| eval(param, lexical_hash, stack_count + 1) }
-        pp eval_params: eval_params
+        eval_params = params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)
 
-        a = eval_params[0..-2]
-        b = eval_params[-1]
+        head_lists = eval_params[0...-1]
+        last = eval_params[-1]
 
-        pp a: a, b: b
-
-        if a.all? { |eval_param| list?(eval_param) }
-          if list?(b)
-            eval_params.reduce(:+)
-          else
-            Rubi::Cons.new(car: a.reduce(:+), cdr: b)
-          end
+        if eval_params.all? { |eval_param| list?(eval_param) }
+          eval_params.reduce(:+)
+        elsif atom?(last)
+          Rubi::Cons.new(car: head_lists.reduce(:+), cdr: last)
         else
-          raise "TODO:"
+          raise "atomが先頭の場合は実行できません。(eval_params: #{eval_params})"
         end
-
-        # .reduce(:+)
-        # TODO: 仮実装
       end
 
       # システム関数を登録済み

@@ -544,15 +544,6 @@ describe Rubi::Evaluator do
         it { is_expected.to eq [1, 2, 3, 4, 5, 6] }
       end
 
-      context 'atom + list' do
-        let(:str) do
-          <<~LISP
-            (append 1 '(2 3))
-          LISP
-        end
-        it { expect { subject }.to raise_error }
-      end
-
       context 'list + atom' do
         let(:str) do
           <<~LISP
@@ -585,6 +576,42 @@ describe Rubi::Evaluator do
         let(:str) do
           <<~LISP
             append '(1 2) 3 4)
+          LISP
+        end
+        it { expect { subject }.to raise_error }
+      end
+
+      context 'list + nil' do
+        let(:str) do
+          <<~LISP
+            (append '(1 2) nil)
+          LISP
+        end
+        it { is_expected.to eq [1, 2] }
+      end
+
+      context 'nil + list' do
+        let(:str) do
+          <<~LISP
+            (append nil '(1 2))
+          LISP
+        end
+        it { is_expected.to eq [1, 2] }
+      end
+
+      context 'nil + nil' do
+        let(:str) do
+          <<~LISP
+            (append nil nil)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'atom + list' do
+        let(:str) do
+          <<~LISP
+            (append 1 '(2 3))
           LISP
         end
         it { expect { subject }.to raise_error }
