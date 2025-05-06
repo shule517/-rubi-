@@ -70,15 +70,27 @@ module Rubi
       elsif function == :setq # 変数定義
         var_name, value = params
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
-        var_hash[var_name] = eval(value, {}, stack_count + 1)
-        puts "#{nest}-> var_hash: #{var_hash}"
-        var_hash[var_name]
+        if lexical_hash.key?(var_name)
+          # ローカル変数がある場合は、ローカル変数を変更する
+          lexical_hash[var_name] = value
+        else
+          # ローカル変数がない場合は、グローバル変数を定義する
+          var_hash[var_name] = eval(value, lexical_hash, stack_count + 1)
+          puts "#{nest}-> var_hash: #{var_hash}"
+          var_hash[var_name]
+        end
       elsif function == :setf # TODO: 未実装。setqをコピーしただけ
         var_name, value = params
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
-        var_hash[var_name] = eval(value, {}, stack_count + 1)
-        puts "#{nest}-> var_hash: #{var_hash}"
-        var_hash[var_name]
+        if lexical_hash.key?(var_name)
+          # ローカル変数がある場合は、ローカル変数を変更する
+          lexical_hash[var_name] = value
+        else
+          # ローカル変数がない場合は、グローバル変数を定義する
+          var_hash[var_name] = eval(value, lexical_hash, stack_count + 1)
+          puts "#{nest}-> var_hash: #{var_hash}"
+          var_hash[var_name]
+        end
       elsif function == :lambda
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"

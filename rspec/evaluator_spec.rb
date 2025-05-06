@@ -128,12 +128,24 @@ describe Rubi::Evaluator do
       end
 
       context 'スコープの確認' do
-        context 'ローカル変数に代入 ＆ xで評価' do
+        context 'ローカル変数に固定値を代入 ＆ xで評価' do
           let(:str) do
             <<~LISP
               (setq x 0)
               (let ((x 1))
                 (setq x 99))
+              x
+            LISP
+          end
+          it { is_expected.to eq 0 }
+        end
+
+        context 'ローカル変数に式を代入 ＆ xで評価' do
+          let(:str) do
+            <<~LISP
+              (setq x 0)
+              (let ((x 1))
+                (setq x (+ 2 3)))
               x
             LISP
           end
