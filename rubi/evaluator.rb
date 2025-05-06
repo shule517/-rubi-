@@ -325,16 +325,18 @@ module Rubi
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last
       elsif function == :apply
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params
-        puts "#{nest}(a: #{a}, b: #{b})"
+        a = params.shift
+        puts "#{nest}(a: #{a}, params: #{params})"
         puts "#{nest}1. funcを評価する(a: #{a})"
         func = eval(a, lexical_hash, stack_count + 1)
         puts "#{nest}-> (func: #{func})"
-        puts "#{nest}2. proc_paramsを評価する(b: #{b})"
-        proc_params = eval(b, lexical_hash, stack_count + 1)
-        puts "#{nest}-> (proc_params: #{proc_params})"
-        puts "#{nest}-> (func: #{func}, proc_params: #{proc_params})"
-        func.call(*proc_params)
+        puts "#{nest}2. proc_paramsを評価して、リストにまとめる(params: #{params})"
+        # (apply #'+ 1 '(2))
+        # ↓と等価。 applyの仕様として、第3引数以降のatomをリスト化して、最後の引数のリストと結合する。
+        # (apply #'+ (append '(1) '(2)))
+        eval_params = params.map { |param| Array(eval(param, lexical_hash, stack_count + 1)) }.reduce(&:+)
+        puts "#{nest}-> (eval_params: #{eval_params})"
+        func.call(*eval_params)
       elsif function.instance_of?(Array)
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
