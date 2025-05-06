@@ -152,6 +152,10 @@ module Rubi
       elsif function == :eq
         # オブジェクトが一致しているか。ポインタが一致しているか。
         # Lispのeq は Rubyのequal? とほぼ一致する
+        # (eq 1 1) # => true
+        # (setq x 1)(eq x 1) # => true
+        # (eq "あ" "あ") # => nil
+        # (setq x "あ")(eq x x) # => true
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.equal?(b) # 一致しない場合は、nilを返す
