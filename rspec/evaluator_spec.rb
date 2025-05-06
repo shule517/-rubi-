@@ -469,6 +469,40 @@ describe Rubi::Evaluator do
     end
 
     describe '#symbol-value' do
+      context "グローバル変数が取得できること" do
+        let(:str) do
+          <<~LISP
+              (setq double 2)
+              (symbol-value 'double)
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context 'スコープの確認' do
+        context 'グローバル変数が取得できること → ローカル変数に代入 ＆ symbol-valueで評価' do
+          let(:str) do
+            <<~LISP
+                (setq x 0)
+                (let ((x 1))
+                  (setq x 99))
+                (symbol-value 'x)
+            LISP
+          end
+          it { is_expected.to eq 0 }
+        end
+
+        context 'グローバル変数が取得できること → ローカル変数に存在しない変数をsetqする ＆ symbol-valueで参照する' do
+          let(:str) do
+            <<~LISP
+                (setq x 0)
+                (let ((x 1)) (setq y 99))
+                (symbol-value `y)
+            LISP
+          end
+          it { is_expected.to eq 99 } # グローバル変数yが作成される
+        end
+      end
     end
 
     describe '#list' do
