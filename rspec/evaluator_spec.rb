@@ -448,6 +448,55 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#atom' do
+      context 'listの場合' do
+        let(:str) do
+          <<~LISP
+            (atom (list 1 2))
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'atomの場合' do
+        context '数値の場合' do
+          let(:str) do
+            <<~LISP
+              (atom 1)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'シンボルの場合' do
+          let(:str) do
+            <<~LISP
+              (atom a)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '文字列の場合' do
+          let(:str) do
+            <<~LISP
+              (atom "あいうえお")
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'nilの場合' do
+          let(:str) do
+            <<~LISP
+              (atom nil)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+    end
+
     describe '#quote' do
       context 'シンボル' do
         let(:str) do

@@ -99,6 +99,10 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
         true if result.empty? # falseの場合は、nilを返す
+      elsif function == :atom
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        atom = params.shift
+        true if atom?(atom) # listの場合は、nilを返す
       elsif function == :quote
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params[0] # quoteは評価しない
