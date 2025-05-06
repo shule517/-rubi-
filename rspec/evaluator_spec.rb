@@ -994,5 +994,65 @@ describe Rubi::Evaluator do
         it { is_expected.to eq nil }
       end
     end
+
+    describe '#if' do
+      context '固定値' do
+        context 'trueの場合' do
+          let(:str) do
+            <<~LISP
+              (if t 1 2)
+            LISP
+          end
+          it { is_expected.to eq 1 }
+        end
+
+        context 'falseの場合' do
+          let(:str) do
+            <<~LISP
+              (if nil 1 2)
+            LISP
+          end
+          it { is_expected.to eq 2 }
+        end
+
+        context '数値の場合' do
+          let(:str) do
+            <<~LISP
+              (if 1 1 2)
+            LISP
+          end
+          it { is_expected.to eq 1 }
+        end
+      end
+
+      context '式' do
+        context 'trueの場合' do
+          let(:str) do
+            <<~LISP
+              (if (= 1 1) (+ 2 3) (* 2 3))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
+
+        context 'falseの場合' do
+          let(:str) do
+            <<~LISP
+              (if (= 1 2) (+ 2 3) (* 2 3))
+            LISP
+          end
+          it { is_expected.to eq 6 }
+        end
+
+        context '数値の場合' do
+          let(:str) do
+            <<~LISP
+              (if (+ 1 2) (+ 2 3) (* 2 3))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
+      end
+    end
   end
 end

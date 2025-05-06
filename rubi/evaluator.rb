@@ -155,6 +155,16 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params
         true if a >= b # 不一致の場合は、nilを返す
+      elsif function == :if
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        a, b, c = params
+        condition = eval(a, lexical_hash, stack_count + 1)
+        puts "#{nest}#(condition: #{condition}, b: #{b}, c: #{c})"
+        if condition
+          eval(b, lexical_hash, stack_count + 1)
+        else
+          eval(c, lexical_hash, stack_count + 1)
+        end
       elsif function.instance_of?(Array)
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
