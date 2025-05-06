@@ -151,6 +151,13 @@ module Rubi
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
       elsif function == :eq
         # オブジェクトが一致しているか
+        # Lispのeq は Rubyのequal? とほぼ一致する
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        true if a.equal?(b) # 一致しない場合は、nilを返す
+      elsif function == :equal
+        # 値が一致しているか
+        # Lispのequal は Rubyのeql? とほぼ一致する
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.eql?(b) # 一致しない場合は、nilを返す

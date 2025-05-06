@@ -961,6 +961,117 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#equal' do
+      context "数値と数値" do
+        context '同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (equal 1 1)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '違う値の場合' do
+          let(:str) do
+            <<~LISP
+              (equal 1 2)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '変数と同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 1)
+              (equal x 1)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '整数と小数の場合' do
+          let(:str) do
+            <<~LISP
+              (equal 1 1.0)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context "シンボルとシンボル" do
+        context '同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (equal 'a 'a)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '違う値の場合' do
+          let(:str) do
+            <<~LISP
+              (equal 'a 'b)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '変数と同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 'a)
+              (equal x 'a)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+
+      context "文字列と文字列" do
+        context '同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (equal "あ" "あ")
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '違う値の場合' do
+          let(:str) do
+            <<~LISP
+              (equal "あ" "い")
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '変数と同じ値の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x "あ")
+              (equal x "あ")
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '変数と変数の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x "あ")
+              (equal x x)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+    end
+
     describe '#=' do
       context '整数同士' do
         context '一致する場合' do
