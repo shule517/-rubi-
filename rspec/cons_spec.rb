@@ -2,7 +2,7 @@ require_relative '../rubi.rb'
 
 describe Rubi::Cons do
   describe '#inspect' do
-    subject { Rubi::Cons.new(a, b).inspect }
+    subject { Rubi::Cons.new(car: a, cdr: b).inspect }
 
     context 'car: atom, cdr: atom' do
       let(:a) { 1 }

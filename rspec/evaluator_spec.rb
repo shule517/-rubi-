@@ -472,8 +472,8 @@ describe Rubi::Evaluator do
       context "グローバル変数が取得できること" do
         let(:str) do
           <<~LISP
-              (setq double 2)
-              (symbol-value 'double)
+            (setq double 2)
+            (symbol-value 'double)
           LISP
         end
         it { is_expected.to eq 2 }
@@ -483,10 +483,10 @@ describe Rubi::Evaluator do
         context 'グローバル変数が取得できること → ローカル変数に代入 ＆ symbol-valueで評価' do
           let(:str) do
             <<~LISP
-                (setq x 0)
-                (let ((x 1))
-                  (setq x 99))
-                (symbol-value 'x)
+              (setq x 0)
+              (let ((x 1))
+                (setq x 99))
+              (symbol-value 'x)
             LISP
           end
           it { is_expected.to eq 0 }
@@ -495,9 +495,9 @@ describe Rubi::Evaluator do
         context 'グローバル変数が取得できること → ローカル変数に存在しない変数をsetqする ＆ symbol-valueで参照する' do
           let(:str) do
             <<~LISP
-                (setq x 0)
-                (let ((x 1)) (setq y 99))
-                (symbol-value `y)
+              (setq x 0)
+              (let ((x 1)) (setq y 99))
+              (symbol-value `y)
             LISP
           end
           it { is_expected.to eq 99 } # グローバル変数yが作成される
@@ -522,6 +522,72 @@ describe Rubi::Evaluator do
           LISP
         end
         it { is_expected.to eq [1, 2, 7] }
+      end
+    end
+
+    describe '#append' do
+      context 'list + list' do
+        let(:str) do
+          <<~LISP
+            (append '(1 2) '(3 4))
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3, 4] }
+      end
+
+      context 'list + list + list' do
+        let(:str) do
+          <<~LISP
+            (append '(1 2) '(3 4) '(5 6))
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3, 4, 5, 6] }
+      end
+
+      context 'atom + list' do
+        let(:str) do
+          <<~LISP
+            (append 1 '(2 3))
+          LISP
+        end
+        it { expect { subject }.to raise_error }
+      end
+
+      context 'list + atom' do
+        let(:str) do
+          <<~LISP
+            (append '(1 2) 3)
+          LISP
+        end
+        it do
+          cons = subject
+          expect(cons).to be_instance_of Rubi::Cons
+          expect(cons.car).to eq [1, 2]
+          expect(cons.cdr).to eq 3
+        end
+      end
+
+      context 'list + list + atom' do
+        let(:str) do
+          <<~LISP
+            (append '(1 2) '(3 4) 5)
+          LISP
+        end
+        it do
+          cons = subject
+          expect(cons).to be_instance_of Rubi::Cons
+          expect(cons.car).to eq [1, 2, 3, 4]
+          expect(cons.cdr).to eq 5
+        end
+      end
+
+      context 'list + atom + atom' do
+        let(:str) do
+          <<~LISP
+            append '(1 2) 3 4)
+          LISP
+        end
+        it { expect { subject }.to raise_error }
       end
     end
 

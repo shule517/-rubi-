@@ -20,6 +20,25 @@ module Rubi
       end
 
       func_hash[:append] = Proc.new do |*params|
+        eval_params = params.map { |param| eval(param, lexical_hash, stack_count + 1) }
+        pp eval_params: eval_params
+
+        a = eval_params[0..-2]
+        b = eval_params[-1]
+
+        pp a: a, b: b
+
+        if a.all? { |eval_param| list?(eval_param) }
+          if list?(b)
+            eval_params.reduce(:+)
+          else
+            Rubi::Cons.new(car: a.reduce(:+), cdr: b)
+          end
+        else
+          raise "TODO:"
+        end
+
+        # .reduce(:+)
         # TODO: 仮実装
       end
 
@@ -153,7 +172,7 @@ module Rubi
         if b.nil?
           [a] # 末がnilのものは、配列
         elsif atom?(b)
-          Cons.new(a, b) # 末がnilじゃないものは、cons
+          Cons.new(car: a, cdr: b) # 末がnilじゃないものは、cons
         elsif atom?(a) && list?(b)
           [a] + b
         elsif list?(a) && list?(b)
