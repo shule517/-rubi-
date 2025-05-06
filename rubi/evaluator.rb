@@ -96,6 +96,7 @@ module Rubi
         end
       elsif function == :"symbol-function"
         puts "#{nest}#{function}(params: #{params})"
+        # TODO: functionとの違いがよく分かってない。参照できるスコープの違いなどがあるのか？
         a = params.shift
         if a.instance_of?(Array)
           expression = a
@@ -107,7 +108,6 @@ module Rubi
           puts "#{nest}1. シンボルから関数を取り出す(func_name: #{func_name})"
           func_hash[func_name]
         end
-        # TODO: グローバル関数の参照に変更する
       elsif function == :"symbol-value"
         puts "#{nest}#{function}(params: #{params})"
         # TODO: グローバル変数の参照に変更する

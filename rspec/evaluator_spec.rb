@@ -384,6 +384,20 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#symbol-function' do
+      # TODO: functionとの違いがよく分かってない。参照できるスコープの違いなどがあるのか？
+      let(:str) do
+        <<~LISP
+          (defun double (x) (* x 2))
+          (symbol-function 'double)
+        LISP
+      end
+      it { is_expected.to be_instance_of(Proc) }
+    end
+
+    describe '#symbol-value' do
+    end
+
     describe '#list' do
       context '数値の配列' do
         let(:str) do
