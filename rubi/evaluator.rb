@@ -165,6 +165,12 @@ module Rubi
         else
           eval(c, lexical_hash, stack_count + 1)
         end
+      elsif function == :cond
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        # (cond (t 1) (t 2) (t 3))
+        # (cond ((= 1 1) (+ 1 1)) ((= 2 2) (+ 2 2)) ((= 3 3) (+ 3 3)))
+        _cond, expression = params.find { |cond, _expression| eval(cond, lexical_hash, stack_count + 1) }
+        eval(expression, lexical_hash, stack_count + 1)
       elsif function.instance_of?(Array)
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)

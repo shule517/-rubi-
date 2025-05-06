@@ -996,7 +996,7 @@ describe Rubi::Evaluator do
     end
 
     describe '#if' do
-      context '固定値' do
+      context '固定値の場合' do
         context 'trueの場合' do
           let(:str) do
             <<~LISP
@@ -1025,7 +1025,7 @@ describe Rubi::Evaluator do
         end
       end
 
-      context '式' do
+      context '式の場合' do
         context 'trueの場合' do
           let(:str) do
             <<~LISP
@@ -1051,6 +1051,84 @@ describe Rubi::Evaluator do
             LISP
           end
           it { is_expected.to eq 5 }
+        end
+      end
+    end
+
+    describe '#cond' do
+      context '固定値の場合' do
+        context '1つ目に一致した場合' do
+          let(:str) do
+            <<~LISP
+              (cond (t 1) (t 2) (t 3))
+            LISP
+          end
+          it { is_expected.to eq 1 }
+        end
+
+        context '2つ目に一致した場合' do
+          let(:str) do
+            <<~LISP
+              (cond (nil 1) (t 2) (t 3))
+            LISP
+          end
+          it { is_expected.to eq 2 }
+        end
+
+        context '3つ目に一致した場合' do
+          let(:str) do
+            <<~LISP
+              (cond (nil 1) (nil 2) (t 3))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context 'すべてに一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (cond (nil 1) (nil 2) (nil 3))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context '式の場合' do
+        context '1つ目に一致した場合' do
+          let(:str) do
+            <<~LISP
+              (cond ((= 1 1) (+ 1 1)) ((= 2 2) (+ 2 2)) ((= 3 3) (+ 3 3)))
+            LISP
+          end
+          it { is_expected.to eq 2 }
+        end
+
+        context '2つ目に一致した場合' do
+          let(:str) do
+            <<~LISP
+              (cond ((= 1 2) (+ 1 1)) ((= 2 2) (+ 2 2)) ((= 3 3) (+ 3 3)))
+            LISP
+          end
+          it { is_expected.to eq 4 }
+        end
+
+        context '3つ目に一致した場合' do
+          let(:str) do
+            <<~LISP
+              (cond ((= 1 2) (+ 1 1)) ((= 2 3) (+ 2 2)) ((= 3 3) (+ 3 3)))
+            LISP
+          end
+          it { is_expected.to eq 6 }
+        end
+
+        context 'すべてに一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (cond ((= 1 2) (+ 1 1)) ((= 2 3) (+ 2 2)) ((= 3 4) (+ 3 3)))
+            LISP
+          end
+          it { is_expected.to eq nil }
         end
       end
     end
