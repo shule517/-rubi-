@@ -150,7 +150,7 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
       elsif function == :eq
-        # オブジェクトが一致しているか
+        # オブジェクトが一致しているか。ポインタが一致しているか。
         # Lispのeq は Rubyのequal? とほぼ一致する
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }

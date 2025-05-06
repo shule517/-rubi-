@@ -840,9 +840,9 @@ describe Rubi::Evaluator do
       end
     end
 
-    describe '#eq' do
-      context "数値と数値" do
-        context '同じ値の場合' do
+    describe '#eq (オブジェクトが一致しているか。ポインタが一致しているか)' do
+      context '同じ値の場合' do
+        context "整数と整数の場合" do
           let(:str) do
             <<~LISP
               (eq 1 1)
@@ -851,20 +851,10 @@ describe Rubi::Evaluator do
           it { is_expected.to eq true }
         end
 
-        context '違う値の場合' do
+        context "小数と小数の場合" do
           let(:str) do
             <<~LISP
-              (eq 1 2)
-            LISP
-          end
-          it { is_expected.to eq nil }
-        end
-
-        context '変数と同じ値の場合' do
-          let(:str) do
-            <<~LISP
-              (setq x 1)
-              (eq x 1)
+              (eq 1.1 1.1)
             LISP
           end
           it { is_expected.to eq true }
@@ -878,58 +868,77 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq nil }
         end
-      end
 
-      context "シンボルとシンボル" do
-        context '同じ値の場合' do
+        context "シンボルとシンボル" do
           let(:str) do
             <<~LISP
-              (eq 'a 'a)
+            (eq 'a 'a)
             LISP
           end
           it { is_expected.to eq true }
         end
 
-        context '違う値の場合' do
+        context "文字列と文字列" do
           let(:str) do
             <<~LISP
-              (eq 'a 'b)
+            (eq "あ" "あ")
+            LISP
+          end
+          it { is_expected.to eq nil } # 文字列だけ 同じ文字列でも、別オブジェクト
+        end
+      end
+
+      context '違う値の場合' do
+        context "数値と数値" do
+          let(:str) do
+            <<~LISP
+              (eq 1 2)
             LISP
           end
           it { is_expected.to eq nil }
         end
 
-        context '変数と同じ値の場合' do
+        context "シンボルとシンボル" do
           let(:str) do
             <<~LISP
-              (setq x 'a)
-              (eq x 'a)
+            (eq 'a 'b)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context "文字列と文字列" do
+          let(:str) do
+            <<~LISP
+            (eq "あ" "い")
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context '変数の場合' do
+        context '変数と数値の場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 1)
+              (eq x 1)
             LISP
           end
           it { is_expected.to eq true }
         end
-      end
 
-      context "文字列と文字列" do
-        context '同じ値の場合' do
+        context '変数とシンボルの場合' do
           let(:str) do
             <<~LISP
-              (eq "あ" "あ")
+            (setq x 'a)
+            (eq x 'a)
             LISP
           end
-          it { is_expected.to eq nil }
+          it { is_expected.to eq true }
         end
 
-        context '違う値の場合' do
-          let(:str) do
-            <<~LISP
-              (eq "あ" "い")
-            LISP
-          end
-          it { is_expected.to eq nil }
-        end
-
-        context '変数と同じ値の場合' do
+        context '変数と文字列の場合' do
           let(:str) do
             <<~LISP
               (setq x "あ")
@@ -938,8 +947,10 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq nil }
         end
+      end
 
-        context '変数と変数の場合' do
+      context '変数と変数の場合' do
+        context "文字列と文字列" do
           let(:str) do
             <<~LISP
               (setq x "あ")
