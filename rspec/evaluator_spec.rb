@@ -754,5 +754,129 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 0.6 }
       end
     end
+
+    describe '#=' do
+      context '整数同士' do
+        context '一致する場合' do
+          let(:str) do
+            <<~LISP
+              (= 1 1)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (= 1 2)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context '小数同士' do
+        context '一致する場合' do
+          let(:str) do
+            <<~LISP
+              (= 1.2 1.2)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (= 1.2 1.3)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context '整数と小数' do
+        context '一致する場合' do
+          let(:str) do
+            <<~LISP
+              (= 1 1.0)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (= 1 1.1)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+    end
+
+    describe '!=' do
+      context '整数同士' do
+        context '一致する場合' do
+          let(:str) do
+            <<~LISP
+              (/= 1 1)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (/= 1 2)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+
+      context '小数同士' do
+        context '一致する場合' do
+          let(:str) do
+            <<~LISP
+              (/= 1.2 1.2)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (/= 1.2 1.3)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+
+      context '整数と小数' do
+        context '一致する場合' do
+          let(:str) do
+            <<~LISP
+              (/= 1 1.0)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (/= 1 1.1)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+      end
+    end
   end
 end
