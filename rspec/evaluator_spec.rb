@@ -356,6 +356,17 @@ describe Rubi::Evaluator do
         end
       end
 
+      context "#'関数オブジェクト" do
+        context "#'(lambda (x) (* x 2))" do
+          let(:str) do
+            <<~LISP
+              #'(lambda (x) (* x 2))
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+      end
+
       # TODO: 未実装
       xcontext '組み込み関数の場合' do
         # %w(car cdr apply).each do |func|
@@ -1182,7 +1193,7 @@ describe Rubi::Evaluator do
         context "シンボルとシンボル" do
           let(:str) do
             <<~LISP
-            (equal 'a 'b)
+              (equal 'a 'b)
             LISP
           end
           it { is_expected.to eq nil }
@@ -1191,7 +1202,7 @@ describe Rubi::Evaluator do
         context "文字列と文字列" do
           let(:str) do
             <<~LISP
-            (equal "あ" "い")
+              (equal "あ" "い")
             LISP
           end
           it { is_expected.to eq nil }
@@ -1212,8 +1223,8 @@ describe Rubi::Evaluator do
         context '変数とシンボルの場合' do
           let(:str) do
             <<~LISP
-            (setq x 'a)
-            (equal x 'a)
+              (setq x 'a)
+              (equal x 'a)
             LISP
           end
           it { is_expected.to eq true }

@@ -85,7 +85,11 @@ module Rubi
       elsif function == :function
         puts "#{nest}#{function}(params: #{params})"
         func_name = params.shift
-        func_hash[func_name]
+        if func_name.instance_of?(Array)
+          eval(func_name, lexical_hash, stack_count + 1)
+        else
+          func_hash[func_name]
+        end
       elsif function == :list
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }
