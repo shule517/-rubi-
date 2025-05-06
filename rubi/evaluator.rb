@@ -135,7 +135,6 @@ module Rubi
         expression = params.shift
         var_name = eval(expression, lexical_hash, stack_count + 1)
         var_hash[var_name]
-        # TODO: ローカル変数の変更をできるようにする。今は常にグローバル変数を変えてしまっている。
       elsif function == :list
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }
