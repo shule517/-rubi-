@@ -135,6 +135,7 @@ module Rubi
         puts "#{nest}-> macro_hash: #{macro_hash}"
         macro_name
       elsif function == :+
+        # TODO: 削除して、組み込み関数に差し替える
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.sum
       elsif function == :-
