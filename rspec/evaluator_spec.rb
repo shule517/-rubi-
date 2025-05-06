@@ -872,7 +872,7 @@ describe Rubi::Evaluator do
         context "シンボルとシンボル" do
           let(:str) do
             <<~LISP
-            (eq 'a 'a)
+              (eq 'a 'a)
             LISP
           end
           it { is_expected.to eq true }
@@ -881,10 +881,19 @@ describe Rubi::Evaluator do
         context "文字列と文字列" do
           let(:str) do
             <<~LISP
-            (eq "あ" "あ")
+              (eq "あ" "あ")
             LISP
           end
           it { is_expected.to eq nil } # 文字列だけ 同じ文字列でも、別オブジェクト
+        end
+
+        context "配列と配列" do
+          let(:str) do
+            <<~LISP
+              (eq '(1 2) '(1 2))
+            LISP
+          end
+          it { is_expected.to eq nil }
         end
       end
 
@@ -901,7 +910,7 @@ describe Rubi::Evaluator do
         context "シンボルとシンボル" do
           let(:str) do
             <<~LISP
-            (eq 'a 'b)
+              (eq 'a 'b)
             LISP
           end
           it { is_expected.to eq nil }
@@ -910,7 +919,7 @@ describe Rubi::Evaluator do
         context "文字列と文字列" do
           let(:str) do
             <<~LISP
-            (eq "あ" "い")
+              (eq "あ" "い")
             LISP
           end
           it { is_expected.to eq nil }
@@ -931,8 +940,8 @@ describe Rubi::Evaluator do
         context '変数とシンボルの場合' do
           let(:str) do
             <<~LISP
-            (setq x 'a)
-            (eq x 'a)
+              (setq x 'a)
+              (eq x 'a)
             LISP
           end
           it { is_expected.to eq true }
@@ -1004,7 +1013,7 @@ describe Rubi::Evaluator do
         context "シンボルとシンボル" do
           let(:str) do
             <<~LISP
-            (equal 'a 'a)
+              (equal 'a 'a)
             LISP
           end
           it { is_expected.to eq true }
@@ -1013,10 +1022,19 @@ describe Rubi::Evaluator do
         context "文字列と文字列" do
           let(:str) do
             <<~LISP
-            (equal "あ" "あ")
+              (equal "あ" "あ")
             LISP
           end
-          it { is_expected.to eq nil } # 文字列だけ 同じ文字列でも、別オブジェクト
+          it { is_expected.to eq true } # 文字列だけ 同じ文字列でも、別オブジェクト
+        end
+
+        context "配列と配列" do
+          let(:str) do
+            <<~LISP
+              (equal '(1 2) '(1 2))
+            LISP
+          end
+          it { is_expected.to eq true }
         end
       end
 
@@ -1077,7 +1095,7 @@ describe Rubi::Evaluator do
               (equal x "あ")
             LISP
           end
-          it { is_expected.to eq nil }
+          it { is_expected.to eq true }
         end
       end
 

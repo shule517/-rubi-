@@ -152,9 +152,19 @@ module Rubi
       elsif function == :eq
         # オブジェクトが一致しているか。ポインタが一致しているか。
         # Lispのeq は Rubyのequal? とほぼ一致する
+
+        # 数値
         # (eq 1 1) # => true
         # (setq x 1)(eq x 1) # => true
+
+        # 文字列
         # (eq "あ" "あ") # => nil
+        # (setq x "あ")(eq x "あ") # => nil
+
+        # 配列
+        # (eq '(1 2) '(1 2)) #=> nil
+
+        # 同じ変数
         # (setq x "あ")(eq x x) # => true
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
@@ -162,6 +172,20 @@ module Rubi
       elsif function == :equal
         # 値が一致しているか
         # Lispのequal は Rubyのeql? とほぼ一致する
+
+        # 数値
+        # (equal 1 1) # => true
+        # (setq x 1)(equal x 1) # => true
+
+        # 文字列
+        # (equal "あ" "あ") # => true
+        # (setq x "あ")(equal x "あ") # => true
+
+        # 配列
+        # (equal '(1 2) '(1 2)) #=> true
+
+        # 同じ変数
+        # (setq x "あ")(equal x x) # => true
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.eql?(b) # 一致しない場合は、nilを返す
