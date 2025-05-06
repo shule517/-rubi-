@@ -84,10 +84,14 @@ module Rubi
         func_name # 定義した関数名のシンボルを返す
       elsif function == :function
         puts "#{nest}#{function}(params: #{params})"
-        func_name = params.shift
-        if func_name.instance_of?(Array)
-          eval(func_name, lexical_hash, stack_count + 1)
+        a = params.shift
+        if a.instance_of?(Array)
+          expression = a
+          puts "#{nest}1. 式を評価して、関数を取り出す(expression: #{expression})"
+          eval(expression, lexical_hash, stack_count + 1)
         else
+          func_name = a
+          puts "#{nest}1. シンボルから関数を取り出す(func_name: #{func_name})"
           func_hash[func_name]
         end
       elsif function == :list
