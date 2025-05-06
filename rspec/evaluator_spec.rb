@@ -126,6 +126,67 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq 3 }
       end
+
+      context 'スコープの確認' do
+        context 'ローカル変数に代入 ＆ xで評価' do
+          let(:str) do
+            <<~LISP
+              (setq x 0)
+              (let ((x 1))
+                (setq x 99))
+              x
+            LISP
+          end
+          it { is_expected.to eq 0 }
+        end
+
+        context 'ローカル変数に代入 ＆ symbol-valueで評価' do
+          let(:str) do
+            <<~LISP
+              (setq x 0)
+              (let ((x 1))
+                (setq x 99))
+              (symbol-value 'x)
+            LISP
+          end
+          it { is_expected.to eq 0 }
+        end
+
+        context 'ローカル変数に代入 ＆ ローカル変数で計算' do
+          let(:str) do
+            <<~LISP
+              (setq x 0)
+              (let ((x 1))
+                (setq x 99)
+                (+ x 1))
+            LISP
+          end
+          it { is_expected.to eq 100 }
+        end
+
+        context 'ローカル変数に存在しない変数をsetqする ＆ yで参照する' do
+          let(:str) do
+            <<~LISP
+              (setq x 0)
+              (let ((x 1))
+                (setq y 99))
+              y
+            LISP
+          end
+          it { is_expected.to eq 99 } # グローバル変数yが作成される
+        end
+
+        context 'ローカル変数に存在しない変数をsetqする ＆ symbol-valueで参照する' do
+          let(:str) do
+            <<~LISP
+              (setq x 0)
+              (let ((x 1)) (setq y 99))
+              (symbol-value `y)
+            LISP
+          end
+          it { is_expected.to eq 99 } # グローバル変数yが作成される
+        end
+      end
     end
 
     describe '#lambda' do
@@ -1980,7 +2041,6 @@ describe Rubi::Evaluator do
         context "(symbol-value 'double)" do
           let(:str) do
             <<~LISP
-              (defun double (x) (* x 2))
               (setq double 2)
               (symbol-value 'double)
             LISP
