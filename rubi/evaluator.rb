@@ -67,6 +67,10 @@ module Rubi
         func_hash[func_name] = build_lambda(params, expression, lexical_hash, stack_count, nest)
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
+      elsif function == :function
+        puts "#{nest}#{function}(params: #{params})"
+        func_name = params.shift
+        func_hash[func_name]
       elsif function == :list
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }
@@ -100,7 +104,8 @@ module Rubi
         params[0] # quoteは評価しない
       elsif function == :funcall
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        array = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        array = params.map { |a| puts "#{nest}(a: #{a})";result = eval(a, lexical_hash, stack_count + 1);puts "#{nest}-> #{result}";result }
+        puts "#{nest}#{function}(array: #{array})"
         eval(array, lexical_hash, stack_count + 1)
       elsif function == :defmacro
         macro_name = params.shift
@@ -131,6 +136,9 @@ module Rubi
         puts "#{nest}関数の実行:#{function}(expression: #{expression})"
         puts "#{nest}関数の実行:#{function}(params: #{params})"
         expression.call(*params)
+      elsif function.instance_of?(Proc)
+        puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
+        function.call(*params)
       elsif func_hash.key?(function)
         # 登録されている関数を呼び出す
         puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"

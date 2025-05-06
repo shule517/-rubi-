@@ -253,6 +253,36 @@ describe Rubi::Evaluator do
         it { expect { subject }.to raise_error }
       end
 
+      context '関数を評価する(function)' do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            (function double)
+          LISP
+        end
+        it { is_expected.to be_instance_of(Proc) } # ラムダを返す
+      end
+
+      context '関数を評価する(function)＆実行' do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            (funcall (function double) 3)
+          LISP
+        end
+        it { is_expected.to eq 6 }
+      end
+
+      context "関数を評価する(#')" do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            #'double
+          LISP
+        end
+        it { is_expected.to eq 9999 } # TODO
+      end
+
       context '関数と変数を区別する' do
         let(:str) do
           <<~LISP
