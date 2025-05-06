@@ -19,6 +19,10 @@ module Rubi
         end
       end
 
+      func_hash[:append] = Proc.new do |*params|
+        # TODO: 仮実装
+      end
+
       # システム関数を登録済み
       @built_system_func = true
     end
@@ -64,6 +68,12 @@ module Rubi
         puts "#{nest}#式を評価する - expression: #{expression}"
         expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
       elsif function == :setq # 変数定義
+        var_name, value = params
+        puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
+        var_hash[var_name] = eval(value, {}, stack_count + 1)
+        puts "#{nest}-> var_hash: #{var_hash}"
+        var_hash[var_name]
+      elsif function == :setf # TODO: 未実装。setqをコピーしただけ
         var_name, value = params
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
         var_hash[var_name] = eval(value, {}, stack_count + 1)

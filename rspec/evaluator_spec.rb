@@ -2071,6 +2071,7 @@ describe Rubi::Evaluator do
         context "(eq (symbol-value 'x) (symbol-function 'append))" do
           let(:str) do
             <<~LISP
+              (setq x #'append)
               (eq (symbol-value 'x) (symbol-function 'append))
             LISP
           end
