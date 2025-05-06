@@ -32,9 +32,10 @@ describe Rubi::Parser do
   end
 
   describe '#expand_syntactic_sugar' do
-    subject { pp ast; Rubi::Parser.new.expand_syntactic_sugar(ast) }
+    subject { pp ast: ast; parser.expand_syntactic_sugar(ast) }
 
-    let(:ast) { Rubi::Parser.new.parse(tokens) }
+    let(:parser) { Rubi::Parser.new }
+    let(:ast) { parser.parse(tokens) }
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
     context 'quoteの糖衣構文' do
@@ -76,6 +77,12 @@ describe Rubi::Parser do
           before { expect(ast).to eq [:"`", [1, 2, :a]] }
           it { is_expected.to eq [[:quote, [1, 2, :a]]] }
         end
+      end
+
+      context "#'の場合" do
+        let(:str) { "#'double" }
+        before { expect(ast).to eq [:"#'", :double] }
+        it { is_expected.to eq [[:function, :double]] }
       end
     end
   end

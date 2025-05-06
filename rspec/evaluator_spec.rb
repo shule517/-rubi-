@@ -136,7 +136,12 @@ describe Rubi::Evaluator do
               (lambda () (+ 1 2))
             LISP
           end
-          it { is_expected.to be_instance_of(Proc) } # ラムダを返す
+
+          it do
+            proc = subject
+            expect(proc).to be_instance_of(Proc)
+            expect(proc.call).to eq 3
+          end
         end
 
         context '引数なしの関数定義＆実行①' do
@@ -165,7 +170,12 @@ describe Rubi::Evaluator do
               (lambda (x) (+ x 2))
             LISP
           end
-          it { is_expected.to be_instance_of(Proc) } # ラムダを返す
+
+          it do
+            proc = subject
+            expect(proc).to be_instance_of(Proc)
+            expect(proc.call(3)).to eq 5
+          end
         end
 
         context '引数ありの関数定義＆実行①' do
@@ -260,7 +270,12 @@ describe Rubi::Evaluator do
             (function double)
           LISP
         end
-        it { is_expected.to be_instance_of(Proc) } # ラムダを返す
+
+        it do
+          proc = subject
+          expect(proc).to be_instance_of(Proc)
+          expect(proc.call(3)).to eq 6
+        end
       end
 
       context '関数を評価する(function)＆実行' do
@@ -280,7 +295,12 @@ describe Rubi::Evaluator do
             #'double
           LISP
         end
-        it { is_expected.to eq 9999 } # TODO
+
+        it do
+          proc = subject
+          expect(proc).to be_instance_of(Proc)
+          expect(proc.call(3)).to eq 6
+        end
       end
 
       context '関数と変数を区別する' do

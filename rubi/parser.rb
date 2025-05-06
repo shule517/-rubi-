@@ -35,6 +35,13 @@ module Rubi
             # [:quote, [1, 2, :a]]
             token = ast.shift
             array << [:quote, token]
+          elsif token == :"#'"
+            # 関数参照を展開する
+            # [:"#'", :double]
+            # ↓
+            # [[:function, :double]]
+            token = ast.shift
+            array << [:function, token]
           else
             # 変更なし。そのまま追加する。
             array << token

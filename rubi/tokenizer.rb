@@ -4,7 +4,7 @@ module Rubi
       str
         .gsub("(", " ( ")
         .gsub(")", " ) ")
-        .gsub("'", " ' ") # クォート
+        .gsub(%r{(#?')}, " \\1 ") # クォート
         .gsub("`", " ` ") # バッククォート
         .split
         .map { |c| Integer(c) rescue Float(c) rescue c.to_sym }
