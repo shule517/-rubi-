@@ -878,5 +878,121 @@ describe Rubi::Evaluator do
         end
       end
     end
+
+    describe '#<' do
+      context 'aの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (< 2 1)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'aとbが一致している場合' do
+        let(:str) do
+          <<~LISP
+            (< 1 1)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'bの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (< 1 2)
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+    end
+
+    describe '#>' do
+      context 'aの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (> 2 1)
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+
+      context 'aとbが一致している場合' do
+        let(:str) do
+          <<~LISP
+            (> 1 1)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'bの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (> 1 2)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+    end
+
+    describe '#<=' do
+      context 'aの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (<= 2 1)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'aとbが一致している場合' do
+        let(:str) do
+          <<~LISP
+            (<= 1 1)
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+
+      context 'bの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (<= 1 2)
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+    end
+
+    describe '#>=' do
+      context 'aの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (>= 2 1)
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+
+      context 'aとbが一致している場合' do
+        let(:str) do
+          <<~LISP
+            (>= 1 1)
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+
+      context 'bの方が大きい場合' do
+        let(:str) do
+          <<~LISP
+            (>= 1 2)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+    end
   end
 end
