@@ -182,6 +182,9 @@ module Rubi
         # (cond ((= 1 1) (+ 1 1)) ((= 2 2) (+ 2 2)) ((= 3 3) (+ 3 3)))
         _cond, expression = params.find { |cond, _expression| eval(cond, lexical_hash, stack_count + 1) }
         eval(expression, lexical_hash, stack_count + 1)
+      elsif function == :progn
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last
       elsif function.instance_of?(Array)
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
@@ -209,7 +212,7 @@ module Rubi
         eval(expanded, lexical_hash, stack_count + 1)
       else
         puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        raise "対応する関数が見つかりません"
+        raise "対応する関数(#{function})が見つかりません(params: #{params})"
       end
     end
 

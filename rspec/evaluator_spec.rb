@@ -1312,5 +1312,34 @@ describe Rubi::Evaluator do
         end
       end
     end
+
+    describe '#progn' do
+      context 'prognの戻り値を確認' do
+        let(:str) do
+          <<~LISP
+            (setq x 0)
+            (progn
+              (setq x (+ 1 x))
+              (setq x (+ 2 x))
+              (setq x (+ 3 x)))
+          LISP
+        end
+        it { is_expected.to eq 6 }
+      end
+
+      context 'prognの実行結果を確認' do
+        let(:str) do
+          <<~LISP
+            (setq x 0)
+            (progn
+              (setq x (+ 1 x))
+              (setq x (+ 2 x))
+              (setq x (+ 3 x)))
+            x
+          LISP
+        end
+        it { is_expected.to eq 6 }
+      end
+    end
   end
 end
