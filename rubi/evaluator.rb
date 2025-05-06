@@ -174,18 +174,18 @@ module Rubi
         # Lispのeq は Rubyのequal? とほぼ一致する
 
         # 数値
-        # (eq 1 1) # => true
-        # (setq x 1)(eq x 1) # => true
+        # (eql 1 1) # => true
+        # (setq x 1)(eql x 1) # => true
 
         # 文字列
-        # (eq "あ" "あ") # => nil
-        # (setq x "あ")(eq x "あ") # => nil
+        # (eql "あ" "あ") # => nil
+        # (setq x "あ")(eql x "あ") # => nil
 
         # 配列
-        # (eq '(1 2) '(1 2)) #=> nil
+        # (eql '(1 2) '(1 2)) #=> nil
 
         # 同じ変数
-        # (setq x "あ")(eq x x) # => true
+        # (setq x "あ")(eql x x) # => true
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.equal?(b) # 一致しない場合は、nilを返す

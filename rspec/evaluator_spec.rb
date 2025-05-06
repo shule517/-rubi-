@@ -857,7 +857,7 @@ describe Rubi::Evaluator do
               (eq 1.1 1.1)
             LISP
           end
-          it { is_expected.to eq true }
+          it { is_expected.to eq true } # TODO: Common Lispはnilらしい
         end
 
         context '整数と小数の場合' do
