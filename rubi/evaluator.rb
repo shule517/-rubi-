@@ -94,6 +94,23 @@ module Rubi
           puts "#{nest}1. シンボルから関数を取り出す(func_name: #{func_name})"
           func_hash[func_name]
         end
+      elsif function == :"symbol-function"
+        puts "#{nest}#{function}(params: #{params})"
+        a = params.shift
+        if a.instance_of?(Array)
+          expression = a
+          puts "#{nest}1. 式を評価して、シンボルを取り出す(expression: #{expression})"
+          func_name = eval(expression, lexical_hash, stack_count + 1)
+          func_hash[func_name]
+        elsif a.instance_of?(Symbol)
+          func_name = a
+          puts "#{nest}1. シンボルから関数を取り出す(func_name: #{func_name})"
+          func_hash[func_name]
+        end
+        # TODO: グローバル関数の参照に変更する
+      elsif function == :"symbol-value"
+        puts "#{nest}#{function}(params: #{params})"
+        # TODO: グローバル変数の参照に変更する
       elsif function == :list
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }
