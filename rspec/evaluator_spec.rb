@@ -315,6 +315,63 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe "#function / #'(糖衣構文)" do
+      context '関数を評価する(function)' do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            (function double)
+          LISP
+        end
+
+        it do
+          proc = subject
+          expect(proc).to be_instance_of(Proc)
+          expect(proc.call(3)).to eq 6
+        end
+      end
+
+      context '関数を評価する(function)＆実行' do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            (funcall (function double) 3)
+          LISP
+        end
+        it { is_expected.to eq 6 }
+      end
+
+      context "関数を評価する(#')" do
+        let(:str) do
+          <<~LISP
+            (defun double (x) (* x 2))
+            #'double
+          LISP
+        end
+
+        it do
+          proc = subject
+          expect(proc).to be_instance_of(Proc)
+          expect(proc.call(3)).to eq 6
+        end
+      end
+
+      context '組み込み関数の場合' do
+        # %w(car cdr apply).each do |func|
+        %w(list cons null atom funcall + - * / = /= < > <= >= not).each do |func|
+          context "#'#{func}の場合" do
+            let(:str) do
+              <<~LISP
+                #'#{func}
+              LISP
+            end
+
+            it { is_expected.to be_instance_of(Proc) }
+          end
+        end
+      end
+    end
+
     describe '#list' do
       context '数値の配列' do
         let(:str) do
@@ -1336,6 +1393,18 @@ describe Rubi::Evaluator do
               (setq x (+ 2 x))
               (setq x (+ 3 x)))
             x
+          LISP
+        end
+        it { is_expected.to eq 6 }
+      end
+    end
+
+    describe '#apply' do
+      context '' do
+        let(:str) do
+          <<~LISP
+            (defun add (x y z) (+ x y z))
+            (apply #'add '(1 2 3))
           LISP
         end
         it { is_expected.to eq 6 }

@@ -185,6 +185,14 @@ module Rubi
       elsif function == :progn
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last
+      elsif function == :apply
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        a, b = params
+        puts "#{nest}(a: #{a}, b: #{b})"
+        func = eval(a, lexical_hash, stack_count + 1)
+        proc_params = eval(b, lexical_hash, stack_count + 1)
+        puts "#{nest}-> (func: #{func}, proc_params: #{proc_params})"
+        func.call(*proc_params)
       elsif function.instance_of?(Array)
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
