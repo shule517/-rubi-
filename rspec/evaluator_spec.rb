@@ -1254,6 +1254,63 @@ describe Rubi::Evaluator do
     end
 
     describe '#or' do
+      context '固定値の場合' do
+        context 'すべてtrueの場合' do
+          let(:str) do
+            <<~LISP
+              (or t t t)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'trueとfalseが混ざっている場合' do
+          let(:str) do
+            <<~LISP
+              (or t nil t)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'すべてがfalseの場合' do
+          let(:str) do
+            <<~LISP
+              (or nil nil nil)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
+      context '式の場合' do
+        context 'すべてtrueの場合' do
+          let(:str) do
+            <<~LISP
+              (or (= 1 1) (= 2 2) (= 3 3))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'trueとfalseが混ざっている場合' do
+          let(:str) do
+            <<~LISP
+              (or (= 1 1) (= 2 3) (= 3 3))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context 'すべてがfalseの場合' do
+          let(:str) do
+            <<~LISP
+              (or (= 1 2) (= 2 3) (= 3 4))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
     end
   end
 end

@@ -165,6 +165,7 @@ module Rubi
         true if params.all? { |param| eval(param, lexical_hash, stack_count + 1) }
       elsif function == :or
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        true if params.any? { |param| eval(param, lexical_hash, stack_count + 1) }
       elsif function == :if
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b, c = params
