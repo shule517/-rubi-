@@ -543,6 +543,15 @@ describe Rubi::Evaluator do
           it { is_expected.to eq true }
         end
 
+        context '関数オブジェクトの場合' do
+          let(:str) do
+            <<~LISP
+              (atom #'+)
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
         context 'nilの場合' do
           let(:str) do
             <<~LISP
@@ -1432,196 +1441,486 @@ describe Rubi::Evaluator do
     end
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
-    context 'https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functions.html' do
-      context '(defun double (x) (* x 2))' do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-          LISP
+    context '2. 関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functions.html' do
+      context '関数の定義' do
+        context '(defun double (x) (* x 2))' do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+            LISP
+          end
+          it { is_expected.to eq :double }
         end
-        it { is_expected.to eq :double }
+
+        context '(double 1)' do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+              (double 1)
+            LISP
+          end
+          it { is_expected.to eq 2 }
+        end
+
+        context "#'double" do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+              #'double
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+
+        context "(eq #'double (car (list #'double)))" do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+              (eq #'double (car (list #'double)))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context "(lambda (x) (* x 2))" do
+          let(:str) do
+            <<~LISP
+              (lambda (x) (* x 2))
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+
+        context "#'(lambda (x) (* x 2))" do
+          let(:str) do
+            <<~LISP
+              #'(lambda (x) (* x 2))
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+
+        context "(double 3)" do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+              (double 3)
+            LISP
+          end
+          it { is_expected.to eq 6 }
+        end
+
+        context "((lambda (x) (* x 2)) 3)" do
+          let(:str) do
+            <<~LISP
+              ((lambda (x) (* x 2)) 3)
+            LISP
+          end
+          it { is_expected.to eq 6 }
+        end
+
+        context "(double double)" do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+              (setq double 2)
+              (double double)
+            LISP
+          end
+          it { is_expected.to eq 4 }
+        end
+
+        context "(symbol-value 'double)" do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+              (setq double 2)
+              (symbol-value 'double)
+            LISP
+          end
+          it { is_expected.to eq 2 }
+        end
+
+        context "(symbol-function 'double)" do
+          let(:str) do
+            <<~LISP
+              (defun double (x) (* x 2))
+              (setq double 2)
+              (symbol-function 'double)
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+
+        context "(setq x #'append)" do
+          let(:str) do
+            <<~LISP
+              (setq x #'append)
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+
+        context "(eq (symbol-value 'x) (symbol-function 'append))" do
+          let(:str) do
+            <<~LISP
+              (eq (symbol-value 'x) (symbol-function 'append))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context "(setf (symbol-function 'double) #'(lambda (x) (* x 2)))" do
+          let(:str) do
+            <<~LISP
+              (setf (symbol-function 'double)
+                #'(lambda (x) (* x 2)))
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
       end
 
-      context '(double 1)' do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-            (double 1)
-          LISP
+      context '関数を引数にする' do
+        context "(+ 1 2)" do
+          let(:str) do
+            <<~LISP
+              (+ 1 2)
+            LISP
+          end
+          it { is_expected.to eq 3 }
         end
-        it { is_expected.to eq 2 }
+
+        context "(apply #'+ '(1 2))" do
+          let(:str) do
+            <<~LISP
+              (apply #'+ '(1 2))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "(apply (symbol-function '+) '(1 2))" do
+          let(:str) do
+            <<~LISP
+              (apply (symbol-function '+) '(1 2))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "(apply #'(lambda (x y) (+ x y)) '(1 2))" do
+          let(:str) do
+            <<~LISP
+              (apply #'(lambda (x y) (+ x y)) '(1 2))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "(apply #'+ 1 '(2))" do
+          let(:str) do
+            <<~LISP
+              (apply #'+ 1 '(2))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "(funcall #'+ 1 2)" do
+          let(:str) do
+            <<~LISP
+              (funcall #'+ 1 2)
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "(mapcar #'(lambda (x) (+ x 10)) '(1 2 3))" do
+          let(:str) do
+            <<~LISP
+              (mapcar #'(lambda (x) (+ x 10))
+                '(1 2 3))
+            LISP
+          end
+          it { is_expected.to eq [11, 12, 13] }
+        end
+
+        context "(mapcar #'(lambda (x) (+ x 10)) '(1 2 3))" do
+          let(:str) do
+            <<~LISP
+              (mapcar #'+
+                '(1 2 3)
+                '(10 100 1000))
+            LISP
+          end
+          it { is_expected.to eq [11, 102, 1003] }
+        end
+
+        context "(sort '(1 4 2 5 6 7 3) #'<)" do
+          let(:str) do
+            <<~LISP
+              (sort '(1 4 2 5 6 7 3) #'<)
+            LISP
+          end
+          it { is_expected.to eq [1, 2, 3, 4, 5, 6, 7] }
+        end
+
+        context "(remove-if #'evenp '(1 2 3 4 5 6 7))" do
+          let(:str) do
+            <<~LISP
+              (remove-if #'evenp '(1 2 3 4 5 6 7))
+            LISP
+          end
+          it { is_expected.to eq [1, 3, 5, 7] }
+        end
+
+        context "(defun our-remove-if (fn lst)" do
+          let(:str) do
+            <<~LISP
+              (defun our-remove-if (fn lst)
+                (if (null lst)
+                    nil
+                    (if (funcall fn (car lst))
+                        (our-remove-if fn (cdr lst))
+                        (cons (car lst) (our-remove-if fn (cdr lst))))))
+            LISP
+          end
+          it { is_expected.to eq :"our-remove-if" }
+        end
       end
 
-      context "#'double" do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-            #'double
-          LISP
+      context '属性としての関数' do
+        context "(defun behave (animal)" do
+          let(:str) do
+            <<~LISP
+              (defun behave (animal)
+                (case animal
+                  (dog (wag-tail)
+                    (bark))
+                  (rat (scurry)
+                    (squeak))
+                  (cat (rub-legs)
+                    (scratch-carpet))))
+            LISP
+          end
+          it { is_expected.to eq :behave }
         end
-        it { is_expected.to be_instance_of Proc }
+
+        context "(defun behave (animal) (funcall (get animal 'behavior)))" do
+          let(:str) do
+            <<~LISP
+              (defun behave (animal)
+                (funcall (get animal 'behavior)))
+            LISP
+          end
+          it { is_expected.to eq :behave }
+        end
+
+        context "(setf (get 'dog 'behavior)" do
+          let(:str) do
+            <<~LISP
+              (setf (get 'dog 'behavior)
+                #'(lambda ()
+                    (wag-tail)
+                      (bark)))
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
       end
 
-      context "(eq #'double (car (list #'double)))" do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-            (eq #'double (car (list #'double)))
-          LISP
+      # schemeの仕様のため、対応しない
+      xcontext 'スコープ' do
+        context "(let ((y 7))" do
+          let(:str) do
+            <<~LISP
+              (let ((y 7))
+                (defun scope-test (x)
+                  (list x y)))
+            LISP
+          end
+          it { is_expected.to eq :"scope-test" }
         end
-        it { is_expected.to eq true }
+
+        context "(let ((y 7))" do
+          let(:str) do
+            <<~LISP
+              (let ((y 7))
+                (defun scope-test (x)
+                  (list x y)))
+              (let ((y 5))
+                (scope-test 3))
+                  (3 5)
+            LISP
+          end
+          it { is_expected.to eq :"scope-test" }
+        end
       end
 
-      context "(lambda (x) (* x 2))" do
-        let(:str) do
-          <<~LISP
-            (lambda (x) (* x 2))
-          LISP
+      context 'クロージャ' do
+        context "(defun list+ (lst n)" do
+          let(:str) do
+            <<~LISP
+              (defun list+ (lst n)
+                (mapcar #'(lambda (x) (+ x n))
+                        lst))
+            LISP
+          end
+          it { is_expected.to eq :"list+" }
         end
-        it { is_expected.to be_instance_of Proc }
+
+        context "(defun list+ (lst n)" do
+          let(:str) do
+            <<~LISP
+              (defun list+ (lst n)
+                (mapcar #'(lambda (x) (+ x n))
+                        lst))
+              (list+ '(1 2 3) 10)
+            LISP
+          end
+          it { is_expected.to eq [11, 12, 13] }
+        end
+
+        context "(let ((counter 0))" do
+          let(:str) do
+            <<~LISP
+              (let ((counter 0))
+                (defun new-id () (incf counter))
+                (defun reset-id () (setq counter 0)))
+            LISP
+          end
+          it { is_expected.to eq :"reset-id" }
+        end
+
+        context "(defun make-adder (n)" do
+          let(:str) do
+            <<~LISP
+              (defun make-adder (n)
+                #'(lambda (x) (+ x n)))
+            LISP
+          end
+          it { is_expected.to eq :"make-adder" }
+        end
+
+        context "(setq add2 (make-adder 2)" do
+          let(:str) do
+            <<~LISP
+              (setq add2 (make-adder 2)
+                add10 (make-adder 10))
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+
+        context "(setq add2 (make-adder 2)" do
+          let(:str) do
+            <<~LISP
+              (setq add2 (make-adder 2)
+                add10 (make-adder 10))
+              (funcall add2 5)
+            LISP
+          end
+          it { is_expected.to eq 7 }
+        end
+
+        context "(setq add2 (make-adder 2)" do
+          let(:str) do
+            <<~LISP
+              (setq add2 (make-adder 2)
+                add10 (make-adder 10))
+              (funcall add10 3)
+            LISP
+          end
+          it { is_expected.to eq 13 }
+        end
+
+        context "(defun make-adderb (n)" do
+          let(:str) do
+            <<~LISP
+              (defun make-adderb (n)
+                #'(lambda (x &optional change)
+                    (if change
+                        (setq n x)
+                        (+ x n))))
+            LISP
+          end
+          it { is_expected.to eq :"make-adderb" }
+        end
+
+        context "(setq addx (make-adderb 1))" do
+          let(:str) do
+            <<~LISP
+              (defun make-adderb (n)
+                #'(lambda (x &optional change)
+                    (if change
+                        (setq n x)
+                        (+ x n))))
+              (setq addx (make-adderb 1))
+            LISP
+          end
+          it { is_expected.to be_instance_of Proc }
+        end
+
+        context "(funcall addx 3)" do
+          let(:str) do
+            <<~LISP
+              (defun make-adderb (n)
+                #'(lambda (x &optional change)
+                    (if change
+                        (setq n x)
+                        (+ x n))))
+              (setq addx (make-adderb 1))
+              (funcall addx 3)
+            LISP
+          end
+          it { is_expected.to eq 4 }
+        end
+
+        context "(funcall addx 100 t)" do
+          let(:str) do
+            <<~LISP
+              (defun make-adderb (n)
+                #'(lambda (x &optional change)
+                    (if change
+                        (setq n x)
+                        (+ x n))))
+              (setq addx (make-adderb 1))
+              (funcall addx 3)
+              (funcall addx 100 t)
+            LISP
+          end
+          it { is_expected.to eq 100 }
+        end
+
+        context "(funcall addx 3)" do
+          let(:str) do
+            <<~LISP
+              (defun make-adderb (n)
+                #'(lambda (x &optional change)
+                    (if change
+                        (setq n x)
+                        (+ x n))))
+              (setq addx (make-adderb 1))
+              (funcall addx 3)
+              (funcall addx 100 t)
+              (funcall addx 3)
+            LISP
+          end
+          it { is_expected.to eq 103 }
+        end
+
+        # TODO: まだ続きあるよ
       end
 
-      context "#'(lambda (x) (* x 2))" do
-        let(:str) do
-          <<~LISP
-            #'(lambda (x) (* x 2))
-          LISP
-        end
-        it { is_expected.to be_instance_of Proc }
+      context 'ローカル関数' do
       end
 
-      context "(double 3)" do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-            (double 3)
-          LISP
-        end
-        it { is_expected.to eq 6 }
+      context '末尾再帰' do
       end
 
-      context "((lambda (x) (* x 2)) 3)" do
-        let(:str) do
-          <<~LISP
-            ((lambda (x) (* x 2)) 3)
-          LISP
-        end
-        it { is_expected.to eq 6 }
-      end
-
-      context "(double double)" do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-            (setq double 2)
-            (double double)
-          LISP
-        end
-        it { is_expected.to eq 4 }
-      end
-
-      context "(symbol-value 'double)" do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-            (setq double 2)
-            (symbol-value 'double)
-          LISP
-        end
-        it { is_expected.to eq 2 }
-      end
-
-      context "(symbol-function 'double)" do
-        let(:str) do
-          <<~LISP
-            (defun double (x) (* x 2))
-            (setq double 2)
-            (symbol-function 'double)
-          LISP
-        end
-        it { is_expected.to be_instance_of Proc }
-      end
-
-      context "(setq x #'append)" do
-        let(:str) do
-          <<~LISP
-            (setq x #'append)
-          LISP
-        end
-        it { is_expected.to be_instance_of Proc }
-      end
-
-      context "(eq (symbol-value 'x) (symbol-function 'append))" do
-        let(:str) do
-          <<~LISP
-            (eq (symbol-value 'x) (symbol-function 'append))
-          LISP
-        end
-        it { is_expected.to eq true }
-      end
-
-      context "(setf (symbol-function 'double) #'(lambda (x) (* x 2)))" do
-        let(:str) do
-          <<~LISP
-            (setf (symbol-function 'double)
-              #'(lambda (x) (* x 2)))
-          LISP
-        end
-        it { is_expected.to be_instance_of Proc }
-      end
-
-      context "(+ 1 2)" do
-        let(:str) do
-          <<~LISP
-            (+ 1 2)
-          LISP
-        end
-        it { is_expected.to eq 3 }
-      end
-
-      context "(apply #'+ '(1 2))" do
-        let(:str) do
-          <<~LISP
-            (apply #'+ '(1 2))
-          LISP
-        end
-        it { is_expected.to eq 3 }
-      end
-
-      context "(apply (symbol-function '+) '(1 2))" do
-        let(:str) do
-          <<~LISP
-            (apply (symbol-function '+) '(1 2))
-          LISP
-        end
-        it { is_expected.to eq 3 }
-      end
-
-      context "(apply #'(lambda (x y) (+ x y)) '(1 2))" do
-        let(:str) do
-          <<~LISP
-            (apply #'(lambda (x y) (+ x y)) '(1 2))
-          LISP
-        end
-        it { is_expected.to eq 3 }
-      end
-
-      context "(apply #'+ 1 '(2))" do
-        let(:str) do
-          <<~LISP
-            (apply #'+ 1 '(2))
-          LISP
-        end
-        it { is_expected.to eq 3 }
-      end
-
-      context "(funcall #'+ 1 2)" do
-        let(:str) do
-          <<~LISP
-            (funcall #'+ 1 2)
-          LISP
-        end
-        it { is_expected.to eq 3 }
+      # コンパイルは未実装なので、スキップ
+      xcontext 'コンパイル' do
       end
     end
   end

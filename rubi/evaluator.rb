@@ -116,7 +116,9 @@ module Rubi
         true if result.empty? # falseの場合は、nilを返す
       elsif function == :atom
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        atom = params.shift
+        a = params.shift
+        puts "#{nest}1. 評価する(a: #{a})"
+        atom = eval(a, lexical_hash, stack_count + 1)
         true if atom?(atom) # listの場合は、nilを返す
       elsif function == :quote
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
