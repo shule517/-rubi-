@@ -20,6 +20,7 @@ module Rubi
       end
 
       func_hash[:append] = Proc.new do |proc_params:, lexical_hash:|
+        # TODO: Lispで実装した方がよいのでは？
         eval_params = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)
 
         head_lists = eval_params[0...-1]
