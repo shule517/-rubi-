@@ -34,6 +34,14 @@ module Rubi
         end
       end
 
+      func_hash[:mapcar] = Proc.new do |proc_params:, lexical_hash:|
+        puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash: #{lexical_hash})"
+        a, b = proc_params
+        proc = eval(a, lexical_hash, stack_count + 1)
+        array = eval(b, lexical_hash, stack_count + 1)
+        array.map { |element| pp element: element, lexical_hash: lexical_hash; proc.call(proc_params: element, lexical_hash: lexical_hash) }
+      end
+
       # システム関数を登録済み
       @built_system_func = true
     end
