@@ -35,6 +35,7 @@ module Rubi
       end
 
       func_hash[:mapcar] = Proc.new do |proc_params:, lexical_hash:|
+        # TODO: Lispのcarで実装した方がよいのでは？
         puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash: #{lexical_hash})"
         a, b, c = proc_params
         if c.nil?
