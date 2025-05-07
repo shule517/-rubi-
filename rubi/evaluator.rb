@@ -10,17 +10,17 @@ module Rubi
       @debug = debug
     end
 
-    def build_system_func(lexical_hash, stack_count, nest)
-      func_hash[:+] = Proc.new do |*params|
-        if params.empty?
+    def build_system_func(stack_count, nest)
+      func_hash[:+] = Proc.new do |proc_params:, lexical_hash:|
+        if proc_params.empty?
           0
         else
-          params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(:+)
+          proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(:+)
         end
       end
 
-      func_hash[:append] = Proc.new do |*params|
-        eval_params = params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)
+      func_hash[:append] = Proc.new do |proc_params:, lexical_hash:|
+        eval_params = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)
 
         head_lists = eval_params[0...-1]
         last = eval_params[-1]
@@ -53,7 +53,7 @@ module Rubi
     def eval(ast, lexical_hash, stack_count)
       raise "スタック多すぎ問題" if stack_count > 100
       nest = "  " * (stack_count + 1)
-      build_system_func(lexical_hash, stack_count + 1, nest) unless built_system_func
+      build_system_func(stack_count + 1, nest) unless built_system_func
       puts "#{nest}eval(ast: #{ast}, lexical_hash: #{lexical_hash})"
       if atom?(ast)
         return eval_atom(ast, lexical_hash, nest)
@@ -106,13 +106,13 @@ module Rubi
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
         # 関数定義
-        build_lambda(params, expression, lexical_hash, stack_count, nest)
+        build_lambda(params, expression, stack_count, nest)
       elsif function == :defun # 関数定義
         func_name = params.shift
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
         # 関数定義
-        func_hash[func_name] = build_lambda(params, expression, lexical_hash, stack_count, nest)
+        func_hash[func_name] = build_lambda(params, expression, stack_count, nest)
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
       elsif function == :function
@@ -196,10 +196,6 @@ module Rubi
         macro_hash[macro_name] = build_macro(params, expression, lexical_hash, stack_count, nest)
         puts "#{nest}-> macro_hash: #{macro_hash}"
         macro_name
-      elsif function == :+
-        # TODO: 削除して、組み込み関数に差し替える
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        params.map { |a| eval(a, lexical_hash, stack_count + 1) }.sum
       elsif function == :-
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:-)
@@ -336,8 +332,8 @@ module Rubi
         # (apply #'+ (append '(1) '(2)))
         eval_params = params.map { |param| Array(eval(param, lexical_hash, stack_count + 1)) }.reduce(&:+)
         puts "#{nest}-> (eval_params: #{eval_params})"
-        func.call(*eval_params)
-      elsif function.instance_of?(Array)
+        func.call(proc_params: eval_params, lexical_hash: lexical_hash)
+      elsif function.instance_of?(Array) # lambdaを実行する
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
         # まずは第１引数を評価してから、実行する
@@ -345,17 +341,17 @@ module Rubi
         expression = eval(function, lexical_hash, stack_count + 1)
         puts "#{nest}関数の実行:#{function}(expression: #{expression})"
         puts "#{nest}関数の実行:#{function}(params: #{params})"
-        expression.call(*params)
-      elsif function.instance_of?(Proc)
+        expression.call(proc_params: params, lexical_hash: lexical_hash)
+      elsif function.instance_of?(Proc) # funcallで関数を実行する
         puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
-        function.call(*params)
-      elsif func_hash.key?(function)
+        function.call(proc_params: params, lexical_hash: lexical_hash)
+      elsif func_hash.key?(function) # defunで登録した関数を実行する
         # 登録されている関数を呼び出す
         puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
         func = func_hash[function]
         puts "#{nest}func_hash[function]: #{func}"
         puts "#{nest}params: #{params}"
-        func.call(*params)
+        func.call(proc_params: params, lexical_hash: lexical_hash)
       elsif macro_hash.key?(function)
         # 登録されているマクロを呼び出す
         puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
@@ -371,8 +367,8 @@ module Rubi
     private
 
     # 関数定義
-    def build_lambda(params, expression, lexical_hash, stack_count, nest)
-      Proc.new do |*proc_params|
+    def build_lambda(params, expression, stack_count, nest)
+      Proc.new do |proc_params:, lexical_hash:|
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
         puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
         params.each.with_index do |param, index|

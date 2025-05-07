@@ -296,26 +296,8 @@ describe Rubi::Evaluator do
           it do
             proc = subject
             expect(proc).to be_instance_of(Proc)
-            expect(proc.call).to eq 3
+            expect(proc.call(proc_params: [], lexical_hash: {})).to eq 3
           end
-        end
-
-        context '引数なしの関数定義＆実行①' do
-          let(:str) do
-            <<~LISP
-              ((lambda () (+ 1 2)))
-            LISP
-          end
-          it { is_expected.to eq 3 }
-        end
-
-        context '引数なしの関数定義＆実行②' do
-          let(:str) do
-            <<~LISP
-              ((lambda () (+ 2 3)))
-            LISP
-          end
-          it { is_expected.to eq 5 }
         end
       end
 
@@ -330,23 +312,47 @@ describe Rubi::Evaluator do
           it do
             proc = subject
             expect(proc).to be_instance_of(Proc)
-            expect(proc.call(3)).to eq 5
+            expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 5
           end
         end
+      end
+    end
 
-        context '引数ありの関数定義＆実行①' do
+    describe "#lambdaを実行 / function.instance_of?(Array)" do
+      context '引数なし' do
+        context '関数定義＆実行①' do
           let(:str) do
             <<~LISP
-              ((lambda (x) (+ x 2)) 4)
+                ((lambda () (+ 1 2)))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context '関数定義＆実行②' do
+          let(:str) do
+            <<~LISP
+                ((lambda () (+ 2 3)))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
+      end
+
+      context '引数あり' do
+        context '関数定義＆実行①' do
+          let(:str) do
+            <<~LISP
+                ((lambda (x) (+ x 2)) 4)
             LISP
           end
           it { is_expected.to eq 6 }
         end
 
-        context '引数ありの関数定義＆実行②' do
+        context '関数定義＆実行②' do
           let(:str) do
             <<~LISP
-              ((lambda (x) (+ 1 x)) 4)
+                ((lambda (x) (+ 1 x)) 4)
             LISP
           end
           it { is_expected.to eq 5 }
@@ -355,7 +361,7 @@ describe Rubi::Evaluator do
         context '引数複数の関数定義＆実行' do
           let(:str) do
             <<~LISP
-              ((lambda (x y) (* x y)) 3 4)
+                ((lambda (x y) (* x y)) 3 4)
             LISP
           end
           it { is_expected.to eq 12 }
@@ -430,7 +436,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(3)).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
         end
       end
 
@@ -455,7 +461,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(3)).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
         end
       end
 
@@ -483,7 +489,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(3)).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
         end
       end
 
@@ -508,7 +514,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(3)).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
         end
       end
 
