@@ -2394,7 +2394,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [11, 12, 13] }
         end
 
-        context "(mapcar #'(lambda (x) (+ x 10)) '(1 2 3))" do
+        context "(mapcar #'+ '(1 2 3) '(10 100 1000))" do
           let(:str) do
             <<~LISP
               (mapcar #'+

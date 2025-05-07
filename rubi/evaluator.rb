@@ -36,10 +36,33 @@ module Rubi
 
       func_hash[:mapcar] = Proc.new do |proc_params:, lexical_hash:|
         puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash: #{lexical_hash})"
-        a, b = proc_params
-        proc = eval(a, lexical_hash, stack_count + 1)
-        array = eval(b, lexical_hash, stack_count + 1)
-        array.map { |element| pp element: element, lexical_hash: lexical_hash; proc.call(proc_params: element, lexical_hash: lexical_hash) }
+        a, b, c = proc_params
+        if c.nil?
+          # 引数が2つの場合
+          # (mapcar
+          #   #'(lambda (x) (+ x 10))
+          #   '(1 2 3))
+          proc = eval(a, lexical_hash, stack_count + 1)
+          array = eval(b, lexical_hash, stack_count + 1)
+          array.map do |element|
+            puts "#{nest}mapcar(element: #{element}, lexical_hash: #{lexical_hash})"
+            proc.call(proc_params: [element], lexical_hash: lexical_hash.dup)
+          end
+        else
+          # 引数が3つの場合
+          # (mapcar #'+
+          #   '(1 2 3)
+          #   '(10 100 1000))
+          proc = eval(a, lexical_hash, stack_count + 1)
+          array1 = eval(b, lexical_hash, stack_count + 1)
+          array2 = eval(c, lexical_hash, stack_count + 1)
+          array1.map.with_index do |element, index|
+            puts "#{nest}mapcar(element: #{element}, lexical_hash: #{lexical_hash})"
+            param1 = element
+            param2 = array2[index]
+            proc.call(proc_params: [param1, param2], lexical_hash: lexical_hash.dup)
+          end
+        end
       end
 
       # システム関数を登録済み
@@ -377,15 +400,17 @@ module Rubi
     # 関数定義
     def build_lambda(params, expression, stack_count, nest)
       Proc.new do |proc_params:, lexical_hash:|
+        raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
         puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
         params.each.with_index do |param, index|
-          # 変数を展開するために、評価する
+          puts "#{nest}1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, lexical_hash: #{lexical_hash})"
           lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 1)
         end
         puts "#{nest}-> lexical_hash: #{lexical_hash}"
         puts "#{nest}2. lambdaを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
-        eval(expression, lexical_hash, stack_count + 1)
+        # 関数を実行すると、expressionが書き換わってしまうので、expression.dup
+        eval(expression.dup, lexical_hash, stack_count + 1)
       end
     end
 
