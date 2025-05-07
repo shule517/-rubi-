@@ -2641,10 +2641,128 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 103 }
         end
 
-        # TODO: まだ続きあるよ
+        context "(setq cities (make-dbms '((boston . us) (paris . france))))" do
+          let(:str) do
+            <<~LISP
+              (defun make-dbms (db)
+                (list
+                  #'(lambda (key)
+                      (cdr (assoc key db)))
+                  #'(lambda (key val)
+                      (push (cons key val) db)
+                      key)
+                  #'(lambda (key)
+                      (setf db (delete key db :key #'car))
+                      key)))
+              (setq cities (make-dbms '((boston . us) (paris . france))))
+            LISP
+          end
+          it { is_expected.to eq 999999 }
+        end
+
+        context "(funcall (car cities) 'boston)" do
+          let(:str) do
+            <<~LISP
+              (defun make-dbms (db)
+                (list
+                  #'(lambda (key)
+                      (cdr (assoc key db)))
+                  #'(lambda (key val)
+                      (push (cons key val) db)
+                      key)
+                  #'(lambda (key)
+                      (setf db (delete key db :key #'car))
+                      key)))
+              (setq cities (make-dbms '((boston . us) (paris . france))))
+              (funcall (car cities) 'boston)
+            LISP
+          end
+          it { is_expected.to eq 999999 }
+        end
+
+        context "(funcall (second cities) 'london 'england)" do
+          let(:str) do
+            <<~LISP
+              (defun make-dbms (db)
+                (list
+                  #'(lambda (key)
+                      (cdr (assoc key db)))
+                  #'(lambda (key val)
+                      (push (cons key val) db)
+                      key)
+                  #'(lambda (key)
+                      (setf db (delete key db :key #'car))
+                      key)))
+              (setq cities (make-dbms '((boston . us) (paris . france))))
+              (funcall (car cities) 'boston)
+              (funcall (second cities) 'london 'england)
+            LISP
+          end
+          it { is_expected.to eq 999999 }
+        end
+
+        context "(funcall (car cities) 'london)" do
+          let(:str) do
+            <<~LISP
+              (defun make-dbms (db)
+                (list
+                  #'(lambda (key)
+                      (cdr (assoc key db)))
+                  #'(lambda (key val)
+                      (push (cons key val) db)
+                      key)
+                  #'(lambda (key)
+                      (setf db (delete key db :key #'car))
+                      key)))
+              (setq cities (make-dbms '((boston . us) (paris . france))))
+              (funcall (car cities) 'boston)
+              (funcall (second cities) 'london 'england)
+              (funcall (car cities) 'london)
+            LISP
+          end
+          it { is_expected.to eq 999999 }
+        end
+
+        context "(funcall (car cities) 'london)" do
+          let(:str) do
+            <<~LISP
+              (defun lookup (key db)
+                (funcall (car db) key))
+            LISP
+          end
+          it { is_expected.to eq 999999 }
+        end
       end
 
       context 'ローカル関数' do
+        context "(funcall (car cities) 'london)" do
+          let(:str) do
+            <<~LISP
+              (mapcar #'(lambda (x) (+ 2 x))
+                '(2 5 7 3))
+            LISP
+          end
+          it { is_expected.to eq [4, 7, 9, 5] }
+        end
+
+        context "(mapcar #'copy-tree '((a b) (c d e)))" do
+          let(:str) do
+            <<~LISP
+              (mapcar #'copy-tree '((a b) (c d e)))
+            LISP
+          end
+          it { is_expected.to eq [4, 7, 9, 5] }
+        end
+
+        context "(defun list+ (lst n) (mapcar #'(lambda (x) (+ x n))" do
+          let(:str) do
+            <<~LISP
+              (defun list+ (lst n)
+                (mapcar #'(lambda (x) (+ x n))
+            LISP
+          end
+          it { is_expected.to eq [4, 7, 9, 5] }
+        end
       end
 
       context '末尾再帰' do
