@@ -323,7 +323,7 @@ describe Rubi::Evaluator do
         context '関数定義＆実行①' do
           let(:str) do
             <<~LISP
-                ((lambda () (+ 1 2)))
+              ((lambda () (+ 1 2)))
             LISP
           end
           it { is_expected.to eq 3 }
@@ -332,7 +332,7 @@ describe Rubi::Evaluator do
         context '関数定義＆実行②' do
           let(:str) do
             <<~LISP
-                ((lambda () (+ 2 3)))
+              ((lambda () (+ 2 3)))
             LISP
           end
           it { is_expected.to eq 5 }
@@ -343,7 +343,7 @@ describe Rubi::Evaluator do
         context '関数定義＆実行①' do
           let(:str) do
             <<~LISP
-                ((lambda (x) (+ x 2)) 4)
+              ((lambda (x) (+ x 2)) 4)
             LISP
           end
           it { is_expected.to eq 6 }
@@ -352,7 +352,7 @@ describe Rubi::Evaluator do
         context '関数定義＆実行②' do
           let(:str) do
             <<~LISP
-                ((lambda (x) (+ 1 x)) 4)
+              ((lambda (x) (+ 1 x)) 4)
             LISP
           end
           it { is_expected.to eq 5 }
@@ -361,7 +361,7 @@ describe Rubi::Evaluator do
         context '引数複数の関数定義＆実行' do
           let(:str) do
             <<~LISP
-                ((lambda (x y) (* x y)) 3 4)
+              ((lambda (x y) (* x y)) 3 4)
             LISP
           end
           it { is_expected.to eq 12 }
@@ -540,11 +540,22 @@ describe Rubi::Evaluator do
         end
       end
 
-      # TODO: 未実装
-      xcontext '組み込み関数の場合' do
-        # %w(car cdr apply).each do |func|
-        %w(list cons null atom funcall + - * / = /= < > <= >= not).each do |func|
+      context '組み込み関数の場合' do
+        %w(+ - * /).each do |func|
           context "#'#{func}の場合" do
+            let(:str) do
+              <<~LISP
+                #'#{func}
+              LISP
+            end
+
+            it { is_expected.to be_instance_of(Proc) }
+          end
+        end
+
+        # %w(car cdr apply).each do |func|
+        %w(list cons null atom funcall = /= < > <= >= not).each do |func|
+          xcontext "#'#{func}の場合" do
             let(:str) do
               <<~LISP
                 #'#{func}
@@ -2175,6 +2186,17 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 6 }
       end
     end
+
+    describe '#evenp' do
+      context '1の場合' do
+        let(:str) do
+          <<~LISP
+            (evenp 2)
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+    end
   end
 
   describe 'On Lispのサンプルコード' do
@@ -2416,6 +2438,9 @@ describe Rubi::Evaluator do
 
         context "(remove-if #'evenp '(1 2 3 4 5 6 7))" do
           let(:str) do
+            # TODO:
+            # (defun evenp (x) (= 2 (denominator (/ x 2))))
+            # (defun remove-if (func lst) (funcall func (car lst)))
             <<~LISP
               (remove-if #'evenp '(1 2 3 4 5 6 7))
             LISP
@@ -2551,9 +2576,11 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :"make-adder" }
         end
 
-        context "(setq add2 (make-adder 2)" do
+        context "(setq add2 (make-adder 2) add10 (make-adder 10))" do
           let(:str) do
             <<~LISP
+              (defun make-adder (n)
+                #'(lambda (x) (+ x n)))
               (setq add2 (make-adder 2)
                 add10 (make-adder 10))
             LISP
@@ -2561,9 +2588,11 @@ describe Rubi::Evaluator do
           it { is_expected.to be_instance_of Proc }
         end
 
-        context "(setq add2 (make-adder 2)" do
+        context "(funcall add2 5)" do
           let(:str) do
             <<~LISP
+              (defun make-adder (n)
+                #'(lambda (x) (+ x n)))
               (setq add2 (make-adder 2)
                 add10 (make-adder 10))
               (funcall add2 5)
@@ -2572,9 +2601,11 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 7 }
         end
 
-        context "(setq add2 (make-adder 2)" do
+        context "(funcall add10 3)" do
           let(:str) do
             <<~LISP
+              (defun make-adder (n)
+                #'(lambda (x) (+ x n)))
               (setq add2 (make-adder 2)
                 add10 (make-adder 10))
               (funcall add10 3)
