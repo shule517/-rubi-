@@ -11,11 +11,13 @@ module Rubi
     end
 
     def build_system_func(stack_count, nest)
-      func_hash[:+] = Proc.new do |proc_params:, lexical_hash:|
-        if proc_params.empty?
-          0
-        else
-          proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(:+)
+      %i(+ - * /).each do |operator|
+        func_hash[operator] = Proc.new do |proc_params:, lexical_hash:|
+          if proc_params.empty?
+            0
+          else
+            proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(operator)
+          end
         end
       end
 
@@ -229,15 +231,6 @@ module Rubi
         macro_hash[macro_name] = build_macro(params, expression, lexical_hash, stack_count, nest)
         puts "#{nest}-> macro_hash: #{macro_hash}"
         macro_name
-      elsif function == :-
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:-)
-      elsif function == :*
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:*)
-      elsif function == :/
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        params.map { |a| eval(a, lexical_hash, stack_count + 1) }.reduce(:/)
       elsif function == :eq
         # オブジェクトが一致しているか。ポインタが一致しているか。
         # Lispのeq は Rubyのequal? とほぼ一致する
