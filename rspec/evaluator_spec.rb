@@ -2246,6 +2246,36 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#1+' do
+      context '数値の場合' do
+        let(:str) do
+          <<~LISP
+            (1+ 2)
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+
+      context '変数の場合' do
+        let(:str) do
+          <<~LISP
+            (setq x 3)
+            (1+ x)
+          LISP
+        end
+        it { is_expected.to eq 4 }
+      end
+
+      context '式の場合' do
+        let(:str) do
+          <<~LISP
+            (1+ (+ 1 2))
+          LISP
+        end
+        it { is_expected.to eq 4 }
+      end
+    end
+
     describe '#remove-if' do
       context '最終的な確認' do
         let(:str) { "(remove-if #'evenp '(1 2 3 4 5))" }
@@ -2929,11 +2959,46 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [4, 7, 9, 5] }
         end
 
-        context "(defun list+ (lst n) (mapcar #'(lambda (x) (+ x n))" do
+        context "(defun list+ (lst n) (mapcar #'(lambda (x) (+ x n)) lst))" do
           let(:str) do
             <<~LISP
               (defun list+ (lst n)
                 (mapcar #'(lambda (x) (+ x n))
+                        lst))
+            LISP
+          end
+          it { is_expected.to eq [4, 7, 9, 5] }
+        end
+
+        context "(labels ((inc (x) (1+ x))) (inc 3))" do
+          let(:str) do
+            <<~LISP
+              (labels ((inc (x) (1+ x)))
+                      (inc 3))
+            LISP
+          end
+          it { is_expected.to eq [4, 7, 9, 5] }
+        end
+
+        context "(defun count-instances (obj lsts)" do
+          let(:str) do
+            <<~LISP
+              (defun count-instances (obj lsts)
+                (labels ((instances-in (lst)
+                           (if (consp lst)
+                               (+ (if (eq (car lst) obj) 1 0)
+                                  (instances-in (cdr lst)))
+                               0)))
+                  (mapcar #'instances-in lsts)))
+            LISP
+          end
+          it { is_expected.to eq [4, 7, 9, 5] }
+        end
+
+        context "(count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))" do
+          let(:str) do
+            <<~LISP
+              (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
             LISP
           end
           it { is_expected.to eq [4, 7, 9, 5] }
@@ -2941,6 +3006,19 @@ describe Rubi::Evaluator do
       end
 
       context '末尾再帰' do
+        context "(defun our-length (lst)" do
+          # TODO: 再帰すると壊れるっぽい気がする
+          let(:str) do
+            <<~LISP
+              (defun our-length (lst)
+                (if (null lst)
+                    0
+                    (1+ (our-length (cdr lst)))))
+              (our-length '(1 2 3 4 5))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
       end
 
       # コンパイルは未実装なので、スキップ

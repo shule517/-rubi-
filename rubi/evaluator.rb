@@ -80,6 +80,7 @@ module Rubi
       @built_system_func = true
 
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
+      lisp_eval("(defun 1+ (x) (+ x 1))")
 
       lisp_eval(<<~LISP)
         (defun remove-if (func lst)
