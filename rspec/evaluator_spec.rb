@@ -3196,28 +3196,34 @@ describe Rubi::Evaluator do
       end
 
       context '命令的プログラミングの裏返し' do
-        # TODO:
+        xit 'TODO' do
+        end
       end
 
       context '関数的インタフェイス' do
-        # TODO:
+        xit 'TODO' do
+        end
       end
 
       context 'インタラクティブ・プログラミング' do
-        # TODO:
+        xit 'TODO' do
+        end
       end
     end
 
     context '4. ユーティリティ関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/utilityFunctions.html' do
-      # TODO:
+      xit 'TODO' do
+      end
     end
 
     context '5. 返り値としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/returningFunctions.html' do
-      # TODO:
+      xit 'TODO' do
+      end
     end
 
     context '6. 表現としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionsAsRepresentation.html' do
-      # TODO:
+      xit 'TODO' do
+      end
     end
 
     context '7. マクロ: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/macros.html' do
@@ -3323,10 +3329,13 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq nil }
         end
-        # TODO: まだある
 
+        xit 'TODO: まだある' do
+        end
       end
-      # TODO: まだある
+
+      xit 'TODO: まだある' do
+      end
     end
   end
 end
