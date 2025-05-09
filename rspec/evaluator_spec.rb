@@ -254,6 +254,37 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
+      context '変数を複数定義する' do
+        context '1つ目の変数を参照する' do
+          let(:str) do
+            <<~LISP
+              (setq a 1 b 2 c 3)
+              a
+            LISP
+          end
+          it { is_expected.to eq 1 }
+        end
+
+        context '3つ目の変数を参照する' do
+          let(:str) do
+            <<~LISP
+              (setq a 1 b 2 c 3)
+              c
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context '戻り値を確認する' do
+          let(:str) do
+            <<~LISP
+              (setq a 1 b 2 c 3)
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+      end
+
       context 'スコープの確認' do
         context 'ローカル変数に固定値を代入 ＆ xで評価' do
           let(:str) do

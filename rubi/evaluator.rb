@@ -16,6 +16,7 @@ module Rubi
       # システム関数を登録済み(このメソッドを1回しか実行しない)
       @built_system_func = true
 
+      puts "#### ↓ 初期化 ↓ ####"
       %i(+ - * /).each do |operator|
         func_hash[operator] = Proc.new do |proc_params:, lexical_hash:|
           if proc_params.empty?
@@ -100,9 +101,10 @@ module Rubi
       # TODO: compileを仮実装
       lisp_eval("(defun compile (x) nil)")
       lisp_eval("(defun compiled-function-p (x) t)")
+
+      puts "#### ↑ 初期化 ↑ ####"
     end
 
-    # TODO:
     def lisp_eval(line)
       tokens = tokenizer.split_tokens(line)
       ast = parser.parse(tokens)
@@ -164,17 +166,19 @@ module Rubi
         puts "#{nest}#式を評価する - expression: #{expression}"
         expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
       elsif function == :setq # 変数定義
-        var_name, value = params
-        puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
-        if lexical_hash.key?(var_name)
-          # ローカル変数がある場合は、ローカル変数を変更する
-          lexical_hash[var_name] = value
-        else
-          # ローカル変数がない場合は、グローバル変数を定義する
-          var_hash[var_name] = eval(value, lexical_hash, stack_count + 1)
-          puts "#{nest}-> var_hash: #{var_hash}"
-          var_hash[var_name]
-        end
+        # (setq a 1 b 2 c 3)
+        params.each_slice(2).map do |var_name, value|
+          puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
+          if lexical_hash.key?(var_name)
+            # ローカル変数がある場合は、ローカル変数を変更する
+            lexical_hash[var_name] = value
+          else
+            # ローカル変数がない場合は、グローバル変数を定義する
+            var_hash[var_name] = eval(value, lexical_hash, stack_count + 1)
+            puts "#{nest}-> var_hash: #{var_hash}"
+            var_hash[var_name]
+          end
+        end.last
       elsif function == :setf # TODO: 未実装。setqをコピーしただけ
         var_name, value = params
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
