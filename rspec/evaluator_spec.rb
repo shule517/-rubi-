@@ -3134,7 +3134,8 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999 }
         end
 
-        # TODO: まだある
+        xit 'TODO' do
+        end
       end
     end
 
@@ -3212,17 +3213,98 @@ describe Rubi::Evaluator do
     end
 
     context '4. ユーティリティ関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/utilityFunctions.html' do
-      xit 'TODO' do
+      context 'ユーティリティの誕生' do
+        xit 'TODO' do
+        end
+      end
+
+      context '抽象化への投資' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'リストに対する操作' do
+        xit 'TODO' do
+        end
+      end
+
+      context '検索' do
+        xit 'TODO' do
+        end
+      end
+
+      context '対応付け' do
+        xit 'TODO' do
+        end
+      end
+
+      context '入出力' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'シンボルとストリング' do
+        xit 'TODO' do
+        end
+      end
+
+      context '密度' do
+        xit 'TODO' do
+        end
       end
     end
 
     context '5. 返り値としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/returningFunctions.html' do
-      xit 'TODO' do
+      context 'Common Lispは進化する' do
+        xit 'TODO' do
+        end
+      end
+
+      context '直交性' do
+        xit 'TODO' do
+        end
+      end
+
+      context '関数の値のメモワイズ' do
+        xit 'TODO' do
+        end
+      end
+
+      context '関数を合成する' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'Cdr部での再帰' do
+        xit 'TODO' do
+        end
+      end
+
+      context '部分ツリーでの再帰' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'いつ関数を作るべきか' do
+        xit 'TODO' do
+        end
       end
     end
 
     context '6. 表現としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionsAsRepresentation.html' do
-      xit 'TODO' do
+      context 'ネットワーク' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'ネットワークのコンパイル' do
+        xit 'TODO' do
+        end
+      end
+
+      context '前を向く' do
+        xit 'TODO' do
+        end
       end
     end
 
@@ -3330,11 +3412,53 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        xit 'TODO: まだある' do
+        xit 'TODO' do
         end
       end
 
-      xit 'TODO: まだある' do
+      context '単純なマクロの定義' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'マクロ展開の確認' do
+        xit 'TODO' do
+        end
+      end
+
+      context '引数リストの構造化代入' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'マクロのモデル' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'プログラムとしてのマクロ' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'マクロのスタイル' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'マクロへの依存' do
+        xit 'TODO' do
+        end
+      end
+
+      context '関数からマクロへ' do
+        xit 'TODO' do
+        end
+      end
+
+      context 'シンボル・マクロ' do
+        xit 'TODO' do
+        end
       end
     end
   end
