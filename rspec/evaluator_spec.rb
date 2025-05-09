@@ -13,6 +13,32 @@ describe Rubi::Evaluator do
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
     describe '#let' do
+      context '#let*との比較' do
+        context 'let内で宣言した変数を参照する' do
+          let(:str) do
+            <<~LISP
+              (let ((a 2) ; aはlet内ではまだ未定義
+                    (b (+ a 3))) ; ← a まだ未定義
+                (list a b))
+            LISP
+          end
+          it { expect { subject }.to raise_error }
+          # TODO: it { is_expected.to eq [2, 13] }
+        end
+
+        context 'let内で宣言した変数を参照する' do
+          let(:str) do
+            <<~LISP
+              (setq a 10)
+              (let ((a 2)
+                    (b (+ a 3)))  ; ← 外の a（10）を参照して b = 13
+                (list a b))
+            LISP
+          end
+          it { is_expected.to eq [2, 13] }
+        end
+      end
+
       context '変数１つ宣言' do
         let(:str) do
           <<~LISP
@@ -98,21 +124,17 @@ describe Rubi::Evaluator do
     end
 
     describe '#let*' do
-      context '変数を定義するだけ' do
-        let(:str) do
-          <<~LISP
-            (let* ((a 1)
-                   (b (+ a 1)))
-              b)
-          LISP
-          # TODO:
-          # <<~LISP
-          #   (let* ((a 1)
-          #          (b (+ a 1)))  ; ← a はすでに 1 として定義済み
-          #     b)
-          # LISP
+      context '#letとの比較' do
+        context 'let*内で宣言した変数を参照する' do
+          let(:str) do
+            <<~LISP
+              (let* ((a 2) ; a = 2で定義
+                    (b (+ a 3))) ; ← a 定義済み
+                (list a b))
+            LISP
+          end
+          it { is_expected.to eq [2, 5] }
         end
-        it { is_expected.to eq 2 }
       end
 
       context '変数１つ宣言' do
