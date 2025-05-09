@@ -2225,12 +2225,23 @@ describe Rubi::Evaluator do
     end
 
     describe '#evenp' do
-      context '1の場合' do
-        let(:str) do
-          <<~LISP
-            (evenp 2)
-          LISP
-        end
+      context '(evenp 0)' do
+        let(:str) { '(evenp 0)' }
+        it { is_expected.to eq nil }
+      end
+
+      context '(evenp 1)' do
+        let(:str) { '(evenp 1)' }
+        it { is_expected.to eq true }
+      end
+
+      context '(evenp 2)' do
+        let(:str) { '(evenp 2)' }
+        it { is_expected.to eq nil }
+      end
+
+      context '(evenp 3)' do
+        let(:str) { '(evenp 3)' }
         it { is_expected.to eq true }
       end
     end

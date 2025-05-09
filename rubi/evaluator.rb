@@ -77,9 +77,7 @@ module Rubi
       # システム関数を登録済み
       @built_system_func = true
 
-      # (= 2 (denominator (/ x 2)))
-      # func_hash[:evenp] = build_lambda([:x], [:'=', 2, [:denominator, [:/, :x, 2 ]]], stack_count, nest)
-      # pp lisp_eval("(defun evenp (x) (= 2 (denominator (/ x 2))))")
+      lisp_eval("(defun evenp (x) (/= (mod x 2) 0))")
     end
 
     # TODO:
