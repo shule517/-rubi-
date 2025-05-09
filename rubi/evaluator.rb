@@ -21,6 +21,11 @@ module Rubi
         end
       end
 
+      func_hash[:mod] = Proc.new do |proc_params:, lexical_hash:|
+        a, b = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        a % b
+      end
+
       func_hash[:append] = Proc.new do |proc_params:, lexical_hash:|
         # TODO: Lispで実装した方がよいのでは？
         eval_params = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)
@@ -72,21 +77,20 @@ module Rubi
       # システム関数を登録済み
       @built_system_func = true
 
-      # TODO:
       # (= 2 (denominator (/ x 2)))
       # func_hash[:evenp] = build_lambda([:x], [:'=', 2, [:denominator, [:/, :x, 2 ]]], stack_count, nest)
       # pp lisp_eval("(defun evenp (x) (= 2 (denominator (/ x 2))))")
     end
 
     # TODO:
-    # def lisp_eval(line)
-    #   tokenizer = Rubi::Tokenizer.new
-    #   parser = Rubi::Parser.new
-    #   tokens = tokenizer.split_tokens(line)
-    #   ast = parser.parse(tokens)
-    #   ast = parser.expand_syntactic_sugar(ast)
-    #   result = ast.map { |code| eval(code, {}, 0) }.last
-    # end
+    def lisp_eval(line)
+      tokenizer = Rubi::Tokenizer.new
+      parser = Rubi::Parser.new
+      tokens = tokenizer.split_tokens(line)
+      ast = parser.parse(tokens)
+      ast = parser.expand_syntactic_sugar(ast)
+      result = ast.map { |code| eval(code, {}, 0) }.last
+    end
 
     def atom?(ast)
       !list?(ast)

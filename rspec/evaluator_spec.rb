@@ -1176,6 +1176,23 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#mod' do
+      context '(mod 0 2)' do
+        let(:str) { "(mod 0 2)" }
+        it { is_expected.to eq 0 }
+      end
+
+      context '(mod 1 2)' do
+        let(:str) { "(mod 1 2)" }
+        it { is_expected.to eq 1 }
+      end
+
+      context '(mod 2 2)' do
+        let(:str) { "(mod 2 2)" }
+        it { is_expected.to eq 0 }
+      end
+    end
+
     describe '#eq (オブジェクトが一致しているか。ポインタが一致しているか)' do
       context '同じ値の場合' do
         context "整数と整数の場合" do
