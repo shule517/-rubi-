@@ -2368,6 +2368,10 @@ describe Rubi::Evaluator do
     end
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
+    context '1. 拡張可能なプログラミング言語: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/extensibleLanguage.html' do
+      # Common Lispで動くコードはなかった
+    end
+
     context '2. 関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functions.html' do
       context '関数の定義' do
         context '(defun double (x) (* x 2))' do
@@ -3135,6 +3139,194 @@ describe Rubi::Evaluator do
     end
 
     context '3. 関数的プログラミング: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionalProgramming.html' do
+      context '関数的デザイン' do
+        context '(defun bad-reverse (lst)' do
+          let(:str) do
+            <<~LISP
+              (defun bad-reverse (lst)
+                (let* ((len (length lst))
+                       (ilimit (truncate (/ len 2))))
+                  (do ((i 0 (1+ i))
+                       (j (1- len) (1- j)))
+                      ((>= i ilimit))
+                    (rotatef (nth i lst) (nth j lst)))))
+                (bad-reverse '(1 2 3))
+            LISP
+          end
+          it { is_expected.to eq [3, 2, 1] }
+        end
+
+        context '(defun bad-reverse (lst)' do
+          let(:str) do
+            <<~LISP
+              (defun bad-reverse (lst)
+                (let* ((len (length lst))
+                       (ilimit (truncate (/ len 2))))
+                  (do ((i 0 (1+ i))
+                       (j (1- len) (1- j)))
+                      ((>= i ilimit))
+                    (rotatef (nth i lst) (nth j lst)))))
+
+                (setq lst '(a b c))
+                (bad-reverse lst)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context '(defun bad-reverse (lst)' do
+          let(:str) do
+            <<~LISP
+              (defun bad-reverse (lst)
+                (let* ((len (length lst))
+                       (ilimit (truncate (/ len 2))))
+                  (do ((i 0 (1+ i))
+                       (j (1- len) (1- j)))
+                      ((>= i ilimit))
+                    (rotatef (nth i lst) (nth j lst)))))
+
+                (setq lst '(a b c))
+                (bad-reverse lst)
+                lst
+            LISP
+          end
+          it { is_expected.to eq [:c, :b, :a] }
+        end
+        # TODO:
+      end
+
+      context '命令的プログラミングの裏返し' do
+        # TODO:
+      end
+
+      context '関数的インタフェイス' do
+        # TODO:
+      end
+
+      context 'インタラクティブ・プログラミング' do
+        # TODO:
+      end
+    end
+
+    context '4. ユーティリティ関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/utilityFunctions.html' do
+      # TODO:
+    end
+
+    context '5. 返り値としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/returningFunctions.html' do
+      # TODO:
+    end
+
+    context '6. 表現としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionsAsRepresentation.html' do
+      # TODO:
+    end
+
+    context '7. マクロ: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/macros.html' do
+      context 'マクロはどのように動作するか' do
+        context '(defmacro nil! (var)' do
+          context '定義' do
+            let(:str) do
+              <<~LISP
+                (defmacro nil! (var)
+                  (list 'setq var nil))
+              LISP
+            end
+            it { is_expected.to eq :nil! }
+          end
+
+          context '定義＆実行' do
+            let(:str) do
+              <<~LISP
+                (setq x 2)
+                (defmacro nil! (var)
+                  (list 'setq var nil))
+                (nil! x)
+                x
+              LISP
+            end
+            it { is_expected.to eq nil }
+          end
+        end
+      end
+
+      context '逆クォート' do
+        context "(setq a 1 b 2 c 3)" do
+          let(:str) do
+            <<~LISP
+              (setq a 1 b 2 c 3)
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "`(a ,b c)" do
+          let(:str) do
+            <<~LISP
+              `(a ,b c)
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "`(a (,b c))" do
+          let(:str) do
+            <<~LISP
+              `(a (,b c))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+
+        context "(defmacro nil! (var) `(setq ,var nil))" do
+          let(:str) do
+            <<~LISP
+              (setq x 2)
+              (defmacro nil! (var)
+                `(setq ,var nil))
+              (nil! x)
+              x
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context "(defmacro nif (expr pos zero neg)  バッククォート版" do
+          let(:str) do
+            <<~LISP
+              (defmacro nif (expr pos zero neg)
+                `(case (truncate (signum ,expr))
+                   (1 ,pos)
+                   (0 ,zero)
+                   (-1 ,neg)))
+  
+              (mapcar #'(lambda (x)
+                (nif x 'p 'z 'n))
+                '(0 2.5 -8))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context "(defmacro nif (expr pos zero neg) バッククォートなし版" do
+          let(:str) do
+            <<~LISP
+              (defmacro nif (expr pos zero neg)
+                (list 'case
+                      (list 'truncate (list 'signum expr))
+                      (list 1 pos)
+                      (list 0 zero)
+                      (list -1 neg)))
+  
+              (mapcar #'(lambda (x)
+                (nif x 'p 'z 'n))
+                '(0 2.5 -8))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+        # TODO: まだある
+
+      end
+      # TODO: まだある
     end
   end
 end
