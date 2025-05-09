@@ -21,7 +21,9 @@ module Rubi
           if proc_params.empty?
             0
           else
-            proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(operator)
+            result = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(operator)
+            puts "(#{operator} #{proc_params}) -> #{result}"
+            result
           end
         end
       end
@@ -329,6 +331,7 @@ module Rubi
       elsif function == :"="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        puts "#{nest}#{a} == #{b} -> #{a == b}"
         true if a == b # 不一致の場合は、nilを返す
       elsif function == :"/="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"

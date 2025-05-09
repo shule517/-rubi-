@@ -2380,6 +2380,19 @@ describe Rubi::Evaluator do
     describe '#labels' do
       xit {}
     end
+
+    describe '再帰処理の動作確認' do
+      let(:str) do
+        <<~LISP
+          (defun fact (n)
+            (if (= n 0)
+              1
+              (* n (fact (- n 1)))))
+          (fact 5)
+        LISP
+      end
+      it { is_expected.to eq 120 }
+    end
   end
 
   describe 'On Lispのサンプルコード' do
