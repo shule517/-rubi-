@@ -3413,16 +3413,62 @@ describe Rubi::Evaluator do
       end
 
       context '命令的プログラミングの裏返し' do
-        xit 'TODO' do
+        context "(defun fun (x)" do
+          let(:str) do
+            <<~LISP
+              (defun fun (x)
+                (list 'a (expt (car x) 2)))
+              (fun '(1 2 3))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(defun imp (x)" do
+          let(:str) do
+            <<~LISP
+              (defun imp (x)
+                (let (y sqr)
+                  (setq y (car x))
+                  (setq sqr (expt y 2))
+                  (list 'a sqr)))
+              (imp '(1 2 3))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(list 'a (expt y 2)))" do
+          let(:str) do
+            <<~LISP
+              (list 'a (expt y 2)))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(list 'a (expt (car x) 2))" do
+          let(:str) do
+            <<~LISP
+              (list 'a (expt (car x) 2))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
         end
       end
 
       context '関数的インタフェイス' do
-        xit 'TODO' do
+        context "(defun qualify (expr)" do
+          let(:str) do
+            <<~LISP
+              (defun qualify (expr)
+                (nconc (copy-list expr) (list 'maybe)))
+              (qualify '(1 2))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
         end
-      end
 
-      context 'インタラクティブ・プログラミング' do
         xit 'TODO' do
         end
       end
@@ -3430,12 +3476,49 @@ describe Rubi::Evaluator do
 
     context '4. ユーティリティ関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/utilityFunctions.html' do
       context 'ユーティリティの誕生' do
+        context "(defun all-nicknames (names)" do
+          let(:str) do
+            <<~LISP
+              (defun all-nicknames (names)
+                (if (null names)
+                    nil
+                    (nconc (nicknames (car names))
+                      (all-nicknames (cdr names)))))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(mapcan #'nicknames people)" do
+          let(:str) do
+            <<~LISP
+              (mapcan #'nicknames people)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
         xit 'TODO' do
         end
       end
 
       context '抽象化への投資' do
-        xit 'TODO' do
+        context "(> (length x) (length y))" do
+          let(:str) do
+            <<~LISP
+              (> (length x) (length y))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(mapcar fn (append x y z))" do
+          let(:str) do
+            <<~LISP
+              (mapcar fn (append x y z))
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
         end
       end
 
@@ -3450,6 +3533,15 @@ describe Rubi::Evaluator do
       end
 
       context '対応付け' do
+        context "(map0-n #'1+ 5)" do
+          let(:str) do
+            <<~LISP
+              (map0-n #'1+ 5)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
         xit 'TODO' do
         end
       end
@@ -3460,11 +3552,15 @@ describe Rubi::Evaluator do
       end
 
       context 'シンボルとストリング' do
-        xit 'TODO' do
+        context '(mkstr pi " pieces of " pi)' do
+          let(:str) do
+            <<~LISP
+              (mkstr pi " pieces of " 'pi)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
         end
-      end
 
-      context '密度' do
         xit 'TODO' do
         end
       end
@@ -3472,16 +3568,77 @@ describe Rubi::Evaluator do
 
     context '5. 返り値としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/returningFunctions.html' do
       context 'Common Lispは進化する' do
+        context "(remove-if-not #'pred lst)" do
+          let(:str) do
+            <<~LISP
+              (remove-if-not #'pred lst)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(remove-if #'(lambda (x) (not (pred x))) lst)" do
+          let(:str) do
+            <<~LISP
+              (remove-if #'(lambda (x) (not (pred x))) lst)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(remove-if-not #'pred lst)" do
+          let(:str) do
+            <<~LISP
+              (remove-if-not #'pred lst)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
+        context "(remove-if (complement #'pred) lst)" do
+          let(:str) do
+            <<~LISP
+              (remove-if (complement #'pred) lst)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1] }
+        end
+
         xit 'TODO' do
         end
       end
 
       context '直交性' do
+        context "(setf (get 'ball 'color) 'red)" do
+          let(:str) do
+            <<~LISP
+              (setf (get 'ball 'color) 'red)
+            LISP
+          end
+          it { is_expected.to eq :red }
+        end
+
         xit 'TODO' do
         end
       end
 
       context '関数の値のメモワイズ' do
+        context "(defun memoize (fn)" do
+          let(:str) do
+            <<~LISP
+              (defun memoize (fn)
+                (let ((cache (make-hash-table :test #'equal)))
+                  #'(lambda (&rest args)
+                      (multiple-value-bind (val win) (gethash args cache)
+                        (if win
+                            val
+                            (setf (gethash args cache)
+                                  (apply fn args)))))))
+            LISP
+          end
+          it { is_expected.to eq :red }
+        end
+
         xit 'TODO' do
         end
       end
