@@ -2843,6 +2843,7 @@ describe Rubi::Evaluator do
                     (squeak))
                   (cat (rub-legs)
                     (scratch-carpet))))
+              (behave 'dog)
             LISP
           end
           it { is_expected.to eq :behave }
@@ -2853,6 +2854,7 @@ describe Rubi::Evaluator do
             <<~LISP
               (defun behave (animal)
                 (funcall (get animal 'behavior)))
+              (behave 'dog)
             LISP
           end
           it { is_expected.to eq :behave }
@@ -2861,10 +2863,15 @@ describe Rubi::Evaluator do
         context "(setf (get 'dog 'behavior)" do
           let(:str) do
             <<~LISP
+              (defun behave (animal)
+                (funcall (get animal 'behavior)))
+
               (setf (get 'dog 'behavior)
                 #'(lambda ()
                     (wag-tail)
                       (bark)))
+
+              (behave 'dog)
             LISP
           end
           it { is_expected.to be_instance_of Proc }
@@ -3666,17 +3673,155 @@ describe Rubi::Evaluator do
 
     context '6. 表現としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionsAsRepresentation.html' do
       context 'ネットワーク' do
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+  > (run-node 'people)
+  Is the person a man?
+  >> yes
+  Is he living?
+  >> no
+  Was he American?
+  >> yes
+  Is he on a coin?
+  >> yes
+  Is the coin a penny?
+  >> yes
+  LINCOLN
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+  (defnode 'people "Is the person a man?"
+           'male 'female)
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+  (defstruct node contents yes no)
+  
+  (defvar *nodes* (make-hash-table))
+  
+  (defun defnode (name conts &optional yes no)
+    (setf (gethash name *nodes*)
+          (make-node :contents conts
+                     :yes yes
+                     :no no)))
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+  (defnode 'people "Is the person a man?" 'male 'female)
+  (defnode 'male "Is he living?" 'liveman 'deadman)
+  (defnode 'deadman "Was he American?" 'us 'them)
+  (defnode 'us "Is he on a coin?" 'coin 'cidence)
+  (defnode 'coin "Is the coin a penny?" 'penny 'coins)
+  (defnode 'penny 'lincoln)
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+  (defun run-node (name)
+    (let ((n (gethash name *nodes*)))
+      (cond ((node-yes n)
+             (format t "~A~%>> " (node-contents n))
+             (case (read)
+               (yes (run-node (node-yes n)))
+               (t (run-node (node-no n)))))
+            (t (node-contents n)))))
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
       context 'ネットワークのコンパイル' do
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+  (defvar *nodes* (make-hash-table))
+  
+  (defun defnode (name conts &optional yes no)
+    (setf (gethash name *nodes*)
+          (if yes
+              #'(lambda ()
+                  (format t "~A~%>> " conts)
+                  (case (read)
+                    (yes (funcall (gethash yes *nodes*)))
+                    (t (funcall (gethash no *nodes*)))))
+              #'(lambda () conts))))
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
-      end
 
-      context '前を向く' do
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+  (funcall (gethash 'people *nodes*))
+  Is the person a man?
+  >>
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+  (defvar *nodes* nil)
+  
+  (defun defnode (&rest args)
+    (push args *nodes*)
+    args)
+  
+  (defun compile-net (root)
+    (let ((node (assoc root *nodes*)))
+      (if (null node)
+          nil
+          (let ((conts (second node))
+                (yes (third node))
+                (no (fourth node)))
+            (if yes
+                (let ((yes-fn (compile-net yes))
+                      (no-fn (compile-net no)))
+                  #'(lambda ()
+                      (format t "~A~%>> " conts)
+                      (funcall (if (eq (read) 'yes)
+                                   yes-fn
+                                   no-fn))))
+                #'(lambda () conts))))))
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+  > (setq n (compile-net 'people))
+  #<Compiled-Function BF3C06>
+  > (funcall n)
+  Is the person a man?
+              LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
     end
