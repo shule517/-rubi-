@@ -2292,8 +2292,38 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq 2 }
       end
+      context 'ifの二重の確認①' do
+        let(:str) do
+          <<~LISP
+            (setq lst '(1 2 3 4 5))
+            (if (null lst)
+              nil
+              (if (evenp (car lst))
+                (car lst)
+                (cdr lst)
+              )
+            )
+          LISP
+        end
+        it { is_expected.to eq [2, 3, 4, 5] }
+      end
+      context 'ifの二重の確認②' do
+        let(:str) do
+          <<~LISP
+            (setq lst '(2 3 4 5))
+            (if (null lst)
+              nil
+              (if (evenp (car lst))
+                (car lst)
+                (cdr lst)
+              )
+            )
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
 
-      # TODO: ifの二重の確認
+      # TODO: 再帰
     end
   end
 
