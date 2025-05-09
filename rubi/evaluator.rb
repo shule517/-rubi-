@@ -13,6 +13,9 @@ module Rubi
     end
 
     def build_system_func(stack_count, nest)
+      # システム関数を登録済み(このメソッドを1回しか実行しない)
+      @built_system_func = true
+
       %i(+ - * /).each do |operator|
         func_hash[operator] = Proc.new do |proc_params:, lexical_hash:|
           if proc_params.empty?
@@ -76,9 +79,6 @@ module Rubi
           end
         end
       end
-
-      # システム関数を登録済み
-      @built_system_func = true
 
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
       lisp_eval("(defun 1+ (x) (+ x 1))")

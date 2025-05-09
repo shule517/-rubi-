@@ -97,6 +97,10 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#let*' do
+      xit {}
+    end
+
     describe '#setq' do
       context '変数を定義するだけ' do
         let(:str) do
@@ -2368,6 +2372,14 @@ describe Rubi::Evaluator do
       xit 'TODO: 再帰' do
       end
     end
+
+    describe '#copy-tree' do
+      xit {}
+    end
+
+    describe '#labels' do
+      xit {}
+    end
   end
 
   describe 'On Lispのサンプルコード' do
@@ -2678,32 +2690,32 @@ describe Rubi::Evaluator do
       end
 
       # schemeの仕様のため、対応しない
-      xcontext 'スコープ' do
-        context "(let ((y 7))" do
-          let(:str) do
-            <<~LISP
-              (let ((y 7))
-                (defun scope-test (x)
-                  (list x y)))
-            LISP
-          end
-          it { is_expected.to eq :"scope-test" }
-        end
-
-        context "(let ((y 7))" do
-          let(:str) do
-            <<~LISP
-              (let ((y 7))
-                (defun scope-test (x)
-                  (list x y)))
-              (let ((y 5))
-                (scope-test 3))
-                  (3 5)
-            LISP
-          end
-          it { is_expected.to eq :"scope-test" }
-        end
-      end
+      # xcontext 'スコープ' do
+      #   context "(let ((y 7))" do
+      #     let(:str) do
+      #       <<~LISP
+      #         (let ((y 7))
+      #           (defun scope-test (x)
+      #             (list x y)))
+      #       LISP
+      #     end
+      #     it { is_expected.to eq :"scope-test" }
+      #   end
+      #
+      #   context "(let ((y 7))" do
+      #     let(:str) do
+      #       <<~LISP
+      #         (let ((y 7))
+      #           (defun scope-test (x)
+      #             (list x y)))
+      #         (let ((y 5))
+      #           (scope-test 3))
+      #             (3 5)
+      #       LISP
+      #     end
+      #     it { is_expected.to eq :"scope-test" }
+      #   end
+      # end
 
       context 'クロージャ' do
         context "(defun list+ (lst n)" do
