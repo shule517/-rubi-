@@ -2899,7 +2899,7 @@ describe Rubi::Evaluator do
               (funcall (car cities) 'boston)
             LISP
           end
-          it { is_expected.to eq 999999 }
+          it { is_expected.to eq :us }
         end
 
         context "(funcall (second cities) 'london 'england)" do
@@ -2920,7 +2920,7 @@ describe Rubi::Evaluator do
               (funcall (second cities) 'london 'england)
             LISP
           end
-          it { is_expected.to eq 999999 }
+          it { is_expected.to eq :london }
         end
 
         context "(funcall (car cities) 'london)" do
@@ -2942,7 +2942,7 @@ describe Rubi::Evaluator do
               (funcall (car cities) 'london)
             LISP
           end
-          it { is_expected.to eq 999999 }
+          it { is_expected.to eq :england }
         end
 
         context "(funcall (car cities) 'london)" do
@@ -2951,6 +2951,7 @@ describe Rubi::Evaluator do
               (defun lookup (key db)
                 (funcall (car db) key))
             LISP
+            # TODO: callする
           end
           it { is_expected.to eq 999999 }
         end
@@ -2973,7 +2974,7 @@ describe Rubi::Evaluator do
               (mapcar #'copy-tree '((a b) (c d e)))
             LISP
           end
-          it { is_expected.to eq [4, 7, 9, 5] }
+          it { is_expected.to eq [[:a, :b], [:c, :d, :e]] }
         end
 
         context "(defun list+ (lst n) (mapcar #'(lambda (x) (+ x n)) lst))" do
@@ -2983,6 +2984,7 @@ describe Rubi::Evaluator do
                 (mapcar #'(lambda (x) (+ x n))
                         lst))
             LISP
+            # TODO: callする
           end
           it { is_expected.to eq [4, 7, 9, 5] }
         end
@@ -2994,7 +2996,7 @@ describe Rubi::Evaluator do
                       (inc 3))
             LISP
           end
-          it { is_expected.to eq [4, 7, 9, 5] }
+          it { is_expected.to eq 4 }
         end
 
         context "(defun count-instances (obj lsts)" do
@@ -3008,6 +3010,7 @@ describe Rubi::Evaluator do
                                0)))
                   (mapcar #'instances-in lsts)))
             LISP
+            # TODO: callする
           end
           it { is_expected.to eq [4, 7, 9, 5] }
         end
@@ -3025,7 +3028,7 @@ describe Rubi::Evaluator do
               (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
             LISP
           end
-          it { is_expected.to eq [4, 7, 9, 5] }
+          it { is_expected.to eq [1, 2, 1, 2] }
         end
       end
 
@@ -3052,6 +3055,7 @@ describe Rubi::Evaluator do
                     (car lst)
                     (our-find-if fn (cdr lst))))
             LISP
+            # TODO: callする
           end
           it { is_expected.to eq 5 }
         end
@@ -3076,6 +3080,7 @@ describe Rubi::Evaluator do
             <<~LISP
               (proclaim '(optimize speed))
             LISP
+            # TODO: 何を確認している？
           end
           it { is_expected.to eq 5 }
         end
@@ -3091,10 +3096,10 @@ describe Rubi::Evaluator do
                                   (tri (the fixnum (+ n c))
                                        (the fixnum (- n 1))))))
                   (tri 0 n)))
-              (triangle 3)
+              (triangle 6)
             LISP
           end
-          it { is_expected.to eq 5 }
+          it { is_expected.to eq 21 }
         end
       end
 
@@ -3137,7 +3142,7 @@ describe Rubi::Evaluator do
               (compiled-function-p #'foo)
             LISP
           end
-          it { is_expected.to eq nil }
+          it { is_expected.to eq true }
         end
 
         context "(compile nil '(lambda (x) (+ x 2)))" do
@@ -3146,7 +3151,7 @@ describe Rubi::Evaluator do
               (compile nil '(lambda (x) (+ x 2)))
             LISP
           end
-          it { is_expected.to eq 99999999 }
+          it { is_expected.to eq nil }
         end
 
         xit 'TODO' do
@@ -3410,7 +3415,7 @@ describe Rubi::Evaluator do
                 '(0 2.5 -8))
             LISP
           end
-          it { is_expected.to eq nil }
+          it { is_expected.to eq [:z, :p, :n] }
         end
 
         context "(defmacro nif (expr pos zero neg) バッククォートなし版" do
@@ -3428,7 +3433,7 @@ describe Rubi::Evaluator do
                 '(0 2.5 -8))
             LISP
           end
-          it { is_expected.to eq nil }
+          it { is_expected.to eq [:z, :p, :n] }
         end
 
         xit 'TODO' do
