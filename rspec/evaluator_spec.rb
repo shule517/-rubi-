@@ -225,7 +225,7 @@ describe Rubi::Evaluator do
       end
 
       # TODO: 未実装
-      xcontext 'listのcarに代入' do
+      context 'listのcarに代入' do
         context 'setqの場合' do
           let(:str) do
             <<~LISP
@@ -254,7 +254,7 @@ describe Rubi::Evaluator do
       end
 
       # TODO: 未実装
-      xcontext 'listの要素に代入' do
+      context 'listの要素に代入' do
         context 'setqの場合' do
           let(:str) do
             <<~LISP
@@ -273,14 +273,26 @@ describe Rubi::Evaluator do
               arr
             LISP
           end
-          # it {}
+          it { raise }
         end
       end
 
-      # TODO: 未実装
-      xcontext '' do
-        # (setf (gethash 'foo table) 123)  ; ハッシュテーブルのキーに代入
-        # (setf (nth 1 my-list) 'apple)    ; リストの2番目の要素に代入
+      context 'gethashの場合' do
+        let(:str) do
+          <<~LISP
+            (setf (gethash 'foo table) 123)  ; ハッシュテーブルのキーに代入
+          LISP
+        end
+        it { raise }
+      end
+
+      context 'nth' do
+        let(:str) do
+          <<~LISP
+            (setf (nth 1 my-list) 'apple)    ; リストの2番目の要素に代入
+          LISP
+        end
+        it { raise }
       end
     end
 
@@ -2353,7 +2365,8 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 2 }
       end
 
-      # TODO: 再帰
+      xit 'TODO: 再帰' do
+      end
     end
   end
 
@@ -3195,7 +3208,9 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq [:c, :b, :a] }
         end
-        # TODO:
+
+        xit 'TODO' do
+        end
       end
 
       context '命令的プログラミングの裏返し' do
