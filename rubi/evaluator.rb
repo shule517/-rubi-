@@ -79,7 +79,7 @@ module Rubi
       # システム関数を登録済み
       @built_system_func = true
 
-      lisp_eval("(defun evenp (x) (/= (mod x 2) 0))")
+      lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
     end
 
     # TODO:

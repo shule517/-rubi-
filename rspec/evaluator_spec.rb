@@ -2227,22 +2227,22 @@ describe Rubi::Evaluator do
     describe '#evenp' do
       context '(evenp 0)' do
         let(:str) { '(evenp 0)' }
-        it { is_expected.to eq nil }
+        it { is_expected.to eq true }
       end
 
       context '(evenp 1)' do
         let(:str) { '(evenp 1)' }
-        it { is_expected.to eq true }
+        it { is_expected.to eq nil }
       end
 
       context '(evenp 2)' do
         let(:str) { '(evenp 2)' }
-        it { is_expected.to eq nil }
+        it { is_expected.to eq true }
       end
 
       context '(evenp 3)' do
         let(:str) { '(evenp 3)' }
-        it { is_expected.to eq true }
+        it { is_expected.to eq nil }
       end
     end
   end
