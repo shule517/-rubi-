@@ -3052,6 +3052,7 @@ describe Rubi::Evaluator do
                              acc
                              (rec (cdr lst) (1+ acc)))))
                   (rec lst 0)))
+              (our-length '(1 2 3 4 5))
             LISP
           end
           it { is_expected.to eq 5 }
@@ -3077,6 +3078,7 @@ describe Rubi::Evaluator do
                                   (tri (the fixnum (+ n c))
                                        (the fixnum (- n 1))))))
                   (tri 0 n)))
+              (triangle 3)
             LISP
           end
           it { is_expected.to eq 5 }
@@ -3349,19 +3351,21 @@ describe Rubi::Evaluator do
         context "`(a ,b c)" do
           let(:str) do
             <<~LISP
+              (setq a 1 b 2 c 3)
               `(a ,b c)
             LISP
           end
-          it { is_expected.to eq 3 }
+          it { is_expected.to eq [:a, 2, :c] }
         end
 
         context "`(a (,b c))" do
           let(:str) do
             <<~LISP
+              (setq a 1 b 2 c 3)
               `(a (,b c))
             LISP
           end
-          it { is_expected.to eq 3 }
+          it { is_expected.to eq [:a, [2, :c]] }
         end
 
         context "(defmacro nil! (var) `(setq ,var nil))" do

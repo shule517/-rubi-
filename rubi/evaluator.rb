@@ -54,7 +54,7 @@ module Rubi
           #   #'(lambda (x) (+ x 10))
           #   '(1 2 3))
           proc = eval(a, lexical_hash, stack_count + 1)
-          raise "procがnil" if proc.nil?
+          raise "procがnil。(a: #{a})を評価して、procが戻ってこなかった" if proc.nil?
           array = eval(b, lexical_hash, stack_count + 1)
           array.map do |element|
             puts "#{nest}mapcar(element: #{element}, lexical_hash: #{lexical_hash})"
@@ -191,7 +191,11 @@ module Rubi
         else
           func_name = a
           puts "#{nest}1. シンボルから関数を取り出す(func_name: #{func_name})"
-          func_hash[func_name]
+          if func_hash.key?(func_name)
+            func_hash[func_name]
+          else
+            raise "#{func_name}の関数が見つかりません(func_hash: #{func_hash})"
+          end
         end
       elsif function == :"symbol-function"
         puts "#{nest}#{function}(params: #{params})"
