@@ -1580,6 +1580,26 @@ describe Rubi::Evaluator do
     end
 
     describe '#=' do
+      context '式同士' do
+        context '一致する場合' do
+          let(:str) do
+            <<~LISP
+              (= (+ 3 5) (* 2 4))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (= (+ 3 5) (* 2 5))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+      end
+
       context '整数同士' do
         context '一致する場合' do
           let(:str) do

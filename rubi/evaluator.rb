@@ -71,7 +71,22 @@ module Rubi
 
       # システム関数を登録済み
       @built_system_func = true
+
+      # TODO:
+      # (= 2 (denominator (/ x 2)))
+      # func_hash[:evenp] = build_lambda([:x], [:'=', 2, [:denominator, [:/, :x, 2 ]]], stack_count, nest)
+      # pp lisp_eval("(defun evenp (x) (= 2 (denominator (/ x 2))))")
     end
+
+    # TODO:
+    # def lisp_eval(line)
+    #   tokenizer = Rubi::Tokenizer.new
+    #   parser = Rubi::Parser.new
+    #   tokens = tokenizer.split_tokens(line)
+    #   ast = parser.parse(tokens)
+    #   ast = parser.expand_syntactic_sugar(ast)
+    #   result = ast.map { |code| eval(code, {}, 0) }.last
+    # end
 
     def atom?(ast)
       !list?(ast)
@@ -293,27 +308,27 @@ module Rubi
         true if a.eql?(b) # 一致しない場合は、nilを返す
       elsif function == :"="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a == b # 不一致の場合は、nilを返す
       elsif function == :"/="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a != b # 不一致の場合は、nilを返す
       elsif function == :"<"
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a < b # 不一致の場合は、nilを返す
       elsif function == :">"
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a > b # 不一致の場合は、nilを返す
       elsif function == :"<="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a <= b # 不一致の場合は、nilを返す
       elsif function == :">="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params
+        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a >= b # 不一致の場合は、nilを返す
       elsif function == :not
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
