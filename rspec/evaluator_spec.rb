@@ -3198,10 +3198,10 @@ describe Rubi::Evaluator do
                 (if (funcall fn (car lst))
                     (car lst)
                     (our-find-if fn (cdr lst))))
+              (our-find-if #'evenp '(1 3 5 6 8 10))
             LISP
-            # TODO: callする
           end
-          it { is_expected.to eq 5 }
+          it { is_expected.to eq 6 }
         end
 
         context "(defun our-length (lst)" do
