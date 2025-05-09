@@ -98,6 +98,108 @@ describe Rubi::Evaluator do
     end
 
     describe '#let*' do
+      context '変数を定義するだけ' do
+        let(:str) do
+          <<~LISP
+            (let* ((a 1)
+                   (b (+ a 1)))
+              b)
+          LISP
+          # TODO:
+          # <<~LISP
+          #   (let* ((a 1)
+          #          (b (+ a 1)))  ; ← a はすでに 1 として定義済み
+          #     b)
+          # LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context '変数１つ宣言' do
+        let(:str) do
+          <<~LISP
+            (let*
+              ((x 2))
+              x)
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context '式が２つ' do
+        let(:str) do
+          <<~LISP
+            (let*
+              ((x 2))
+              (+ 1 x)
+              (+ 2 x))
+          LISP
+        end
+        it { is_expected.to eq 4 }
+      end
+
+      context 'グローバルと同じ変数を宣言する' do
+        let(:str) do
+          <<~LISP
+            (setq x 3)
+            (let*
+              ((x 2))
+              x)
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+
+      context '変数２つ宣言' do
+        let(:str) do
+          <<~LISP
+            (let*
+              ((x 2) (y 3))
+              (+ x y))
+          LISP
+        end
+        it { is_expected.to eq 5 }
+      end
+
+      context 'グローバル変数 と ローカル変数で 同じ名前の変数を定義する' do
+        let(:str) do
+          <<~LISP
+            (setq x 3)
+            (let*
+              ((x 2) (y 3))
+              (+ x y))
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+
+      context 'letをネストして、2階層目の変数を評価' do
+        let(:str) do
+          <<~LISP
+            (let* ((x 1))
+              (let* ((x 2))
+                x))
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context 'letをネストして、1階層目の変数を評価' do
+        let(:str) do
+          <<~LISP
+            (let* ((x 1))
+              (let* ((x 2))
+                x)
+              x)
+          LISP
+        end
+        it { is_expected.to eq 1 }
+      end
+    end
+
+    describe '#labels' do
       xit {}
     end
 
@@ -2374,10 +2476,6 @@ describe Rubi::Evaluator do
     end
 
     describe '#copy-tree' do
-      xit {}
-    end
-
-    describe '#labels' do
       xit {}
     end
 

@@ -146,6 +146,19 @@ module Rubi
         puts "#{nest}-> next_lexical_hash: #{next_lexical_hash}"
         puts "#{nest}#式を評価する - expression: #{expression}"
         expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
+      elsif function == :'let*' # TODO: letをコピーしただけ
+        var_params = params.shift
+        expression = params
+        puts "#{nest}#{function}(var_params: #{var_params}, expression: #{expression})"
+        # レキシカル変数(next_lexical_hash)を定義する
+        puts "#{nest}#レキシカル変数を定義する"
+        next_lexical_hash = lexical_hash.dup
+        var_params.each do |var_name, value|
+          next_lexical_hash[var_name] = eval(value, next_lexical_hash, stack_count + 1)
+        end
+        puts "#{nest}-> next_lexical_hash: #{next_lexical_hash}"
+        puts "#{nest}#式を評価する - expression: #{expression}"
+        expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
       elsif function == :setq # 変数定義
         var_name, value = params
         puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
