@@ -233,7 +233,9 @@ module Rubi
         var_hash[var_name]
       elsif function == :list
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        result = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        puts "#{nest}-> #{result}"
+        result
       elsif function == :car
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
@@ -416,8 +418,7 @@ module Rubi
         # まずは第１引数を評価してから、実行する
         puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
         expression = eval(function, lexical_hash, stack_count + 1)
-        puts "#{nest}関数の実行:#{function}(expression: #{expression})"
-        puts "#{nest}関数の実行:#{function}(params: #{params})"
+        puts "#{nest}関数の実行:#{function}(expression: #{expression}, params: #{params})"
         expression.call(proc_params: params, lexical_hash: lexical_hash)
       elsif function.instance_of?(Proc) # funcallで関数を実行する
         puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"

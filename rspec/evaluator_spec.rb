@@ -14,7 +14,7 @@ describe Rubi::Evaluator do
 
     describe '#let' do
       context '#let*との比較' do
-        context 'let内で宣言した変数を参照する' do
+        context 'let内で宣言した変数を参照する(aは未定義)' do
           let(:str) do
             <<~LISP
               (let ((a 2) ; aはlet内ではまだ未定義
@@ -23,10 +23,9 @@ describe Rubi::Evaluator do
             LISP
           end
           it { expect { subject }.to raise_error }
-          # TODO: it { is_expected.to eq [2, 13] }
         end
 
-        context 'let内で宣言した変数を参照する' do
+        context 'let内で宣言した変数を参照する(aを外部で定義)' do
           let(:str) do
             <<~LISP
               (setq a 10)
