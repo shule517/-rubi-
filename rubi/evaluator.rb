@@ -80,6 +80,18 @@ module Rubi
       @built_system_func = true
 
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
+
+      lisp_eval(<<~LISP)
+        (defun remove-if (func lst)
+          (if (null lst)
+            nil
+            (if (evenp (car lst))
+              (remove-if func (cdr lst))
+              (cons (car lst) (remove-if func (cdr lst)))
+            )
+          )
+        )
+      LISP
     end
 
     # TODO:

@@ -2245,6 +2245,56 @@ describe Rubi::Evaluator do
         it { is_expected.to eq nil }
       end
     end
+
+    describe '#remove-if' do
+      context '最終的な確認' do
+        let(:str) { "(remove-if #'evenp '(1 2 3 4 5))" }
+        it { is_expected.to eq [1, 3, 5] }
+      end
+      context 'carの確認' do
+        let(:str) { "(car '(1 2 3 4 5))" }
+        it { is_expected.to eq 1 }
+      end
+      context 'cdrの確認' do
+        let(:str) { "(cdr '(1 2 3 4 5))" }
+        it { is_expected.to eq [2, 3, 4, 5] }
+      end
+      context 'consの確認' do
+        let(:str) do
+          <<~LISP
+            (setq lst '(1 2 3 4 5))
+            (cons (car lst) (cdr lst))
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3, 4, 5] }
+      end
+      context 'ifの確認①' do
+        let(:str) do
+          <<~LISP
+            (setq lst '(1 2 3 4 5))
+            (if (evenp (car lst))
+              (car lst)
+              (cdr lst)
+            )
+          LISP
+        end
+        it { is_expected.to eq [2, 3, 4, 5] }
+      end
+      context 'ifの確認②' do
+        let(:str) do
+          <<~LISP
+            (setq lst '(2 3 4 5))
+            (if (evenp (car lst))
+              (car lst)
+              (cdr lst)
+            )
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      # TODO: ifの二重の確認
+    end
   end
 
   describe 'On Lispのサンプルコード' do
