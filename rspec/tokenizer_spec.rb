@@ -17,8 +17,8 @@ describe Rubi::Tokenizer do
     context '複数行' do
       let(:str) do
         <<~LISP
-            (define x 3)
-            (+ x 4)
+          (define x 3)
+          (+ x 4)
         LISP
       end
       it { is_expected.to eq [:"(", :define, :x, 3, :")", :"(", :+, :x, 4, :")"] }
@@ -37,6 +37,15 @@ describe Rubi::Tokenizer do
       let(:str) do
         <<~LISP
           '(1 2 a)
+        LISP
+      end
+      it { is_expected.to eq [:"'", :"(", 1, 2, :a, :")"] }
+    end
+
+    context 'コメントアウト' do
+      let(:str) do
+        <<~LISP
+          '(1 2 a) ; コメント
         LISP
       end
       it { is_expected.to eq [:"'", :"(", 1, 2, :a, :")"] }

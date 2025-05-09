@@ -2,6 +2,7 @@ module Rubi
   class Tokenizer
     def split_tokens(str)
       str
+        .gsub(/;.*$/, "") # コメントを除去
         .gsub("(", " ( ")
         .gsub(")", " ) ")
         .gsub(%r{(#?')}, " \\1 ") # クォート
