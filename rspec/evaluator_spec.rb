@@ -3611,7 +3611,68 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, 1] }
         end
 
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun joiner (obj)
+  (typecase obj
+    (cons #'append)
+    (number #'+)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun join (&rest args)
+  (apply (joiner (car args)) args))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun make-adder (n)
+  #'(lambda (x) (+ x n)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq add3 (make-adder 3))
+#<Interpreted-Function BF1356>
+> (funcall add3 2)
+5
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun complement (fn)
+  #'(lambda (&rest args) (not (apply fn args))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (remove-if (complement #'oddp) '(1 2 3 4 5 6))
+(1 3 5)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
@@ -3625,7 +3686,55 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :red }
         end
 
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+(defvar *!equivs* (make-hash-table))
+
+(defun ! (fn)
+  (or (gethash fn *!equivs*) fn))
+
+(defun def! (fn fn!)
+  (setf (gethash fn *!equivs*) fn!))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(def! #'remove-if #'delete-if)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(delete-if #'oddp lst)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(funcall (! #'remove-if) #'oddp lst)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+((! remove-if) oddp lst)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
@@ -3646,27 +3755,438 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :red }
         end
 
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq slowid (memoize #'(lambda (x) (sleep 5) x)))
+#<Interpreted-Function C38346>
+> (time (funcall slowid 1))
+Elapsed Time = 5.15 seconds
+1
+> (time (funcall slowid 1))
+Elapsed Time = 0.00 seconds
+1
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
       context '関数を合成する' do
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun compose (&rest fns)
+  (if fns
+      (let ((fn1 (car (last fns)))
+            (fns (butlast fns)))
+        #'(lambda (&rest args)
+                   (reduce #'funcall fns
+                           :from-end t
+                           :initial-value (apply fn1 args))))
+      #'identity))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(compose #'list #'1+)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+#'(lambda (x) (list (1+ x)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (funcall (compose #'1+ #'find-if) #'oddp '(2 3 4))
+4
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun complement (pred)
+  (compose #'not pred))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun fif (if then &optional else)
+  #'(lambda (x)
+      (if (funcall if x)
+          (funcall then x)
+          (if else (funcall else x)))))
+
+(defun fint (fn &rest fns)
+  (if (null fns)
+      fn
+      (let ((chain (apply #'fint fns)))
+        #'(lambda (x)
+            (and (funcall fn x) (funcall chain x))))))
+
+(defun fun (fn &rest fns)
+  (if (null fns)
+      fn
+      (let ((chain (apply #'fun fns)))
+        #'(lambda (x)
+            (or (funcall fn x) (funcall chain x))))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(mapcar #'(lambda (x)
+            (if (slave x)
+                (owner x)
+                (employer x)))
+        people)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(mapcar (fif #'slave #'owner #'employer)
+        people)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(find-if #'(lambda (x)
+             (and (signed x) (sealed x) (delivered x)))
+         docs)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(find-if (fint #'signed #'sealed #'delivered) docs)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
       context 'Cdr部での再帰' do
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun our-length (lst)
+  (if (null lst)
+      0
+      (1+ (our-length (cdr lst)))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun our-every (fn lst)
+  (if (null lst)
+      t
+      (and (funcall fn (car lst))
+           (our-every fn (cdr lst)))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun lrec (rec &optional base)
+  (labels ((self (lst)
+                 (if (null lst)
+                     (if (functionp base)
+                         (funcall base)
+                         base)
+                     (funcall rec (car lst)
+                              #'(lambda ()
+                                  (self (cdr lst)))))))
+    #'self))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(lrec #'(lambda (x f) (1+ (funcall f))) 0)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(lrec #'(lambda (x f) (and (oddp x) (funcall f))) t)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+; copy-list
+(lrec #'(lambda (x f) (cons x (funcall f))))
+; remove-duplicates
+(lrec #'(lambda (x f) (adjoin x (funcall f))))
+; find-if, for some function fn
+(lrec #'(lambda (x f) (if (fn x) x (funcall f))))
+; some, for some function fn
+(lrec #'(lambda (x f) (or (fn x) (funcall f))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
       context '部分ツリーでの再帰' do
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+(a b c) = (a . (b . (c . nil)))
+(a b (c d)) = (a . (b . ((c . (d . nil)) . nil)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq x '(a b)
+        listx (list x 1))
+((A B) 1)
+> (eq x (car (copy-list listx)))
+T
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (eq x (car (copy-tree listx)))
+NIL
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun our-copy-tree (tree)
+  (if (atom tree)
+      tree
+      (cons (our-copy-tree (car tree))
+            (if (cdr tree) (our-copy-tree (cdr tree))))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun count-leaves (tree)
+  (if (atom tree)
+      1
+      (+ (count-leaves (car tree))
+         (or (if (cdr tree) (count-leaves (cdr tree)))
+             1))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (count-leaves '((a b (c d)) (e) f))
+10
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (flatten '((a b (c d)) (e) f ()))
+(A B C D E F)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun flatten (tree)
+  (if (atom tree)
+      (mklist tree)
+      (nconc (flatten (car tree))
+             (if (cdr tree) (flatten (cdr tree))))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun rfind-if (fn tree)
+  (if (atom tree)
+      (and (funcall fn tree) tree)
+      (or (rfind-if fn (car tree))
+          (if (cdr tree) (rfind-if fn (cdr tree))))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (rfind-if (fint #'numberp #'addp) '(2 (3 4) 5))
+3
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun ttrav (rec &optional (base #'identity))
+  (labels ((self (tree)
+                 (if (atom tree)
+                     (if (functionp base)
+                         (funcall base tree)
+                         base)
+                     (funcall rec (self (car tree))
+                              (if (cdr tree)
+                                  (self (cdr tree)))))))
+    #'self))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(ttrav #'cons #'identity)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+; our-copy-tree
+(ttrav #'cons)
+; count-leaves
+(ttrav #'(lambda (l r) (+ l (or r 1))) 1)
+; flatten
+(ttrav #'nconc #'mklist)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(trec #'(lambda (o l r) (nconc (funcall l) (funcall r)))
+      #'mklist)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(trec #'(lambda (o l r) (or (funcall l) (funcall r)))
+      #'(lambda (tree) (and (oddp tree) tree)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun trec (rec &optional (base #'identity))
+  (labels
+    ((self (tree)
+           (if (atom tree)
+               (if (functionp base)
+                   (funcall base tree)
+                   base)
+               (funcall rec tree
+                        #'(lambda ()
+                            (self (car tree)))
+                        #'(lambda ()
+                            (if (cdr tree)
+                                (self (cdr tree))))))))
+    #'self))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
       context 'いつ関数を作るべきか' do
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+(find-if #.(compose #'oddp #'truncate) lst)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
     end
