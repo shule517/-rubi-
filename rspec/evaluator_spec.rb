@@ -221,7 +221,26 @@ describe Rubi::Evaluator do
     end
 
     describe '#labels' do
-      xit {}
+      context 'スコープ内で、定義した関数を実行する' do
+        let(:str) do
+          <<~LISP
+            (labels ((inc (x) (1+ x)))
+                    (inc 3))
+          LISP
+        end
+        it { is_expected.to eq 4 }
+      end
+
+      context 'スコープ外で、定義した関数を実行する' do
+        let(:str) do
+          <<~LISP
+            (labels ((inc (x) (1+ x)))
+                    (inc 3))
+            (inc 3)
+          LISP
+        end
+        it { is_expected.to eq 4 }
+      end
     end
 
     describe '#setq' do
