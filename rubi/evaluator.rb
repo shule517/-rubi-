@@ -54,6 +54,7 @@ module Rubi
           #   #'(lambda (x) (+ x 10))
           #   '(1 2 3))
           proc = eval(a, lexical_hash, stack_count + 1)
+          raise "procがnil" if proc.nil?
           array = eval(b, lexical_hash, stack_count + 1)
           array.map do |element|
             puts "#{nest}mapcar(element: #{element}, lexical_hash: #{lexical_hash})"

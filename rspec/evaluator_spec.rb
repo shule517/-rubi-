@@ -2998,6 +2998,13 @@ describe Rubi::Evaluator do
         context "(count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))" do
           let(:str) do
             <<~LISP
+              (defun count-instances (obj lsts)
+                (labels ((instances-in (lst)
+                           (if (consp lst)
+                               (+ (if (eq (car lst) obj) 1 0)
+                                  (instances-in (cdr lst)))
+                               0)))
+                  (mapcar #'instances-in lsts)))
               (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
             LISP
           end
@@ -3019,11 +3026,115 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq 5 }
         end
+
+        context "(defun our-find-if (fn lst)" do
+          let(:str) do
+            <<~LISP
+              (defun our-find-if (fn lst)
+                (if (funcall fn (car lst))
+                    (car lst)
+                    (our-find-if fn (cdr lst))))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
+
+        context "(defun our-length (lst)" do
+          let(:str) do
+            <<~LISP
+              (defun our-length (lst)
+                (labels ((rec (lst acc)
+                         (if (null lst)
+                             acc
+                             (rec (cdr lst) (1+ acc)))))
+                  (rec lst 0)))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
+
+        context "(proclaim '(optimize speed))" do
+          let(:str) do
+            <<~LISP
+              (proclaim '(optimize speed))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
+
+        context "(defun triangle (n)" do
+          let(:str) do
+            <<~LISP
+              (defun triangle (n)
+                (labels ((tri (c n)
+                              (declare (type fixnum n c))
+                              (if (zerop n)
+                                  c
+                                  (tri (the fixnum (+ n c))
+                                       (the fixnum (- n 1))))))
+                  (tri 0 n)))
+            LISP
+          end
+          it { is_expected.to eq 5 }
+        end
       end
 
       # コンパイルは未実装なので、スキップ
-      xcontext 'コンパイル' do
+      context 'コンパイル' do
+        context "(defun foo (x) (1+ x))" do
+          let(:str) do
+            <<~LISP
+              (defun foo (x) (1+ x))
+            LISP
+          end
+          it { is_expected.to eq :foo }
+        end
+
+        context "(compiled-function-p #'foo)" do
+          let(:str) do
+            <<~LISP
+              (defun foo (x) (1+ x))
+              (compiled-function-p #'foo)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context "(compile 'foo)" do
+          let(:str) do
+            <<~LISP
+              (defun foo (x) (1+ x))
+              (compile 'foo)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context "(compile 'foo)(compiled-function-p #'foo)" do
+          let(:str) do
+            <<~LISP
+              (defun foo (x) (1+ x))
+              (compile 'foo)
+              (compiled-function-p #'foo)
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
+
+        context "(compile nil '(lambda (x) (+ x 2)))" do
+          let(:str) do
+            <<~LISP
+              (compile nil '(lambda (x) (+ x 2)))
+            LISP
+          end
+          it { is_expected.to eq 99999999 }
+        end
+
+        # TODO: まだある
       end
+    end
+
+    context '3. 関数的プログラミング: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionalProgramming.html' do
     end
   end
 end
