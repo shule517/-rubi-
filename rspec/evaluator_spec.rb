@@ -2487,7 +2487,6 @@ describe Rubi::Evaluator do
         context "(remove-if #'evenp '(1 2 3 4 5 6 7))" do
           let(:str) do
             # TODO:
-            # (defun evenp (x) (= 2 (denominator (/ x 2))))
             # (defun remove-if (func lst) (funcall func (car lst)))
             <<~LISP
               (remove-if #'evenp '(1 2 3 4 5 6 7))

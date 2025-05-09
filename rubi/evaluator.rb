@@ -1,12 +1,14 @@
 module Rubi
   class Evaluator
-    attr_reader :var_hash, :func_hash, :macro_hash, :built_system_func, :debug
+    attr_reader :var_hash, :func_hash, :macro_hash, :built_system_func, :debug, :tokenizer, :parser
 
     def initialize(debug: false)
       @var_hash = {}
       @func_hash = {}
       @macro_hash = {}
       @built_system_func = false
+      @tokenizer = Rubi::Tokenizer.new
+      @parser = Rubi::Parser.new
       @debug = debug
     end
 
@@ -82,12 +84,10 @@ module Rubi
 
     # TODO:
     def lisp_eval(line)
-      tokenizer = Rubi::Tokenizer.new
-      parser = Rubi::Parser.new
       tokens = tokenizer.split_tokens(line)
       ast = parser.parse(tokens)
       ast = parser.expand_syntactic_sugar(ast)
-      result = ast.map { |code| eval(code, {}, 0) }.last
+      ast.map { |code| eval(code, {}, 0) }.last
     end
 
     def atom?(ast)
