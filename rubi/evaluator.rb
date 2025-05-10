@@ -247,9 +247,10 @@ module Rubi
           var_hash[place]
         end
       elsif function == :lambda
-        params, expression = params
-        puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
+        params, *expressions = params
+        puts "#{nest}#{function}(params: #{params}, expressions: #{expressions})"
         # 関数定義
+        expression = expressions.last # TODO: 途中の式を実行していない
         build_lambda(params, expression, stack_count, nest)
       elsif function == :defun # 関数定義
         func_name = params.shift

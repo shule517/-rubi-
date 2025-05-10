@@ -551,18 +551,24 @@ describe Rubi::Evaluator do
       end
 
       context '実行する式が複数ある場合' do
-        context '引数ありの関数定義' do
+        context '最後の結果が返ってくる' do
           let(:str) do
             <<~LISP
-              (lambda (x) (+ x 2) (* x 3))
+              ((lambda (x) (+ 1 2) (* x 3)) 3)
             LISP
           end
+          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+        end
 
-          it do
-            proc = subject
-            expect(proc).to be_instance_of(Proc)
-            expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 15
+        context '最初の式が実行されている' do
+          let(:str) do
+            <<~LISP
+              (setq n 1)
+              ((lambda (x) (setq n 2) (* x 3)) 3)
+              n
+            LISP
           end
+          it { is_expected.to eq 2 } # 最初の式が実行されている
         end
       end
     end
