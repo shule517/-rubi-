@@ -2582,6 +2582,44 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#length' do
+      context "配列の場合①" do
+        let(:str) do
+          <<~LISP
+            (length '(1 2 3 4 5))
+          LISP
+        end
+        it { is_expected.to eq 5 }
+      end
+
+      context "配列の場合②" do
+        let(:str) do
+          <<~LISP
+            (length '(1))
+          LISP
+        end
+        it { is_expected.to eq 1 }
+      end
+
+      context "空配列の場合" do
+        let(:str) do
+          <<~LISP
+            (length ())
+          LISP
+        end
+        it { is_expected.to eq 0 }
+      end
+
+      context "nilの場合" do
+        let(:str) do
+          <<~LISP
+            (length nil)
+          LISP
+        end
+        it { is_expected.to eq 0 }
+      end
+    end
+
     describe '再帰処理の動作確認' do
       let(:str) do
         <<~LISP
@@ -3216,8 +3254,8 @@ describe Rubi::Evaluator do
               (defun list+ (lst n)
                 (mapcar #'(lambda (x) (+ x n))
                         lst))
+              (list+ '(2 5 7 3) 2)
             LISP
-            # TODO: callする
           end
           it { is_expected.to eq [4, 7, 9, 5] }
         end
@@ -3387,15 +3425,15 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        context '' do
+        context "(compiled-function-p #'bar))" do
           let(:str) do
             <<~LISP
-              > (progn (compile 'bar '(lambda (x) (* x 3)))
+              (progn (compile 'bar '(lambda (x) (* x 3)))
               (compiled-function-p #'bar))
-              T
+              ; T
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq true }
         end
 
         context '' do
