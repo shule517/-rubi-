@@ -205,19 +205,21 @@ module Rubi
         place, newvalue = params
         puts "#{nest}#{function}(place: #{place}, newvalue: #{newvalue})"
         if list?(place)
-          a, b = place
-          if a == :'symbol-function'
+          place_func, *place_params = place
+          if place_func == :'symbol-function'
             # (setf (symbol-function 'double)
             #   #'(lambda (x) (* x 2)))
-            puts "#{nest}#{function}(a: #{a}, b: #{b}, newvalue: #{newvalue})"
-            func_name = eval(b, lexical_hash, stack_count + 1)
+
+            place_param = place_params[0]
+            puts "#{nest}place_func: #{place_func}, place_param: #{place_param}, newvalue: #{newvalue}"
+            func_name = eval(place_param, lexical_hash, stack_count + 1)
             func = eval(newvalue, lexical_hash, stack_count + 1)
             func_hash[func_name] = func
             func # 定義した関数を返す
-          elsif a == :get
+          elsif place_func == :get
             # (setf (get 'color 'shade) 'dark)
             # (get 'color 'shade) ; => 'dark
-            puts "#{nest}#{function}(a: #{a}, b: #{b}, newvalue: #{newvalue})"
+            puts "#{nest}place_func: #{place_func}, place_params: #{place_params}, newvalue: #{newvalue}"
           end
         elsif lexical_hash.key?(place)
           # ローカル変数がある場合は、ローカル変数を変更する
