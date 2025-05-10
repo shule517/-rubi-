@@ -250,7 +250,8 @@ module Rubi
         params, *expressions = params
         puts "#{nest}#{function}(params: #{params}, expressions: #{expressions})"
         # 関数定義
-        build_lambda(params, expressions, stack_count, nest)
+        expression = expressions.last # TODO: 途中の式を実行していない
+        build_lambda(params, expression, stack_count, nest)
       elsif function == :defun # 関数定義
         func_name = params.shift
         params, expression = params
@@ -542,18 +543,15 @@ module Rubi
     def build_lambda(params, expression, stack_count, nest)
       Proc.new do |proc_params:, lexical_hash:|
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
-        expressions = Array(expression)
-        puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expressions: #{expressions}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
         puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
         params.each.with_index do |param, index|
           puts "#{nest}  1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, lexical_hash: #{lexical_hash})"
           lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 2)
         end
         puts "#{nest}-> lexical_hash: #{lexical_hash}"
-        puts "#{nest}2. lambdaを実行する(expressions: #{expressions}, lexical_hash: #{lexical_hash})"
-        expressions.map do |exp|
-          eval(exp, lexical_hash, stack_count + 1)
-        end.last
+        puts "#{nest}2. lambdaを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
+        eval(expression, lexical_hash, stack_count + 1)
       end
     end
 
