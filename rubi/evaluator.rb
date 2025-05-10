@@ -426,6 +426,7 @@ module Rubi
             return eval(expression, lexical_hash, stack_count + 1)
           end
         end
+        nil # 何もHITしなかった場合の戻り値
       elsif function == :progn
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last

@@ -2198,17 +2198,29 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :cat }
         end
 
-        context '値が一致しない場合' do
+        context 'otherwiseに到達する場合' do
           let(:str) do
             <<~LISP
-              (setq x 3)
+              (setq x 2)
               (case x
                 (1 'dog)
                 (2 'cat)
                 (otherwise 'human))
             LISP
           end
-          it { is_expected.to eq :human }
+          it { is_expected.to eq :cat }
+        end
+
+        context '値が一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 3)
+              (case x
+                (1 'dog)
+                (2 'cat))
+            LISP
+          end
+          it { is_expected.to eq nil }
         end
       end
 
@@ -2226,7 +2238,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 2 }
         end
 
-        context '値が一致しない場合' do
+        context 'otherwiseに到達する場合' do
           let(:str) do
             <<~LISP
               (setq x 'human)
@@ -2238,23 +2250,18 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq 3 }
         end
-      end
 
-      context "On Lispのサンプルコード" do
-        let(:str) do
-          <<~LISP
-              (defun behave (animal)
-                (case animal
-                  (dog (wag-tail)
-                    (bark))
-                  (rat (scurry)
-                    (squeak))
-                  (cat (rub-legs)
-                    (scratch-carpet))))
-              (behave 'dog)
+        context '値が一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 'human)
+              (case x
+                ('dog 1)
+                ('cat 2))
             LISP
+          end
+          it { is_expected.to eq nil }
         end
-        it { is_expected.to eq :behave }
       end
     end
 
