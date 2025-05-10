@@ -192,16 +192,16 @@ module Rubi
           end
         end.last
       elsif function == :setf # TODO: 未実装。setqをコピーしただけ
-        var_name, value = params
-        puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
-        if lexical_hash.key?(var_name)
+        place, newvalue = params
+        puts "#{nest}#{function}(place: #{place}, newvalue: #{newvalue})"
+        if lexical_hash.key?(place)
           # ローカル変数がある場合は、ローカル変数を変更する
-          lexical_hash[var_name] = value
+          lexical_hash[place] = newvalue
         else
           # ローカル変数がない場合は、グローバル変数を定義する
-          var_hash[var_name] = eval(value, lexical_hash, stack_count + 1)
+          var_hash[place] = eval(value, lexical_hash, stack_count + 1)
           puts "#{nest}-> var_hash: #{var_hash}"
-          var_hash[var_name]
+          var_hash[place]
         end
       elsif function == :lambda
         params, expression = params
