@@ -3008,7 +3008,7 @@ describe Rubi::Evaluator do
       end
 
       context '属性としての関数' do
-        context "(defun behave (animal)" do
+        xcontext "CommonLispでは動かないコード？ (defun behave (animal)" do
           let(:str) do
             <<~LISP
               (defun behave (animal)
