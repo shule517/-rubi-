@@ -5398,6 +5398,604 @@ NIL
           it { is_expected.to eq [:z, :p, :n] }
         end
 
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro nif (expr pos zero neg)
+  `(case (truncate (signum ,expr))
+     (1 ,pos)
+     (0 ,zero)
+     (-1 ,neg)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro nif (expr pos zero neg)
+  (list 'case
+        (list 'truncate (list 'signum expr))
+        (list 1 pos)
+        (list 0 zero)
+        (list -1 neg)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(case (truncate (signum x))
+  (1 'p)
+  (0 'z)
+  (-1 'n))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq b '(1 2 3))
+(1 2 3)
+> `(a ,b c)
+(A (1 2 3) C)
+> `(a ,@b c)
+(A 1 2 3 C)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(when (eligible obj)
+  (do-this)
+  (do-that)
+  obj)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro our-when (test &body body)
+  `(if ,test
+       (progn
+         ,@body)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(if (eligible obj)
+    (progn (do-this)
+           (do-that)
+           obj))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun greet (name)
+  `(hello ,name))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(member x choices :test #'eq)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(memq x choices)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro memq (obj lst)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro memq (obj lst)
+  `(member
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro memq (obj lst)
+  `(member ,obj
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro memq (obj lst)
+  `(member ,obj ,lst :test #'eq))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro while (test &body body)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro while (test &body body)
+  `(do ()
+     ((not ,test))
+     ,@body))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (defmacro while (test &body body)
+    `(do ()
+       ((not ,test))
+       ,@body))
+WHILE
+> (pprint (macroexpand '(while (able) (laugh))))
+(BLOCK NIL
+       (LET NIL
+            (TAGBODY
+              #:G61
+              (IF (NOT (ABLE)) (RETURN NIL))
+              (LAUGH)
+              (GO #:G61))))
+T
+> (pprint (macroexpand-1 '(while (able) (laugh))))
+(DO NIL
+    ((NOT (ABLE)))
+    (LAUGH))
+T
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro mac (expr)
+  `(pprint (macroexpand-1 ',expr)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(pprint (macroexpand-1 '(or x y)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(mac (or x y))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq exp (macroexpand-1 '(memq 'a '(a b c))))
+(MEMBER (QUOTE A) (QUOTE (A B C)) :TEST (FUNCTION EQ))
+> (eval exp)
+(A B C)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun foo (x y z)
+  (+ x y z))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(foo 1 2 3)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (destructuring-bind (x (y) . z) '(a (b) c d)
+    (list x y z))
+(A B (C D))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(dolist (x '(a b c))
+  (print x))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro our-dolist ((var list &optional result) &body body)
+  `(progn
+     (mapc #'(lambda (,var) ,@body)
+           ,list)
+     (let ((,var nil))
+       ,result)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro when-bind ((var expr) &body body)
+  `(let ((,var ,expr))
+     (when ,var
+       ,@body)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(when-bind (input (get-user-input))
+           (process input))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(let ((input (get-user-input)))
+  (when input
+    (process input)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro our-expander (name) `(get ,name 'expander))
+
+(defmacro our-defmacro (name parms &body body)
+  (let ((g (gensym)))
+    `(progn
+       (setf (our-expander ',name)
+             #'(lambda (,g)
+                 (block ,name
+                        (destructuring-bind ,parms (cdr ,g)
+                          ,@body))))
+       ',name)))
+
+(defun our-macroexpand-1 (expr)
+  (if (and (consp expr) (our-expander (car expr)))
+      (funcall (our-expander (car expr)) expr)
+      expr))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(let ((op 'setq))
+  (defmacro our-setq (var val)
+    (list op var val)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(do ((w 3)
+     (x 1 (1+ x))
+     (y 2 (1+ y))
+     (z))
+  ((> x 10) (princ z) y)
+  (princ x)
+  (princ y))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(prog ((w 3) (x 1) (y 2) (z nil))
+      foo
+      (if (> x 10)
+          (return (progn (princ z) y)))
+      (princ x)
+      (princ y)
+      (psetq x (1+ x) y (1+ y))
+      (go foo))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (let ((a 1))
+    (setq a 2 b a)
+    (list a b))
+(2 2)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (let ((a 1))
+(psetq a 2 b a)
+(list a b))
+(2 1)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro our-do (bindforms (test &rest result) &body body)
+  (let ((label (gensym)))
+    `(prog ,(make-initforms bindforms)
+           ,label
+           (if ,test
+               (return (progn ,@result)))
+           ,@body
+           (psetq ,@(make-stepforms bindforms))
+           (go ,label))))
+
+(defun make-initforms (bindforms)
+  (mapcar #'(lambda (b)
+              (if (consp b)
+                  (list (car b) (cadr b))
+                  (list b nil)))
+          bindforms))
+
+(defun make-stepforms (bindforms)
+  (mapcan #'(lambda (b)
+              (if (and (consp b) (third b))
+                  (list (car b) (third b))
+                  nil))
+          bindforms))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro our-and (&rest args)
+  (case (length args)
+    (0 t)
+    (1 (car args))
+    (t `(if ,(car args)
+            (our-and ,@(cdr args))))))
+
+(defmacro our-andb (&rest args)
+  (if (null args)
+      t
+      (labels ((expander (rest)
+                         (if (cdr rest)
+                             `(if ,(car rest)
+                                  ,(expander (cdr rest)))
+                             (car rest))))
+        (expander args))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (defmacro mac (x) `(1+ ,x))
+MAC
+> (setq fn (compile nil `(lambda (y) (mac y))))
+#<Compiled-Function BF7E7E>
+> (defmacro mac (x) `(+ ,x 100))
+MAC
+> (funcall fn 1)
+2
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun second (x) (cadr x))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro second (x) `(cadr ,x))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun noisy-second (x)
+  (princ "Someone is taking a cadr!")
+  (cadr x))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro noisy-second (x)
+  `(progn
+     (princ "Someone is taking a cadr!")
+     (cadr ,x)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun sum (&rest args)
+  (apply #'+ args))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro sum (&rest args)
+  `(apply #'+ (list ,@args)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro sum (&rest args)
+  `(+ ,@args))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun foo (x y z)
+  (list x (let ((x y))
+            (list x z))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defmacro foo (x y z)
+  `(list ,x (let ((x ,y))
+              (list x ,z))))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (symbol-macrolet ((hi (progn (print "Howdy")
+                               1)))
+                   (+ hi 2))
+"Howdy"
+3
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
         xit 'TODO' do
         end
       end
