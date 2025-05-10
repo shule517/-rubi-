@@ -391,14 +391,20 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         true if params.any? { |param| eval(param, lexical_hash, stack_count + 1) }
       elsif function == :if
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b, c = params
-        condition = eval(a, lexical_hash, stack_count + 1)
-        puts "#{nest}#(condition: #{condition}, b: #{b}, c: #{c})"
-        if condition
-          eval(b, lexical_hash, stack_count + 1)
+        condition, b, c = params
+        puts "#{nest}#{function}(condition: #{condition}, trueの式: #{b}, falseの式: #{c}, lexical_hash: #{lexical_hash})"
+        eval_condition = eval(condition.dup, lexical_hash, stack_count + 1)
+        puts "#{nest}(eval_condition: #{eval_condition != nil}, trueの式: #{b}, falseの式: #{c})"
+        if eval_condition
+          puts "#{nest}(trueの式を採用: #{b})"
+          result = eval(b, lexical_hash, stack_count + 1)
+          puts "#{nest}-> #{result}"
+          result
         else
-          eval(c, lexical_hash, stack_count + 1)
+          puts "#{nest}#{function}(falseの式を採用: #{c})"
+          result = eval(c, lexical_hash, stack_count + 1)
+          puts "#{nest}-> #{result}"
+          result
         end
       elsif function == :cond
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
@@ -483,8 +489,8 @@ module Rubi
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
         puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
         params.each.with_index do |param, index|
-          puts "#{nest}1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, lexical_hash: #{lexical_hash})"
-          lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 1)
+          puts "#{nest}  1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, lexical_hash: #{lexical_hash})"
+          lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 2)
         end
         puts "#{nest}-> lexical_hash: #{lexical_hash}"
         puts "#{nest}2. lambdaを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"

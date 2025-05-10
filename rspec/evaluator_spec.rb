@@ -2710,6 +2710,19 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq 1 }
         end
+
+        context 'n == 2' do
+          let(:str) do
+            <<~LISP
+              (defun nsum (n)
+                (if (= n 0)
+                  0
+                  (+ n (nsum (- n 1)))))
+              (nsum 2)
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
       end
 
       context '階乗' do
