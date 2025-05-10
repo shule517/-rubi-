@@ -3483,7 +3483,161 @@ T
           it { is_expected.to eq [:c, :b, :a] }
         end
 
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq lst '(a b c))
+(A B C)
+> (bad-reverse lst)
+NIL
+> lst
+(C B A)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq lst '(a b c))
+(A B C)
+> (good-reverse lst)
+(C B A)
+> lst
+(A B C)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun good-reverse (lst)
+  (labels ((rev (lst acc)
+           (if (null lst)
+               acc
+               (rev (cdr lst) (cons (car lst) acc)))))
+    (rev lst nil)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(reverse lst)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(setq lst (reverse lst))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(nreverse lst)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (setq lst '(a b c))
+(A B C)
+> (nreverse lst)
+(C B A)
+> lst
+(A)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(nconc x y)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(setq x (nconc x y))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+set setq setf psetf psetq incf decf push pop pushnew
+rplaca rplacd rotatef shiftf remf remprop remhash
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (truncate 26.21875)
+26
+0.21875
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (= (truncate 26.21875) 26)
+T
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (multiple-value-bind (int frac) (truncate 26.21875)
+    (list int frac))
+(26 0.21875)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (defun powers (x)
+    (values x (sqrt x) (expt x 2)))
+POWERS
+> (multiple-value-bind (base root square) (powers 4)
+    (list base root square))
+(4 2.0 16)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
 
@@ -3544,7 +3698,99 @@ T
           it { is_expected.to eq [:a, 1] }
         end
 
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+(let ((x 0))
+  (defun total (y)
+    (incf x y)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun ok (x)
+  (nconc (list 'a x) (list 'c)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun not-ok (x)
+  (nconc (list 'a) x (list 'c)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun anything (x)
+  (+ x *anything*))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun f (x)
+  (let ((val (g x)))
+  ; ここでvalを書き換えていいものか？
+  ))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun exclaim (expression)
+  (append expression '(oh my)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (exclaim '(lions and tigers and bears))
+(LIONS AND TIGERS AND BEARS OH MY)
+> (nconc * '(goodness))
+(LIONS AND TIGERS AND BEARS OH MY GOODNESS)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (exclaim '(fixnums and bignums and floats))
+(FIXNUMS AND BIGNUMS AND FLOATS OH MY GOODNESS)
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun exclaim (expression)
+  (append expression (list 'oh 'my)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
     end
