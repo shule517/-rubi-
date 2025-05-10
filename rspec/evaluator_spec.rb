@@ -5022,16 +5022,17 @@ describe Rubi::Evaluator do
       end
 
       context 'Cdr部での再帰' do
-        context '' do
+        context '(defun our-length (lst)' do
           let(:str) do
             <<~LISP
               (defun our-length (lst)
                 (if (null lst)
                     0
                     (1+ (our-length (cdr lst)))))
+              (our-length '(1 2 3 4 5))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq 5 }
         end
 
         context '' do
