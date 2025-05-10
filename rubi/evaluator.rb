@@ -107,6 +107,32 @@ module Rubi
         )
       LISP
 
+      # TODO: 要リファクタリング
+      lisp_eval(<<~LISP)
+        (defun private-sort (lst func)
+          (let* (
+              (a (car lst))
+              (b (car (cdr lst)))
+            )
+            (if (null b) lst
+              (if (funcall func a b)
+                (append (list a) (private-sort (cdr lst) func))
+                (append (private-sort (cdr lst) func) (list a))
+              )
+            )
+          )
+        )
+
+        (defun sort (lst func)
+          (let ((result lst))
+            (dotimes (x (length lst))
+              (setq result (private-sort result func))
+            )
+            result
+          )
+        )
+      LISP
+
       # TODO: compileを仮実装
       lisp_eval("(defun compile (x) nil)")
       lisp_eval("(defun compiled-function-p (x) t)")
@@ -474,6 +500,15 @@ module Rubi
           end
         end
         nil # 何もHITしなかった場合の戻り値
+      elsif function == :dotimes
+        a, b = params
+        puts "#{nest}#{function}(a: #{a}, b: #{b} lexical_hash: #{lexical_hash})"
+        var, number = a
+        number.times.with_index do |index|
+          new_lexical_hash = lexical_hash.dup
+          new_lexical_hash[var] = index
+          eval(b, new_lexical_hash, stack_count + 1)
+        end
       elsif function == :progn
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last

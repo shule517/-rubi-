@@ -2547,6 +2547,31 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#dotimes' do
+      context '5回ループする' do
+        let(:str) do
+          <<~LISP
+            (setq x 0)
+            (dotimes (n 5)
+              (setq x (+ 1 x)))
+            x
+          LISP
+        end
+        it { is_expected.to eq 5 }
+      end
+
+      context '変数nを使う' do
+        let(:str) do
+          <<~LISP
+            (dotimes (n 5)
+              (setq x n))
+            x
+          LISP
+        end
+        it { is_expected.to eq 4 }
+      end
+    end
+
     describe '#apply' do
       context '定義した関数の場合' do
         let(:str) do
