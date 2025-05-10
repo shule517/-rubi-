@@ -17,7 +17,7 @@ module Rubi
       @built_system_func = true
 
       puts "#### ↓ 初期化 ↓ ####"
-      %i(+ - * / <).each do |operator|
+      %i(+ - * / < > <= >=).each do |operator|
         func_hash[operator] = Proc.new do |proc_params:, lexical_hash:|
           if proc_params.empty?
             0
@@ -417,18 +417,6 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a != b # 不一致の場合は、nilを返す
-      elsif function == :">"
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
-        true if a > b # 不一致の場合は、nilを返す
-      elsif function == :"<="
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
-        true if a <= b # 不一致の場合は、nilを返す
-      elsif function == :">="
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
-        true if a >= b # 不一致の場合は、nilを返す
       elsif function == :not
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a = params.shift
