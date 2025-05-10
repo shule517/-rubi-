@@ -406,6 +406,26 @@ module Rubi
         # (cond ((= 1 1) (+ 1 1)) ((= 2 2) (+ 2 2)) ((= 3 3) (+ 3 3)))
         _cond, expression = params.find { |cond, _expression| eval(cond, lexical_hash, stack_count + 1) }
         eval(expression, lexical_hash, stack_count + 1)
+      elsif function == :case
+        # (setq x 2)
+        # (case x
+        #   (1 'dog)
+        #   (2 'cat)
+        #   (otherwise 'human)) ; -> 'cat
+        var = eval(params.shift, lexical_hash, stack_count + 1)
+        puts "#{nest}#{function}(var: #{var}, params: #{params.map.with_index { |param, index| "params[#{index}] => #{param}"}.join(", ")}, lexical_hash: #{lexical_hash})"
+        params.each do |value, expression|
+          puts "#{nest}(#{var} == #{value})"
+          # elseに到着
+          if value == :otherwise
+            return eval(expression, lexical_hash, stack_count + 1)
+          end
+          # else以外
+          eval_value = eval(value, lexical_hash, stack_count + 1)
+          if var == eval_value
+            return eval(expression, lexical_hash, stack_count + 1)
+          end
+        end
       elsif function == :progn
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last
