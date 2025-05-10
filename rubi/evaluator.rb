@@ -194,7 +194,18 @@ module Rubi
       elsif function == :setf # TODO: 未実装。setqをコピーしただけ
         place, newvalue = params
         puts "#{nest}#{function}(place: #{place}, newvalue: #{newvalue})"
-        if lexical_hash.key?(place)
+        if list?(place)
+          a, b = place
+          if a == :'symbol-function'
+            # (setf (symbol-function 'double)
+            #   #'(lambda (x) (* x 2)))
+            puts "#{nest}#{function}(a: #{a}, b: #{b}, newvalue: #{newvalue})"
+            func_name = eval(b, lexical_hash, stack_count + 1)
+            func = eval(newvalue, lexical_hash, stack_count + 1)
+            func_hash[func_name] = func
+            func # 定義した関数を返す
+          end
+        elsif lexical_hash.key?(place)
           # ローカル変数がある場合は、ローカル変数を変更する
           lexical_hash[place] = newvalue
         else

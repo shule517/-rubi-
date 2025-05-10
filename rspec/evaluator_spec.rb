@@ -402,14 +402,26 @@ describe Rubi::Evaluator do
       end
 
       context "symbol-functionで関数定義する" do
-        let(:str) do
-          <<~LISP
-              (setf (symbol-function 'double)
-                #'(lambda (x) (* x 2)))
-              (double 2)
-            LISP
+        context '定義のみ' do
+          let(:str) do
+            <<~LISP
+                (setf (symbol-function 'double)
+                  #'(lambda (x) (* x 2)))
+              LISP
+          end
+          it { is_expected.to be_instance_of Proc }
         end
-        it { is_expected.to eq 4 }
+
+        context '定義＆実行' do
+          let(:str) do
+            <<~LISP
+                (setf (symbol-function 'double)
+                  #'(lambda (x) (* x 2)))
+                (double 2)
+              LISP
+          end
+          it { is_expected.to eq 4 }
+        end
       end
 
       # TODO: 未実装
