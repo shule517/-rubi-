@@ -794,7 +794,7 @@ describe Rubi::Evaluator do
       end
 
       context '組み込み関数の場合' do
-        %w(+ - * /).each do |func|
+        %w(+ - * / <).each do |func|
           context "#'#{func}の場合" do
             let(:str) do
               <<~LISP
