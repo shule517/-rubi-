@@ -2560,6 +2560,18 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 5 }
       end
 
+      context '(length list)回ループする' do
+        let(:str) do
+          <<~LISP
+            (setq x 0)
+            (dotimes (n (length (list 1 2 3)))
+              (setq x (+ 1 x)))
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+
       context '変数nを使う' do
         let(:str) do
           <<~LISP
