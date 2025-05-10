@@ -83,9 +83,6 @@ module Rubi
         end
       end
 
-      # TODO: labelsを仮実装
-      lisp_eval("(defun labels (x) (+ x 1))")
-
       # 組み込み関数の定義
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
       lisp_eval("(defun 1+ (x) (+ x 1))")
@@ -177,6 +174,20 @@ module Rubi
         puts "#{nest}-> next_lexical_hash: #{next_lexical_hash}"
         puts "#{nest}#式を評価する - expression: #{expression}"
         expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
+      elsif function == :'labels'
+        # (labels ((double (x) (* 2 x)))
+        #   (double 3))
+        a, labels_expression = params
+        # pp params0: a, labels_expression: labels_expression
+
+        func_name, func_params, func_expression = params[0][0]
+        # pp func_name: func_name, func_params: func_params, func_expression: func_expression
+        puts "#{nest}#{function}(params: #{params}, func_expression: #{func_expression})"
+
+        func = build_lambda(func_params, func_expression, stack_count + 1, nest)
+        func_hash[func_name] = func
+
+        eval(labels_expression, lexical_hash, stack_count + 1)
       elsif function == :setq # 変数定義
         # (setq a 1 b 2 c 3)
         params.each_slice(2).map do |var_name, value|
@@ -561,6 +572,11 @@ module Rubi
         puts "#{nest}-> 値を返す #{ast}"
         ast # シンボルor値を返す
       end
+    end
+
+    # astを(+ 1 2)表記に変換する
+    def expression_to_s(ast)
+      ast.to_s.gsub("[", "(").gsub("]", ")").gsub(":", "").gsub(",", "")
     end
   end
 end

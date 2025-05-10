@@ -224,22 +224,22 @@ describe Rubi::Evaluator do
       context 'スコープ内で、定義した関数を実行する' do
         let(:str) do
           <<~LISP
-            (labels ((inc (x) (1+ x)))
-                    (inc 3))
+            (labels ((double (x) (* 2 x)))
+                    (double 3))
           LISP
         end
-        it { is_expected.to eq 4 }
+        it { is_expected.to eq 6 }
       end
 
       context 'スコープ外で、定義した関数を実行する' do
         let(:str) do
           <<~LISP
-            (labels ((inc (x) (1+ x)))
-                    (inc 3))
-            (inc 3)
+            (labels ((double (x) (* 2 x)))
+                    (double 3))
+            (double 3) ; labelsの中でしかdoubleは有効でない
           LISP
         end
-        it { is_expected.to eq 4 }
+        it { is_expected.to raise_error }
       end
     end
 
