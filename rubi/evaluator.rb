@@ -174,7 +174,7 @@ module Rubi
         puts "#{nest}-> next_lexical_hash: #{next_lexical_hash}"
         puts "#{nest}#式を評価する - expression: #{expression}"
         expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
-      elsif function == :'labels'
+      elsif function == :labels
         # (labels ((double (x) (* 2 x)))
         #   (double 3))
         func_data, labels_expression = params
@@ -201,7 +201,12 @@ module Rubi
             var_hash[var_name]
           end
         end.last
-      elsif function == :setf # TODO: 未実装。setqをコピーしただけ
+      elsif function == :get
+        puts "#{nest}#{function}(params: #{params})"
+        hash_keys = params.map { |param| eval(param, lexical_hash, stack_count + 1) }
+        puts "#{nest}(hash_keys: #{hash_keys}, var_hash: #{var_hash})"
+        var_hash.dig(*hash_keys)
+      elsif function == :setf
         place, newvalue = params
         puts "#{nest}#{function}(place: #{place}, newvalue: #{newvalue})"
         if list?(place)
@@ -220,6 +225,17 @@ module Rubi
             # (setf (get 'color 'shade) 'dark)
             # (get 'color 'shade) ; => 'dark
             puts "#{nest}place_func: #{place_func}, place_params: #{place_params}, newvalue: #{newvalue}"
+            hash_keys = place_params.map { |place_param| eval(place_param, lexical_hash, stack_count + 1) }
+            # TODO: いったん2段固定
+            if hash_keys.size == 2
+              a, b = hash_keys
+              var_hash[a] ||= {}
+              var_hash[a][b] = eval(newvalue, lexical_hash, stack_count + 1)
+              puts "#{nest}-> var_hash: #{var_hash}"
+              var_hash[a][b]
+            else
+              raise "setf getの設定はキー2段階にしか対応してないです！"
+            end
           end
         elsif lexical_hash.key?(place)
           # ローカル変数がある場合は、ローカル変数を変更する

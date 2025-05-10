@@ -425,13 +425,24 @@ describe Rubi::Evaluator do
       end
 
       context "place: getで変数定義する" do
-        let(:str) do
-          <<~LISP
-          (setf (get 'color 'shade) 'dark)
-          (get 'color 'shade) ; => 'dark
-        LISP
+        context '定義のみ' do
+          let(:str) do
+            <<~LISP
+              (setf (get 'color 'shade) 'dark)
+            LISP
+          end
+          it { is_expected.to eq :dark }
         end
-        it { is_expected.to eq :dark }
+
+        context '定義＆参照' do
+          let(:str) do
+            <<~LISP
+              (setf (get 'color 'shade) 'dark)
+              (get 'color 'shade) ; => 'dark
+            LISP
+          end
+          it { is_expected.to eq :dark }
+        end
       end
 
       # TODO: 未実装
@@ -535,6 +546,22 @@ describe Rubi::Evaluator do
             proc = subject
             expect(proc).to be_instance_of(Proc)
             expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 5
+          end
+        end
+      end
+
+      context '実行する式が複数ある場合' do
+        context '引数ありの関数定義' do
+          let(:str) do
+            <<~LISP
+              (lambda (x) (+ x 2) (* x 3))
+            LISP
+          end
+
+          it do
+            proc = subject
+            expect(proc).to be_instance_of(Proc)
+            expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 15
           end
         end
       end
@@ -2690,7 +2717,7 @@ describe Rubi::Evaluator do
     end
 
     describe '#get' do
-      context '' do
+      context 'グローバル変数を取得する' do
         let(:str) do
           <<~LISP
             (setf (get 'color 'shade) 'dark)
@@ -2703,12 +2730,13 @@ describe Rubi::Evaluator do
       context "On Lispのサンプルコード" do
         let(:str) do
           <<~LISP
+            (setf (get 'dog 'behavior) (lambda () 'hoge))
             (defun behave (animal)
               (funcall (get animal 'behavior)))
             (behave 'dog)
           LISP
         end
-        it { is_expected.to eq :behave }
+        it { is_expected.to eq :hoge }
       end
     end
 
