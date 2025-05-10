@@ -127,7 +127,8 @@ module Rubi
       Kernel::puts(args) if debug
     end
 
-    def eval(ast, lexical_hash, stack_count)
+    def eval(arg_ast, lexical_hash, stack_count)
+      ast = arg_ast.dup # evalに渡した引数を変更しない
       raise "スタック多すぎ問題" if stack_count > 100
       nest = "  " * (stack_count + 1)
       build_system_func(stack_count + 1, nest) unless built_system_func
@@ -393,7 +394,7 @@ module Rubi
       elsif function == :if
         condition, b, c = params
         puts "#{nest}#{function}(condition: #{condition}, trueの式: #{b}, falseの式: #{c}, lexical_hash: #{lexical_hash})"
-        eval_condition = eval(condition.dup, lexical_hash, stack_count + 1)
+        eval_condition = eval(condition, lexical_hash, stack_count + 1)
         puts "#{nest}(eval_condition: #{eval_condition != nil}, trueの式: #{b}, falseの式: #{c})"
         if eval_condition
           puts "#{nest}(trueの式を採用: #{b})"
@@ -494,8 +495,7 @@ module Rubi
         end
         puts "#{nest}-> lexical_hash: #{lexical_hash}"
         puts "#{nest}2. lambdaを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
-        # 関数を実行すると、expressionが書き換わってしまうので、expression.dup
-        eval(expression.dup, lexical_hash, stack_count + 1)
+        eval(expression, lexical_hash, stack_count + 1)
       end
     end
 
