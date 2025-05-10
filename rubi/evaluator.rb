@@ -214,6 +214,10 @@ module Rubi
             func = eval(newvalue, lexical_hash, stack_count + 1)
             func_hash[func_name] = func
             func # 定義した関数を返す
+          elsif a == :get
+            # (setf (get 'color 'shade) 'dark)
+            # (get 'color 'shade) ; => 'dark
+            puts "#{nest}#{function}(a: #{a}, b: #{b}, newvalue: #{newvalue})"
           end
         elsif lexical_hash.key?(place)
           # ローカル変数がある場合は、ローカル変数を変更する

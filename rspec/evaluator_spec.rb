@@ -401,7 +401,7 @@ describe Rubi::Evaluator do
         end
       end
 
-      context "symbol-functionで関数定義する" do
+      context "place: symbol-functionで関数定義する" do
         context '定義のみ' do
           let(:str) do
             <<~LISP
@@ -422,6 +422,16 @@ describe Rubi::Evaluator do
           end
           it { is_expected.to eq 4 }
         end
+      end
+
+      context "place: getで変数定義する" do
+        let(:str) do
+          <<~LISP
+          (setf (get 'color 'shade) 'dark)
+          (get 'color 'shade) ; => 'dark
+        LISP
+        end
+        it { is_expected.to eq :dark }
       end
 
       # TODO: 未実装
@@ -2680,6 +2690,16 @@ describe Rubi::Evaluator do
     end
 
     describe '#get' do
+      context '' do
+        let(:str) do
+          <<~LISP
+            (setf (get 'color 'shade) 'dark)
+            (get 'color 'shade)
+          LISP
+        end
+        it { is_expected.to eq :dark }
+      end
+
       context "On Lispのサンプルコード" do
         let(:str) do
           <<~LISP
