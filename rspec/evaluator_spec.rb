@@ -3286,9 +3286,10 @@ describe Rubi::Evaluator do
             <<~LISP
               (defun make-adder (n)
                 #'(lambda (x) (+ x n)))
+              (funcall (make-adder 1) 2)
             LISP
           end
-          it { is_expected.to eq :"make-adder" }
+          it { is_expected.to eq 3 }
         end
 
         context "(setq add2 (make-adder 2) add10 (make-adder 10))" do
