@@ -90,6 +90,14 @@ module Rubi
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
       lisp_eval("(defun 1+ (x) (+ x 1))")
       lisp_eval(<<~LISP)
+        (defun length (lst)
+          (if (null lst)
+            0
+            (1+ (length (cdr lst)))
+          )
+        )
+      LISP
+      lisp_eval(<<~LISP)
         (defun remove-if (func lst)
           (if (null lst)
             nil
@@ -272,7 +280,7 @@ module Rubi
       elsif function == :null
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
-        true if result.empty? # falseの場合は、nilを返す
+        true if result.nil? || result.empty? # falseの場合は、nilを返す
       elsif function == :atom
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a = params.shift

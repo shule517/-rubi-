@@ -1012,10 +1012,19 @@ describe Rubi::Evaluator do
     end
 
     describe '#null' do
-      context 'リストが空の場合' do
+      context 'リストが空の場合①' do
         let(:str) do
           <<~LISP
             (null '())
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
+
+      context 'リストが空の場合②' do
+        let(:str) do
+          <<~LISP
+            (null ())
           LISP
         end
         it { is_expected.to eq true }
