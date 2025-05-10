@@ -5496,7 +5496,9 @@ NIL
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context '単純なマクロの定義' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5574,7 +5576,9 @@ NIL
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context 'マクロ展開の確認' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5641,7 +5645,9 @@ T
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context '引数リストの構造化代入' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5728,7 +5734,9 @@ T
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context 'マクロのモデル' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5763,7 +5771,9 @@ T
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context 'プログラムとしてのマクロ' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5849,7 +5859,9 @@ T
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context 'マクロのスタイル' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5873,7 +5885,9 @@ T
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context 'マクロへの依存' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5889,7 +5903,9 @@ MAC
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context '関数からマクロへ' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5982,7 +5998,9 @@ MAC
           end
           it { is_expected.to eq 99999999999 }
         end
+      end
 
+      context 'シンボル・マクロ' do
         context '' do
           let(:str) do
             <<~LISP
@@ -5994,54 +6012,6 @@ MAC
             LISP
           end
           it { is_expected.to eq 99999999999 }
-        end
-
-        xit 'TODO' do
-        end
-      end
-
-      context '単純なマクロの定義' do
-        xit 'TODO' do
-        end
-      end
-
-      context 'マクロ展開の確認' do
-        xit 'TODO' do
-        end
-      end
-
-      context '引数リストの構造化代入' do
-        xit 'TODO' do
-        end
-      end
-
-      context 'マクロのモデル' do
-        xit 'TODO' do
-        end
-      end
-
-      context 'プログラムとしてのマクロ' do
-        xit 'TODO' do
-        end
-      end
-
-      context 'マクロのスタイル' do
-        xit 'TODO' do
-        end
-      end
-
-      context 'マクロへの依存' do
-        xit 'TODO' do
-        end
-      end
-
-      context '関数からマクロへ' do
-        xit 'TODO' do
-        end
-      end
-
-      context 'シンボル・マクロ' do
-        xit 'TODO' do
         end
       end
     end
