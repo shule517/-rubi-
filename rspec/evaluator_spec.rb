@@ -3119,37 +3119,53 @@ describe Rubi::Evaluator do
       end
 
       context '属性としての関数' do
-        xcontext "CommonLispでは動かないコード？ (defun behave (animal)" do
-          let(:str) do
-            <<~LISP
-              (defun behave (animal)
-                (case animal
+        context "CommonLispでは動かないコード？ (defun behave (animal)" do
+          context 'caseの動作確認' do
+            let(:str) do
+              <<~LISP
+                (defun wag-tail () "WagTail")
+                (defun bark () "Bark")
+  
+                (case 'dog
                   (dog (wag-tail)
                     (bark))
                   (rat (scurry)
                     (squeak))
                   (cat (rub-legs)
                     (scratch-carpet))))
-              (behave 'dog)
-            LISP
+              LISP
+            end
+            it { is_expected.to eq "Bark" }
           end
-          it { is_expected.to eq :behave }
-        end
 
-        context "(defun behave (animal) (funcall (get animal 'behavior)))" do
-          let(:str) do
-            <<~LISP
-              (defun behave (animal)
-                (funcall (get animal 'behavior)))
-              (behave 'dog)
-            LISP
+          context '実際のサンプルコード' do
+            let(:str) do
+              <<~LISP
+                (defun wag-tail () "WagTail")
+                (defun bark () "Bark")
+  
+                (defun behave (animal)
+                  (case animal
+                    (dog (wag-tail)
+                      (bark))
+                    (rat (scurry)
+                      (squeak))
+                    (cat (rub-legs)
+                      (scratch-carpet))))
+  
+                (behave 'dog)
+              LISP
+            end
+            it { is_expected.to eq "Bark" }
           end
-          it { is_expected.to eq :behave }
         end
 
         context "(setf (get 'dog 'behavior)" do
           let(:str) do
             <<~LISP
+              (defun wag-tail () "WagTail")
+              (defun bark () "Bark")
+
               (defun behave (animal)
                 (funcall (get animal 'behavior)))
 
@@ -3161,7 +3177,7 @@ describe Rubi::Evaluator do
               (behave 'dog)
             LISP
           end
-          it { is_expected.to be_instance_of Proc }
+          it { is_expected.to eq "Bark" }
         end
       end
 
