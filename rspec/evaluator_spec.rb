@@ -239,7 +239,7 @@ describe Rubi::Evaluator do
             (double 3) ; labelsの中でしかdoubleは有効でない
           LISP
         end
-        it { is_expected.to raise_error }
+        it { expect { subject }.to raise_error }
       end
     end
 

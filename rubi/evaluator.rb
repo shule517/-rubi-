@@ -185,7 +185,9 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, func_expression: #{func_expression})"
 
         func = build_lambda(func_params, func_expression, stack_count + 1, nest)
-        func_hash[func_name] = func
+
+        # ローカル変数に関数を登録する
+        lexical_hash[func_name] = func
 
         eval(labels_expression, lexical_hash, stack_count + 1)
       elsif function == :setq # 変数定義
@@ -505,6 +507,10 @@ module Rubi
         expanded = macro_hash[function].call(*params)
         puts "#{nest}マクロで展開された式を実行する(expanded: #{expanded}, lexical_hash: #{lexical_hash})"
         eval(expanded, lexical_hash, stack_count + 1)
+      elsif lexical_hash.key?(function)
+        # 登録されている関数を呼び出す
+        puts "#{nest}ローカル関数(#{function})が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
+        lexical_hash[function].call(proc_params: params, lexical_hash: lexical_hash.dup)
       else
         puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         raise "対応する関数(#{function})が見つかりません(params: #{params})"
