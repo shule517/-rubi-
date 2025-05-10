@@ -2684,16 +2684,46 @@ describe Rubi::Evaluator do
     end
 
     describe '再帰処理の動作確認' do
-      let(:str) do
-        <<~LISP
-          (defun fact (n)
-            (if (= n 0)
-              1
-              (* n (fact (- n 1)))))
-          (fact 5)
-        LISP
+      context '合計値' do
+        context 'n == 0' do
+          let(:str) do
+            <<~LISP
+              (defun nsum (n)
+                (if (= n 0)
+                  0
+                  (+ n (nsum (- n 1)))))
+              (nsum 0)
+            LISP
+          end
+          it { is_expected.to eq 0 }
+        end
+
+        context 'n == 1' do
+          let(:str) do
+            <<~LISP
+              (defun nsum (n)
+                (if (= n 0)
+                  0
+                  (+ n (nsum (- n 1)))))
+              (nsum 1)
+            LISP
+          end
+          it { is_expected.to eq 1 }
+        end
       end
-      it { is_expected.to eq 120 }
+
+      context '階乗' do
+        let(:str) do
+          <<~LISP
+            (defun fact (n)
+              (if (= n 0)
+                1
+                (* n (fact (- n 1)))))
+            (fact 5)
+          LISP
+        end
+        it { is_expected.to eq 120 }
+      end
     end
   end
 
