@@ -3005,12 +3005,24 @@ describe Rubi::Evaluator do
         end
 
         context "(sort '(1 4 2 5 6 7 3) #'<)" do
-          let(:str) do
-            <<~LISP
-              (sort '(1 4 2 5 6 7 3) #'<)
-            LISP
+          context "#'<" do
+            let(:str) do
+              <<~LISP
+                ;(sort '(1 4 2 5 6 7 3) #'<)
+                #'<
+              LISP
+            end
+            it { is_expected.to be_instance_of Proc }
           end
-          it { is_expected.to eq [1, 2, 3, 4, 5, 6, 7] }
+
+          context "実行する" do
+            let(:str) do
+              <<~LISP
+                (sort '(1 4 2 5 6 7 3) #'<)
+              LISP
+            end
+            it { is_expected.to eq [1, 2, 3, 4, 5, 6, 7] }
+          end
         end
 
         context "(remove-if #'evenp '(1 2 3 4 5 6 7))" do
