@@ -177,18 +177,15 @@ module Rubi
       elsif function == :'labels'
         # (labels ((double (x) (* 2 x)))
         #   (double 3))
-        a, labels_expression = params
-        # pp params0: a, labels_expression: labels_expression
-
-        func_name, func_params, func_expression = params[0][0]
-        # pp func_name: func_name, func_params: func_params, func_expression: func_expression
+        func_data, labels_expression = params
+        func_name, func_params, func_expression = func_data[0]
         puts "#{nest}#{function}(params: #{params}, func_expression: #{func_expression})"
 
+        # ローカル関数を定義する
         func = build_lambda(func_params, func_expression, stack_count + 1, nest)
+        lexical_hash[func_name] = func # ローカル変数に関数を登録する
 
-        # ローカル変数に関数を登録する
-        lexical_hash[func_name] = func
-
+        # 式を実行する
         eval(labels_expression, lexical_hash, stack_count + 1)
       elsif function == :setq # 変数定義
         # (setq a 1 b 2 c 3)
