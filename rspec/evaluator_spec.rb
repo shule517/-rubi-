@@ -3355,7 +3355,75 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        xit 'TODO' do
+        context '' do
+          let(:str) do
+            <<~LISP
+> (progn (compile 'bar '(lambda (x) (* x 3)))
+(compiled-function-p #'bar))
+T
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (let ((y 2))
+(defun foo (x) (+ x y)))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+> (compile 'make-adder)
+MAKE-ADDER
+> (compiled-function-p (make-adder 2))
+T
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun 50th (lst) (nth 49 lst))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(proclaim '(inline 50th))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun foo (lst)
+  (+ (50th lst) 1))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
+        end
+
+        context '' do
+          let(:str) do
+            <<~LISP
+(defun foo (lst)
+  (+ (nth 49 lst) 1))
+            LISP
+          end
+          it { is_expected.to eq 99999999999 }
         end
       end
     end
