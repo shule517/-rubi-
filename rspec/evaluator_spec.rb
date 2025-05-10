@@ -2183,6 +2183,81 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#case' do
+      context '数値の比較の場合' do
+        context '値が一致する場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 2)
+              (case x
+                (1 'dog)
+                (2 'cat)
+                (otherwise 'human))
+            LISP
+          end
+          it { is_expected.to eq :cat }
+        end
+
+        context '値が一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 3)
+              (case x
+                (1 'dog)
+                (2 'cat)
+                (otherwise 'human))
+            LISP
+          end
+          it { is_expected.to eq :human }
+        end
+      end
+
+      context 'シンボルの比較の場合' do
+        context '値が一致する場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 'cat)
+              (case x
+                ('dog 1)
+                ('cat 2)
+                (otherwise 3))
+            LISP
+          end
+          it { is_expected.to eq 2 }
+        end
+
+        context '値が一致しない場合' do
+          let(:str) do
+            <<~LISP
+              (setq x 'human)
+              (case x
+                ('dog 1)
+                ('cat 2)
+                (otherwise 3))
+            LISP
+          end
+          it { is_expected.to eq 3 }
+        end
+      end
+
+      context "On Lispのサンプルコード" do
+        let(:str) do
+          <<~LISP
+              (defun behave (animal)
+                (case animal
+                  (dog (wag-tail)
+                    (bark))
+                  (rat (scurry)
+                    (squeak))
+                  (cat (rub-legs)
+                    (scratch-carpet))))
+              (behave 'dog)
+            LISP
+        end
+        it { is_expected.to eq :behave }
+      end
+    end
+
     describe '#not' do
       context '固定値の場合' do
         context 'nilの場合' do
@@ -2548,25 +2623,6 @@ describe Rubi::Evaluator do
 
     describe '#copy-tree' do
       xit {}
-    end
-
-    describe '#case' do
-      context "On Lispのサンプルコード" do
-        let(:str) do
-          <<~LISP
-              (defun behave (animal)
-                (case animal
-                  (dog (wag-tail)
-                    (bark))
-                  (rat (scurry)
-                    (squeak))
-                  (cat (rub-legs)
-                    (scratch-carpet))))
-              (behave 'dog)
-            LISP
-        end
-        it { is_expected.to eq :behave }
-      end
     end
 
     describe '#get' do
