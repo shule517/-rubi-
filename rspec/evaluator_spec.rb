@@ -4709,10 +4709,11 @@ describe Rubi::Evaluator do
         context "(remove-if-not #'pred lst)" do
           let(:str) do
             <<~LISP
-              (remove-if-not #'pred lst)
+              ; (remove-if-not #'pred lst) predがCommonLispにないものなので変更する
+              (remove-if-not #'evenp '(1 2 3 4))
             LISP
           end
-          it { is_expected.to eq [:a, 1] }
+          it { is_expected.to eq [2, 4] }
         end
 
         context "(remove-if #'(lambda (x) (not (pred x))) lst)" do
