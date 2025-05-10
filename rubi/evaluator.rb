@@ -199,7 +199,7 @@ module Rubi
           lexical_hash[place] = newvalue
         else
           # ローカル変数がない場合は、グローバル変数を定義する
-          var_hash[place] = eval(value, lexical_hash, stack_count + 1)
+          var_hash[place] = eval(newvalue, lexical_hash, stack_count + 1)
           puts "#{nest}-> var_hash: #{var_hash}"
           var_hash[place]
         end
