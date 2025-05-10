@@ -2303,8 +2303,8 @@ describe Rubi::Evaluator do
             <<~LISP
               (setq x 'cat)
               (case x
-                ('dog 1)
-                ('cat 2)
+                (dog 1)
+                (cat 2)
                 (otherwise 3))
             LISP
           end

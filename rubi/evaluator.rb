@@ -473,16 +473,19 @@ module Rubi
         #   (otherwise 'human)) ; -> 'cat
         var = eval(params.shift, lexical_hash, stack_count + 1)
         puts "#{nest}#{function}(var: #{var}, params: #{params.map.with_index { |param, index| "params[#{index}] => #{param}"}.join(", ")}, lexical_hash: #{lexical_hash})"
-        params.each do |value, expression|
+        params.each do |value, *expressions|
           puts "#{nest}(#{var} == #{value})"
           # elseに到着
           if value == :otherwise
-            return eval(expression, lexical_hash, stack_count + 1)
+            # TODO: 最後の式しか実行していない。本当は途中の式も実行する必要がある。
+            return eval(expressions.last, lexical_hash, stack_count + 1)
           end
           # else以外
-          eval_value = eval(value, lexical_hash, stack_count + 1)
-          if var == eval_value
-            return eval(expression, lexical_hash, stack_count + 1)
+          # eval_value = eval(value, lexical_hash, stack_count + 1)
+          if var == value
+            puts "#{nest}(#{var} == #{value}){expressions: #{expressions}}"
+            # TODO: 最後の式しか実行していない。本当は途中の式も実行する必要がある。
+            return eval(expressions.last, lexical_hash, stack_count + 1)
           end
         end
         nil # 何もHITしなかった場合の戻り値
