@@ -107,31 +107,31 @@ module Rubi
         )
       LISP
 
-      # TODO: 要リファクタリング
-      lisp_eval(<<~LISP)
-        (defun private-sort (lst func)
-          (let* (
-              (a (car lst))
-              (b (car (cdr lst)))
-            )
-            (if (null b) lst
-              (if (funcall func a b)
-                (append (list a) (private-sort (cdr lst) func))
-                (append (private-sort (cdr lst) func) (list a))
-              )
-            )
-          )
-        )
-
-        (defun sort (lst func)
-          (let ((result lst))
-            (dotimes (x (length lst))
-              (setq result (private-sort result func))
-            )
-            result
-          )
-        )
-      LISP
+      # TODO: 要リファクタリング。sortをLispで実装してみた。
+      # lisp_eval(<<~LISP)
+      #   (defun private-sort (lst func)
+      #     (let* (
+      #         (a (car lst))
+      #         (b (car (cdr lst)))
+      #       )
+      #       (if (null b) lst
+      #         (if (funcall func a b)
+      #           (append (list a) (private-sort (cdr lst) func))
+      #           (append (private-sort (cdr lst) func) (list a))
+      #         )
+      #       )
+      #     )
+      #   )
+      #
+      #   (defun sort (lst func)
+      #     (let ((result lst))
+      #       (dotimes (x (length lst))
+      #         (setq result (private-sort result func))
+      #       )
+      #       result
+      #     )
+      #   )
+      # LISP
 
       # TODO: compileを仮実装
       lisp_eval("(defun compile (x) nil)")
@@ -348,6 +348,11 @@ module Rubi
         elsif list?(a) && list?(b)
           a + b
         end
+      elsif function == :sort
+        a, func = params
+        list = eval(a, lexical_hash, stack_count + 1)
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        list.sort # TODO: <しか対応してない funcを参照していない
       elsif function == :null
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
