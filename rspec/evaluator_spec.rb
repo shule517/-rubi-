@@ -2576,7 +2576,7 @@ describe Rubi::Evaluator do
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
     context '1. 拡張可能なプログラミング言語: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/extensibleLanguage.html' do
-      # Common Lispで動くコードはなかった
+      # Common Lispで動くサンプルコードはなかった
     end
 
     context '2. 関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functions.html' do
