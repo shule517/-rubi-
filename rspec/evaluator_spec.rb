@@ -563,12 +563,10 @@ describe Rubi::Evaluator do
         context '最初の式が実行されている' do
           let(:str) do
             <<~LISP
-              (setq n 1)
-              ((lambda (x) (setq n 2) (* x 3)) 3)
-              n
+              ((lambda (x) (setq x 2) (* x 3)) 3)
             LISP
           end
-          it { is_expected.to eq 2 } # 最初の式が実行されている
+          it { is_expected.to eq 6 } # 最初の式が実行されている
         end
       end
     end
