@@ -2550,6 +2550,38 @@ describe Rubi::Evaluator do
       xit {}
     end
 
+    describe '#case' do
+      context "On Lispのサンプルコード" do
+        let(:str) do
+          <<~LISP
+              (defun behave (animal)
+                (case animal
+                  (dog (wag-tail)
+                    (bark))
+                  (rat (scurry)
+                    (squeak))
+                  (cat (rub-legs)
+                    (scratch-carpet))))
+              (behave 'dog)
+            LISP
+        end
+        it { is_expected.to eq :behave }
+      end
+    end
+
+    describe '#get' do
+      context "On Lispのサンプルコード" do
+        let(:str) do
+          <<~LISP
+              (defun behave (animal)
+                (funcall (get animal 'behavior)))
+              (behave 'dog)
+            LISP
+        end
+        it { is_expected.to eq :behave }
+      end
+    end
+
     describe '再帰処理の動作確認' do
       let(:str) do
         <<~LISP
@@ -3358,9 +3390,9 @@ describe Rubi::Evaluator do
         context '' do
           let(:str) do
             <<~LISP
-> (progn (compile 'bar '(lambda (x) (* x 3)))
-(compiled-function-p #'bar))
-T
+              > (progn (compile 'bar '(lambda (x) (* x 3)))
+              (compiled-function-p #'bar))
+              T
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3369,8 +3401,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (let ((y 2))
-(defun foo (x) (+ x y)))
+              > (let ((y 2))
+              (defun foo (x) (+ x y)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3379,10 +3411,10 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (compile 'make-adder)
-MAKE-ADDER
-> (compiled-function-p (make-adder 2))
-T
+              > (compile 'make-adder)
+              MAKE-ADDER
+              > (compiled-function-p (make-adder 2))
+              T
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3391,7 +3423,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun 50th (lst) (nth 49 lst))
+              (defun 50th (lst) (nth 49 lst))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3400,7 +3432,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(proclaim '(inline 50th))
+              (proclaim '(inline 50th))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3409,8 +3441,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun foo (lst)
-  (+ (50th lst) 1))
+              (defun foo (lst)
+                (+ (50th lst) 1))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3419,8 +3451,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun foo (lst)
-  (+ (nth 49 lst) 1))
+              (defun foo (lst)
+                (+ (nth 49 lst) 1))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3486,12 +3518,12 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (setq lst '(a b c))
-(A B C)
-> (bad-reverse lst)
-NIL
-> lst
-(C B A)
+              > (setq lst '(a b c))
+              (A B C)
+              > (bad-reverse lst)
+              NIL
+              > lst
+              (C B A)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3500,12 +3532,12 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (setq lst '(a b c))
-(A B C)
-> (good-reverse lst)
-(C B A)
-> lst
-(A B C)
+              > (setq lst '(a b c))
+              (A B C)
+              > (good-reverse lst)
+              (C B A)
+              > lst
+              (A B C)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3514,12 +3546,12 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun good-reverse (lst)
-  (labels ((rev (lst acc)
-           (if (null lst)
-               acc
-               (rev (cdr lst) (cons (car lst) acc)))))
-    (rev lst nil)))
+              (defun good-reverse (lst)
+                (labels ((rev (lst acc)
+                         (if (null lst)
+                             acc
+                             (rev (cdr lst) (cons (car lst) acc)))))
+                  (rev lst nil)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3528,7 +3560,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(reverse lst)
+              (reverse lst)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3537,7 +3569,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(setq lst (reverse lst))
+              (setq lst (reverse lst))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3546,7 +3578,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(nreverse lst)
+              (nreverse lst)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3555,12 +3587,12 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (setq lst '(a b c))
-(A B C)
-> (nreverse lst)
-(C B A)
-> lst
-(A)
+              > (setq lst '(a b c))
+              (A B C)
+              > (nreverse lst)
+              (C B A)
+              > lst
+              (A)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3569,7 +3601,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(nconc x y)
+              (nconc x y)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3578,7 +3610,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(setq x (nconc x y))
+              (setq x (nconc x y))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3587,8 +3619,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-set setq setf psetf psetq incf decf push pop pushnew
-rplaca rplacd rotatef shiftf remf remprop remhash
+              set setq setf psetf psetq incf decf push pop pushnew
+              rplaca rplacd rotatef shiftf remf remprop remhash
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3597,9 +3629,9 @@ rplaca rplacd rotatef shiftf remf remprop remhash
         context '' do
           let(:str) do
             <<~LISP
-> (truncate 26.21875)
-26
-0.21875
+              > (truncate 26.21875)
+              26
+              0.21875
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3608,8 +3640,8 @@ rplaca rplacd rotatef shiftf remf remprop remhash
         context '' do
           let(:str) do
             <<~LISP
-> (= (truncate 26.21875) 26)
-T
+              > (= (truncate 26.21875) 26)
+              T
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3618,9 +3650,9 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (multiple-value-bind (int frac) (truncate 26.21875)
-    (list int frac))
-(26 0.21875)
+              > (multiple-value-bind (int frac) (truncate 26.21875)
+                  (list int frac))
+              (26 0.21875)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3629,12 +3661,12 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (defun powers (x)
-    (values x (sqrt x) (expt x 2)))
-POWERS
-> (multiple-value-bind (base root square) (powers 4)
-    (list base root square))
-(4 2.0 16)
+              > (defun powers (x)
+                  (values x (sqrt x) (expt x 2)))
+              POWERS
+              > (multiple-value-bind (base root square) (powers 4)
+                  (list base root square))
+              (4 2.0 16)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3701,9 +3733,9 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(let ((x 0))
-  (defun total (y)
-    (incf x y)))
+              (let ((x 0))
+                (defun total (y)
+                  (incf x y)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3712,8 +3744,8 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun ok (x)
-  (nconc (list 'a x) (list 'c)))
+              (defun ok (x)
+                (nconc (list 'a x) (list 'c)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3722,8 +3754,8 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun not-ok (x)
-  (nconc (list 'a) x (list 'c)))
+              (defun not-ok (x)
+                (nconc (list 'a) x (list 'c)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3732,8 +3764,8 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun anything (x)
-  (+ x *anything*))
+              (defun anything (x)
+                (+ x *anything*))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3742,10 +3774,10 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun f (x)
-  (let ((val (g x)))
-  ; ここでvalを書き換えていいものか？
-  ))
+              (defun f (x)
+                (let ((val (g x)))
+                ; ここでvalを書き換えていいものか？
+                ))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3754,8 +3786,8 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun exclaim (expression)
-  (append expression '(oh my)))
+              (defun exclaim (expression)
+                (append expression '(oh my)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3764,10 +3796,10 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-> (exclaim '(lions and tigers and bears))
-(LIONS AND TIGERS AND BEARS OH MY)
-> (nconc * '(goodness))
-(LIONS AND TIGERS AND BEARS OH MY GOODNESS)
+              > (exclaim '(lions and tigers and bears))
+              (LIONS AND TIGERS AND BEARS OH MY)
+              > (nconc * '(goodness))
+              (LIONS AND TIGERS AND BEARS OH MY GOODNESS)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3776,8 +3808,8 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-> (exclaim '(fixnums and bignums and floats))
-(FIXNUMS AND BIGNUMS AND FLOATS OH MY GOODNESS)
+              > (exclaim '(fixnums and bignums and floats))
+              (FIXNUMS AND BIGNUMS AND FLOATS OH MY GOODNESS)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3786,8 +3818,8 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun exclaim (expression)
-  (append expression (list 'oh 'my)))
+              (defun exclaim (expression)
+                (append expression (list 'oh 'my)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3800,11 +3832,11 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun all-nicknames (names)
-  (if (null names)
-      nil
-      (nconc (nicknames (car names))
-        (all-nicknames (cdr names)))))
+              (defun all-nicknames (names)
+                (if (null names)
+                    nil
+                    (nconc (nicknames (car names))
+                      (all-nicknames (cdr names)))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3813,7 +3845,7 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(mapcan #'nicknames people)
+              (mapcan #'nicknames people)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3822,8 +3854,8 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(let ((town (find-if #'bookshops towns)))
-  (values town (bookshops town)))
+              (let ((town (find-if #'bookshops towns)))
+                (values town (bookshops town)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3832,13 +3864,13 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun find-books (towns)
-  (if (null towns)
-      nil
-      (let ((shops (bookshops (car towns))))
-        (if shops
-            (values (car towns) shops)
-            (find-books (cdr towns))))))
+              (defun find-books (towns)
+                (if (null towns)
+                    nil
+                    (let ((shops (bookshops (car towns))))
+                      (if shops
+                          (values (car towns) shops)
+                          (find-books (cdr towns))))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3847,13 +3879,13 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(defun find2 (fn lst)
-  (if (null lst)
-      nil
-      (let ((val (funcall fn (car lst))))
-        (if val
-            (values (car lst) val)
-            (find2 fn (cdr lst))))))
+              (defun find2 (fn lst)
+                (if (null lst)
+                    nil
+                    (let ((val (funcall fn (car lst))))
+                      (if val
+                          (values (car lst) val)
+                          (find2 fn (cdr lst))))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3862,7 +3894,7 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(find2 #'bookshops towns)
+              (find2 #'bookshops towns)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3893,22 +3925,22 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-(proclaim '(inline last1 single append1 conc1 mklist))
+              (proclaim '(inline last1 single append1 conc1 mklist))
 
-(defun last1 (lst)
-  (car (last lst)))
+              (defun last1 (lst)
+                (car (last lst)))
 
-(defun single (lst)
-  (and (consp lst) (not (cdr lst))))
+              (defun single (lst)
+                (and (consp lst) (not (cdr lst))))
 
-(defun append1 (lst obj)
-  (append lst (list obj)))
+              (defun append1 (lst obj)
+                (append lst (list obj)))
 
-(defun conc1 (lst obj)
-  (nconc lst (list obj)))
+              (defun conc1 (lst obj)
+                (nconc lst (list obj)))
 
-(defun mklist (obj)
-  (if (listp obj) obj (list obj)))
+              (defun mklist (obj)
+                (if (listp obj) obj (list obj)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3917,9 +3949,9 @@ POWERS
         context '' do
           let(:str) do
             <<~LISP
-> (last1 "blub")
->>Error: "blub" is not a list.
-Broken at LAST...
+              > (last1 "blub")
+              >>Error: "blub" is not a list.
+              Broken at LAST...
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3928,7 +3960,7 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-(= (length lst) 1)
+              (= (length lst) 1)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3937,8 +3969,8 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-(mapcan #'(lambda (d) (mklist (lookup d)))
-        data)
+              (mapcan #'(lambda (d) (mklist (lookup d)))
+                      data)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3947,7 +3979,7 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-(> (length x) (length y))
+              (> (length x) (length y))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3956,9 +3988,9 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-> (filter #'(lambda (x) (if (numberp x) (1+ x)))
-    '(a 1 2 b 3 c d 4))
-(2 3 4 5)
+              > (filter #'(lambda (x) (if (numberp x) (1+ x)))
+                  '(a 1 2 b 3 c d 4))
+              (2 3 4 5)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3967,30 +3999,30 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-(defun longer (x y)
-  (labels ((compare (x y)
-                    (and (consp x)
-                         (or (null y)
-                             (compare (cdr x) (cdr y))))))
-    (if (and (listp x) (listp y))
-        (compare x y)
-        (> (length x) (length y)))))
+              (defun longer (x y)
+                (labels ((compare (x y)
+                                  (and (consp x)
+                                       (or (null y)
+                                           (compare (cdr x) (cdr y))))))
+                  (if (and (listp x) (listp y))
+                      (compare x y)
+                      (> (length x) (length y)))))
 
-(defun filter (fn lst)
-  (let ((acc nil))
-    (dolist (x lst)
-      (let ((val (funcall fn x)))
-        (if val (push val acc))))
-    (nreverse acc)))
+              (defun filter (fn lst)
+                (let ((acc nil))
+                  (dolist (x lst)
+                    (let ((val (funcall fn x)))
+                      (if val (push val acc))))
+                  (nreverse acc)))
 
-(defun group (source n)
-  (if (zerop n) (error "zero length"))
-  (labels ((rec (source acc)
-                (let ((rest (nthcdr n source)))
-                  (if (consp rest)
-                      (rec rest (cons (subseq source 0 n) acc))
-                      (nreverse (cons source acc))))))
-    (if source (rec source nil) nil)))
+              (defun group (source n)
+                (if (zerop n) (error "zero length"))
+                (labels ((rec (source acc)
+                              (let ((rest (nthcdr n source)))
+                                (if (consp rest)
+                                    (rec rest (cons (subseq source 0 n) acc))
+                                    (nreverse (cons source acc))))))
+                  (if source (rec source nil) nil)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -3999,8 +4031,8 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-> (group '(a b c d e f g) 2)
-((A B) (C D) (E F) (G))
+              > (group '(a b c d e f g) 2)
+              ((A B) (C D) (E F) (G))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4009,24 +4041,24 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-(defun flatten (x)
-  (labels ((rec (x acc)
-                (cond ((null x) acc)
-                      ((atom x) (cons x acc))
-                      (t (rec (car x) (rec (cdr x) acc))))))
-    (rec x nil)))
+              (defun flatten (x)
+                (labels ((rec (x acc)
+                              (cond ((null x) acc)
+                                    ((atom x) (cons x acc))
+                                    (t (rec (car x) (rec (cdr x) acc))))))
+                  (rec x nil)))
 
-(defun prune (test tree)
-  (labels ((rec (tree acc)
-                (cond ((null tree) (nreverse acc))
-                      ((consp (car tree))
-                       (rec (cdr tree)
-                            (cons (rec (car tree) nil) acc)))
-                      (t (rec (cdr tree)
-                              (if (funcall test (car tree))
-                                acc
-                                (cons (car tree) acc)))))))
-    (rec tree nil)))
+              (defun prune (test tree)
+                (labels ((rec (tree acc)
+                              (cond ((null tree) (nreverse acc))
+                                    ((consp (car tree))
+                                     (rec (cdr tree)
+                                          (cons (rec (car tree) nil) acc)))
+                                    (t (rec (cdr tree)
+                                            (if (funcall test (car tree))
+                                              acc
+                                              (cons (car tree) acc)))))))
+                  (rec tree nil)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4035,8 +4067,8 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-> (flatten '(a (b c) ((d e) f)))
-(A B C D E F)
+              > (flatten '(a (b c) ((d e) f)))
+              (A B C D E F)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4045,8 +4077,8 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-> (prune #'evenp '(1 2 (3 (4 5) 6) 7 8 (9)))
-(1 (3 (5)) 7 (9))
+              > (prune #'evenp '(1 2 (3 (4 5) 6) 7 8 (9)))
+              (1 (3 (5)) 7 (9))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4057,35 +4089,35 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-(defun find2 (fn lst)
-  (if (null lst)
-    nil
-    (let ((val (funcall fn (car lst))))
-      (if val
-          (values (car lst) val)
-          (find2 fn (cdr lst))))))
+              (defun find2 (fn lst)
+                (if (null lst)
+                  nil
+                  (let ((val (funcall fn (car lst))))
+                    (if val
+                        (values (car lst) val)
+                        (find2 fn (cdr lst))))))
 
-(defun before (x y lst &key (test #'eql))
-  (and lst
-       (let ((first (car lst)))
-         (cond ((funcall test y first) nil)
-               ((funcall test x first) lst)
-               (t (before x y (cdr lst) :test test))))))
+              (defun before (x y lst &key (test #'eql))
+                (and lst
+                     (let ((first (car lst)))
+                       (cond ((funcall test y first) nil)
+                             ((funcall test x first) lst)
+                             (t (before x y (cdr lst) :test test))))))
 
-(defun after (x y lst &key (test #'eql))
-  (let ((rest (before y x lst :test test)))
-    (and rest (member x rest :test test))))
+              (defun after (x y lst &key (test #'eql))
+                (let ((rest (before y x lst :test test)))
+                  (and rest (member x rest :test test))))
 
-(defun duplicate (obj lst &key (test #'eql))
-  (member obj (cdr (member obj lst :test test))
-          :test test))
+              (defun duplicate (obj lst &key (test #'eql))
+                (member obj (cdr (member obj lst :test test))
+                        :test test))
 
-(defun split-if (fn lst)
-  (let ((acc nil))
-    (do ((src lst (cdr src)))
-      ((or (null src) (funcall fn (car src)))
-       (values (nreverse acc) src))
-      (push (car src) acc))))
+              (defun split-if (fn lst)
+                (let ((acc nil))
+                  (do ((src lst (cdr src)))
+                    ((or (null src) (funcall fn (car src)))
+                     (values (nreverse acc) src))
+                    (push (car src) acc))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4094,8 +4126,8 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-> (before 'a 'b '(a b c d))
-(B C D)
+              > (before 'a 'b '(a b c d))
+              (B C D)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4104,7 +4136,7 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-(< (position 'a '(a b c d)) (position 'b '(a b c d)))
+              (< (position 'a '(a b c d)) (position 'b '(a b c d)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4113,8 +4145,8 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-> (before 'a 'b '(a))
-(A)
+              > (before 'a 'b '(a))
+              (A)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4123,10 +4155,10 @@ Broken at LAST...
         context '' do
           let(:str) do
             <<~LISP
-> (after 'a 'b '(b a d))
-(A D)
-> (after 'a 'b '(a))
-NIL
+              > (after 'a 'b '(b a d))
+              (A D)
+              > (after 'a 'b '(a))
+              NIL
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4135,8 +4167,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (duplicate 'a '(a b c a d))
-(A D)
+              > (duplicate 'a '(a b c a d))
+              (A D)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4145,10 +4177,10 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (split-if #'(lambda (x) (> x 4))
-            '(1 2 3 4 5 6 7 8 9 10))
-(1 2 3 4)
-(5 6 7 8 9 10)
+              > (split-if #'(lambda (x) (> x 4))
+                          '(1 2 3 4 5 6 7 8 9 10))
+              (1 2 3 4)
+              (5 6 7 8 9 10)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4157,40 +4189,40 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun most (fn lst)
-  (if (null lst)
-      (values nil nil)
-      (let* ((wins (car lst))
-             (max (funcall fn wins)))
-        (dolist (obj (cdr lst))
-          (let ((score (funcall fn obj)))
-            (when (> score max)
-              (setq wins obj
-                    max score))))
-        (values wins max))))
+              (defun most (fn lst)
+                (if (null lst)
+                    (values nil nil)
+                    (let* ((wins (car lst))
+                           (max (funcall fn wins)))
+                      (dolist (obj (cdr lst))
+                        (let ((score (funcall fn obj)))
+                          (when (> score max)
+                            (setq wins obj
+                                  max score))))
+                      (values wins max))))
 
-(defun best (fn lst)
-  (if (null lst)
-      nil
-      (let ((wins (car lst)))
-        (dolist (obj (cdr lst))
-          (if (funcall fn obj wins)
-              (setq wins obj)))
-        wins)))
+              (defun best (fn lst)
+                (if (null lst)
+                    nil
+                    (let ((wins (car lst)))
+                      (dolist (obj (cdr lst))
+                        (if (funcall fn obj wins)
+                            (setq wins obj)))
+                      wins)))
 
-(defun mostn (fn lst)
-  (if (null lst)
-      (values nil nil)
-      (let ((result (list (car lst)))
-            (max (funcall fn (car lst))))
-        (dolist (obj (cdr lst))
-          (let ((score (funcall fn obj)))
-            (cond ((> score max)
-                   (setq max score
-                         result (list obj)))
-                  ((= score max)
-                   (push obj result)))))
-        (values (nreverse result) max))))
+              (defun mostn (fn lst)
+                (if (null lst)
+                    (values nil nil)
+                    (let ((result (list (car lst)))
+                          (max (funcall fn (car lst))))
+                      (dolist (obj (cdr lst))
+                        (let ((score (funcall fn obj)))
+                          (cond ((> score max)
+                                 (setq max score
+                                       result (list obj)))
+                                ((= score max)
+                                 (push obj result)))))
+                      (values (nreverse result) max))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4199,9 +4231,9 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (most #'length '((a b) (a b c) (a) (e f g)))
-(A B C)
-3
+              > (most #'length '((a b) (a b c) (a) (e f g)))
+              (A B C)
+              3
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4210,8 +4242,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (best #'> '(1 2 3 4 5))
-5
+              > (best #'> '(1 2 3 4 5))
+              5
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4220,9 +4252,9 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (mostn #'length '((a b) (a b c) (a) (e f g)))
-((A B C) (E F G))
-3
+              > (mostn #'length '((a b) (a b c) (a) (e f g)))
+              ((A B C) (E F G))
+              3
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4233,8 +4265,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (map0-n #'1+ 5)
-(1 2 3 4 5 6)
+              > (map0-n #'1+ 5)
+              (1 2 3 4 5 6)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4243,8 +4275,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (mapa-b #'1+ -2 0 .5)
-(-1 -0.5 0.0 0.5 1.0)
+              > (mapa-b #'1+ -2 0 .5)
+              (-1 -0.5 0.0 0.5 1.0)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4253,11 +4285,11 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun mapa-b (fn a b &optional (step 1))
-  (map-> fn
-         a
-         #'(lambda (x) (> x b))
-         #'(lambda (x) (+ x step))))
+              (defun mapa-b (fn a b &optional (step 1))
+                (map-> fn
+                       a
+                       #'(lambda (x) (> x b))
+                       #'(lambda (x) (+ x step))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4266,8 +4298,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun our-mapcan (fn &rest lsts)
-  (apply #'nconc (apply #'mapcar fn lsts)))
+              (defun our-mapcan (fn &rest lsts)
+                (apply #'nconc (apply #'mapcar fn lsts)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4276,7 +4308,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(mapcar #'sqrt (append list1 list2))
+              (mapcar #'sqrt (append list1 list2))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4285,7 +4317,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(mapcars #'sqrt list1 list2)
+              (mapcars #'sqrt list1 list2)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4294,23 +4326,23 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun map0-n (fn n)
-  (mapa-b fn 0 n))
+              (defun map0-n (fn n)
+                (mapa-b fn 0 n))
 
-(defun map1-n (fn n)
-(mapa-b fn 1 n))
+              (defun map1-n (fn n)
+              (mapa-b fn 1 n))
 
-(defun mapa-b (fn a b &optional (step 1))
-  (do ((i a (+ i step))
-       (result nil))
-    ((> i b) (nreverse result))
-    (push (funcall fn i) result)))
+              (defun mapa-b (fn a b &optional (step 1))
+                (do ((i a (+ i step))
+                     (result nil))
+                  ((> i b) (nreverse result))
+                  (push (funcall fn i) result)))
 
-(defun map-> (fn start test-fn succ-fn)
-  (do ((i start (funcall succ-fn i))
-       (result nil))
-    ((funcall test-fn i) (nreverse result))
-    (push (funcall fn i) result)))
+              (defun map-> (fn start test-fn succ-fn)
+                (do ((i start (funcall succ-fn i))
+                     (result nil))
+                  ((funcall test-fn i) (nreverse result))
+                  (push (funcall fn i) result)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4319,23 +4351,23 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun mappend (fn &rest lsts)
-  (apply #'append (apply #'mapcar fn lsts)))
+              (defun mappend (fn &rest lsts)
+                (apply #'append (apply #'mapcar fn lsts)))
 
-(defun mapcars (fn &rest lsts)
-  (let ((result nil))
-    (dolist (lst lsts)
-      (dolist (obj lst)
-        (push (funcall fn obj) result)))
-    (nreverse result)))
+              (defun mapcars (fn &rest lsts)
+                (let ((result nil))
+                  (dolist (lst lsts)
+                    (dolist (obj lst)
+                      (push (funcall fn obj) result)))
+                  (nreverse result)))
 
-(defun rmapcar (fn &rest args)
-  (if (some #'atom args)
-      (apply fn args)
-      (apply #'mapcar
-             #'(lambda (&rest args)
-                 (apply #'rmapcar fn args))
-             args)))
+              (defun rmapcar (fn &rest args)
+                (if (some #'atom args)
+                    (apply fn args)
+                    (apply #'mapcar
+                           #'(lambda (&rest args)
+                               (apply #'rmapcar fn args))
+                           args)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4344,9 +4376,9 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (rmapcar #'princ '(1 2 (3 4 (5) 6) 7 (8 9)))
-123456789
-(1 2 (3 4 (5) 6) 7 (8 9))
+              > (rmapcar #'princ '(1 2 (3 4 (5) 6) 7 (8 9)))
+              123456789
+              (1 2 (3 4 (5) 6) 7 (8 9))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4355,8 +4387,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (rmapcar #'+ '(1 (2 (3) 4)) '(10 (20 (30) 40)))
-(11 (22 (33) 44))
+              > (rmapcar #'+ '(1 (2 (3) 4)) '(10 (20 (30) 40)))
+              (11 (22 (33) 44))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4365,7 +4397,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(mapa-b #'fn a b c)
+              (mapa-b #'fn a b c)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4374,7 +4406,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(collect (#Mfn (scan-range :from a :upto b :by c)))
+              (collect (#Mfn (scan-range :from a :upto b :by c)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4385,23 +4417,23 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun readlist (&rest args)
-  (values (read-from-string
-            (concatenate 'string "("
-                         (apply #'read-line args)
-                         ")"))))
+              (defun readlist (&rest args)
+                (values (read-from-string
+                          (concatenate 'string "("
+                                       (apply #'read-line args)
+                                       ")"))))
 
-(defun prompt (&rest args)
-  (apply #'format *query-io* args)
-  (read *query-io*))
+              (defun prompt (&rest args)
+                (apply #'format *query-io* args)
+                (read *query-io*))
 
-(defun break-loop (fn quit &rest args)
-  (format *query-io* "Entering break-loop.~%")
-  (loop
-    (let ((in (apply #'prompt args)))
-      (if (funcall quit in)
-          (return)
-          (format *query-io* "~A~%" (funcall fn in))))))
+              (defun break-loop (fn quit &rest args)
+                (format *query-io* "Entering break-loop.~%")
+                (loop
+                  (let ((in (apply #'prompt args)))
+                    (if (funcall quit in)
+                        (return)
+                        (format *query-io* "~A~%" (funcall fn in))))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4410,9 +4442,9 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (readlist)
-Call me "Ed"
-(CALL ME "Ed")
+              > (readlist)
+              Call me "Ed"
+              (CALL ME "Ed")
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4421,10 +4453,10 @@ Call me "Ed"
         context '' do
           let(:str) do
             <<~LISP
-> (prompt "Enter a number between ~A and ~A.~%>> " 1 10)
-Enter a number between 1 and 10.
->> 3
-3
+              > (prompt "Enter a number between ~A and ~A.~%>> " 1 10)
+              Enter a number between 1 and 10.
+              >> 3
+              3
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4433,7 +4465,7 @@ Enter a number between 1 and 10.
         context '' do
           let(:str) do
             <<~LISP
-> (break-loop #'eval #'(lambda (x) (eq x :q)) ">> ")
+              > (break-loop #'eval #'(lambda (x) (eq x :q)) ">> ")
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4442,10 +4474,10 @@ Enter a number between 1 and 10.
         context '' do
           let(:str) do
             <<~LISP
->> (+ 2 3)
-5
->> :q
-:Q
+              >> (+ 2 3)
+              5
+              >> :q
+              :Q
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4456,8 +4488,8 @@ Enter a number between 1 and 10.
         context '' do
           let(:str) do
             <<~LISP
-> (mkstr pi " pieces of " 'pi)
-"3.141592653589793 pieces of PI"
+              > (mkstr pi " pieces of " 'pi)
+              "3.141592653589793 pieces of PI"
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4466,8 +4498,8 @@ Enter a number between 1 and 10.
         context '' do
           let(:str) do
             <<~LISP
-> (symb 'ar "Madi" #\L #\L 0)
-|ARMadiLL0|
+              > (symb 'ar "Madi" #\L #\L 0)
+              |ARMadiLL0|
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4476,9 +4508,9 @@ Enter a number between 1 and 10.
         context '' do
           let(:str) do
             <<~LISP
-> (let ((s (symb '(a b))))
-(and (eq s '|(A B)|) (eq s '\(A\ B\))))
-T
+              > (let ((s (symb '(a b))))
+              (and (eq s '|(A B)|) (eq s '\(A\ B\))))
+              T
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4487,21 +4519,21 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun mkstr (&rest args)
-  (with-output-to-string (s)
-    (dolist (a args) (princ a s))))
+              (defun mkstr (&rest args)
+                (with-output-to-string (s)
+                  (dolist (a args) (princ a s))))
 
-(defun symb (&rest args)
-  (values (intern (apply #'mkstr args))))
+              (defun symb (&rest args)
+                (values (intern (apply #'mkstr args))))
 
-(defun reread (&rest args)
-  (values (read-from-string (apply #'mkstr args))))
+              (defun reread (&rest args)
+                (values (read-from-string (apply #'mkstr args))))
 
-(defun explode (sym)
-  (map 'list #'(lambda (c)
-                 (intern (make-string 1
-                                      :initial-element c)))
-       (symbol-name sym)))
+              (defun explode (sym)
+                (map 'list #'(lambda (c)
+                               (intern (make-string 1
+                                                    :initial-element c)))
+                     (symbol-name sym)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4510,8 +4542,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (explode 'bomb)
-(B O M B)
+              > (explode 'bomb)
+              (B O M B)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4560,10 +4592,10 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun joiner (obj)
-  (typecase obj
-    (cons #'append)
-    (number #'+)))
+              (defun joiner (obj)
+                (typecase obj
+                  (cons #'append)
+                  (number #'+)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4572,8 +4604,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun join (&rest args)
-  (apply (joiner (car args)) args))
+              (defun join (&rest args)
+                (apply (joiner (car args)) args))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4582,8 +4614,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun make-adder (n)
-  #'(lambda (x) (+ x n)))
+              (defun make-adder (n)
+                #'(lambda (x) (+ x n)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4592,10 +4624,10 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (setq add3 (make-adder 3))
-#<Interpreted-Function BF1356>
-> (funcall add3 2)
-5
+              > (setq add3 (make-adder 3))
+              #<Interpreted-Function BF1356>
+              > (funcall add3 2)
+              5
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4604,8 +4636,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun complement (fn)
-  #'(lambda (&rest args) (not (apply fn args))))
+              (defun complement (fn)
+                #'(lambda (&rest args) (not (apply fn args))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4614,8 +4646,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (remove-if (complement #'oddp) '(1 2 3 4 5 6))
-(1 3 5)
+              > (remove-if (complement #'oddp) '(1 2 3 4 5 6))
+              (1 3 5)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4635,13 +4667,13 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defvar *!equivs* (make-hash-table))
+              (defvar *!equivs* (make-hash-table))
 
-(defun ! (fn)
-  (or (gethash fn *!equivs*) fn))
+              (defun ! (fn)
+                (or (gethash fn *!equivs*) fn))
 
-(defun def! (fn fn!)
-  (setf (gethash fn *!equivs*) fn!))
+              (defun def! (fn fn!)
+                (setf (gethash fn *!equivs*) fn!))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4650,7 +4682,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(def! #'remove-if #'delete-if)
+              (def! #'remove-if #'delete-if)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4659,7 +4691,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(delete-if #'oddp lst)
+              (delete-if #'oddp lst)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4668,7 +4700,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(funcall (! #'remove-if) #'oddp lst)
+              (funcall (! #'remove-if) #'oddp lst)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4677,7 +4709,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-((! remove-if) oddp lst)
+              ((! remove-if) oddp lst)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4704,14 +4736,14 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (setq slowid (memoize #'(lambda (x) (sleep 5) x)))
-#<Interpreted-Function C38346>
-> (time (funcall slowid 1))
-Elapsed Time = 5.15 seconds
-1
-> (time (funcall slowid 1))
-Elapsed Time = 0.00 seconds
-1
+              > (setq slowid (memoize #'(lambda (x) (sleep 5) x)))
+              #<Interpreted-Function C38346>
+              > (time (funcall slowid 1))
+              Elapsed Time = 5.15 seconds
+              1
+              > (time (funcall slowid 1))
+              Elapsed Time = 0.00 seconds
+              1
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4722,15 +4754,15 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(defun compose (&rest fns)
-  (if fns
-      (let ((fn1 (car (last fns)))
-            (fns (butlast fns)))
-        #'(lambda (&rest args)
-                   (reduce #'funcall fns
-                           :from-end t
-                           :initial-value (apply fn1 args))))
-      #'identity))
+              (defun compose (&rest fns)
+                (if fns
+                    (let ((fn1 (car (last fns)))
+                          (fns (butlast fns)))
+                      #'(lambda (&rest args)
+                                 (reduce #'funcall fns
+                                         :from-end t
+                                         :initial-value (apply fn1 args))))
+                    #'identity))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4739,7 +4771,7 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(compose #'list #'1+)
+              (compose #'list #'1+)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4748,7 +4780,7 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-#'(lambda (x) (list (1+ x)))
+              #'(lambda (x) (list (1+ x)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4757,8 +4789,8 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-> (funcall (compose #'1+ #'find-if) #'oddp '(2 3 4))
-4
+              > (funcall (compose #'1+ #'find-if) #'oddp '(2 3 4))
+              4
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4767,8 +4799,8 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(defun complement (pred)
-  (compose #'not pred))
+              (defun complement (pred)
+                (compose #'not pred))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4777,25 +4809,25 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(defun fif (if then &optional else)
-  #'(lambda (x)
-      (if (funcall if x)
-          (funcall then x)
-          (if else (funcall else x)))))
+              (defun fif (if then &optional else)
+                #'(lambda (x)
+                    (if (funcall if x)
+                        (funcall then x)
+                        (if else (funcall else x)))))
 
-(defun fint (fn &rest fns)
-  (if (null fns)
-      fn
-      (let ((chain (apply #'fint fns)))
-        #'(lambda (x)
-            (and (funcall fn x) (funcall chain x))))))
+              (defun fint (fn &rest fns)
+                (if (null fns)
+                    fn
+                    (let ((chain (apply #'fint fns)))
+                      #'(lambda (x)
+                          (and (funcall fn x) (funcall chain x))))))
 
-(defun fun (fn &rest fns)
-  (if (null fns)
-      fn
-      (let ((chain (apply #'fun fns)))
-        #'(lambda (x)
-            (or (funcall fn x) (funcall chain x))))))
+              (defun fun (fn &rest fns)
+                (if (null fns)
+                    fn
+                    (let ((chain (apply #'fun fns)))
+                      #'(lambda (x)
+                          (or (funcall fn x) (funcall chain x))))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4804,11 +4836,11 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(mapcar #'(lambda (x)
-            (if (slave x)
-                (owner x)
-                (employer x)))
-        people)
+              (mapcar #'(lambda (x)
+                          (if (slave x)
+                              (owner x)
+                              (employer x)))
+                      people)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4817,8 +4849,8 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(mapcar (fif #'slave #'owner #'employer)
-        people)
+              (mapcar (fif #'slave #'owner #'employer)
+                      people)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4827,9 +4859,9 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(find-if #'(lambda (x)
-             (and (signed x) (sealed x) (delivered x)))
-         docs)
+              (find-if #'(lambda (x)
+                           (and (signed x) (sealed x) (delivered x)))
+                       docs)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4838,7 +4870,7 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(find-if (fint #'signed #'sealed #'delivered) docs)
+              (find-if (fint #'signed #'sealed #'delivered) docs)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4849,10 +4881,10 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(defun our-length (lst)
-  (if (null lst)
-      0
-      (1+ (our-length (cdr lst)))))
+              (defun our-length (lst)
+                (if (null lst)
+                    0
+                    (1+ (our-length (cdr lst)))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4861,11 +4893,11 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(defun our-every (fn lst)
-  (if (null lst)
-      t
-      (and (funcall fn (car lst))
-           (our-every fn (cdr lst)))))
+              (defun our-every (fn lst)
+                (if (null lst)
+                    t
+                    (and (funcall fn (car lst))
+                         (our-every fn (cdr lst)))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4874,16 +4906,16 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(defun lrec (rec &optional base)
-  (labels ((self (lst)
-                 (if (null lst)
-                     (if (functionp base)
-                         (funcall base)
-                         base)
-                     (funcall rec (car lst)
-                              #'(lambda ()
-                                  (self (cdr lst)))))))
-    #'self))
+              (defun lrec (rec &optional base)
+                (labels ((self (lst)
+                               (if (null lst)
+                                   (if (functionp base)
+                                       (funcall base)
+                                       base)
+                                   (funcall rec (car lst)
+                                            #'(lambda ()
+                                                (self (cdr lst)))))))
+                  #'self))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4892,7 +4924,7 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(lrec #'(lambda (x f) (1+ (funcall f))) 0)
+              (lrec #'(lambda (x f) (1+ (funcall f))) 0)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4901,7 +4933,7 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(lrec #'(lambda (x f) (and (oddp x) (funcall f))) t)
+              (lrec #'(lambda (x f) (and (oddp x) (funcall f))) t)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4910,14 +4942,14 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-; copy-list
-(lrec #'(lambda (x f) (cons x (funcall f))))
-; remove-duplicates
-(lrec #'(lambda (x f) (adjoin x (funcall f))))
-; find-if, for some function fn
-(lrec #'(lambda (x f) (if (fn x) x (funcall f))))
-; some, for some function fn
-(lrec #'(lambda (x f) (or (fn x) (funcall f))))
+              ; copy-list
+              (lrec #'(lambda (x f) (cons x (funcall f))))
+              ; remove-duplicates
+              (lrec #'(lambda (x f) (adjoin x (funcall f))))
+              ; find-if, for some function fn
+              (lrec #'(lambda (x f) (if (fn x) x (funcall f))))
+              ; some, for some function fn
+              (lrec #'(lambda (x f) (or (fn x) (funcall f))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4928,8 +4960,8 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-(a b c) = (a . (b . (c . nil)))
-(a b (c d)) = (a . (b . ((c . (d . nil)) . nil)))
+              (a b c) = (a . (b . (c . nil)))
+              (a b (c d)) = (a . (b . ((c . (d . nil)) . nil)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4938,11 +4970,11 @@ Elapsed Time = 0.00 seconds
         context '' do
           let(:str) do
             <<~LISP
-> (setq x '(a b)
-        listx (list x 1))
-((A B) 1)
-> (eq x (car (copy-list listx)))
-T
+              > (setq x '(a b)
+                      listx (list x 1))
+              ((A B) 1)
+              > (eq x (car (copy-list listx)))
+              T
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4951,8 +4983,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (eq x (car (copy-tree listx)))
-NIL
+              > (eq x (car (copy-tree listx)))
+              NIL
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4961,11 +4993,11 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun our-copy-tree (tree)
-  (if (atom tree)
-      tree
-      (cons (our-copy-tree (car tree))
-            (if (cdr tree) (our-copy-tree (cdr tree))))))
+              (defun our-copy-tree (tree)
+                (if (atom tree)
+                    tree
+                    (cons (our-copy-tree (car tree))
+                          (if (cdr tree) (our-copy-tree (cdr tree))))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4974,12 +5006,12 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun count-leaves (tree)
-  (if (atom tree)
-      1
-      (+ (count-leaves (car tree))
-         (or (if (cdr tree) (count-leaves (cdr tree)))
-             1))))
+              (defun count-leaves (tree)
+                (if (atom tree)
+                    1
+                    (+ (count-leaves (car tree))
+                       (or (if (cdr tree) (count-leaves (cdr tree)))
+                           1))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4988,8 +5020,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (count-leaves '((a b (c d)) (e) f))
-10
+              > (count-leaves '((a b (c d)) (e) f))
+              10
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4998,8 +5030,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (flatten '((a b (c d)) (e) f ()))
-(A B C D E F)
+              > (flatten '((a b (c d)) (e) f ()))
+              (A B C D E F)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5008,11 +5040,11 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun flatten (tree)
-  (if (atom tree)
-      (mklist tree)
-      (nconc (flatten (car tree))
-             (if (cdr tree) (flatten (cdr tree))))))
+              (defun flatten (tree)
+                (if (atom tree)
+                    (mklist tree)
+                    (nconc (flatten (car tree))
+                           (if (cdr tree) (flatten (cdr tree))))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5021,11 +5053,11 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun rfind-if (fn tree)
-  (if (atom tree)
-      (and (funcall fn tree) tree)
-      (or (rfind-if fn (car tree))
-          (if (cdr tree) (rfind-if fn (cdr tree))))))
+              (defun rfind-if (fn tree)
+                (if (atom tree)
+                    (and (funcall fn tree) tree)
+                    (or (rfind-if fn (car tree))
+                        (if (cdr tree) (rfind-if fn (cdr tree))))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5034,8 +5066,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (rfind-if (fint #'numberp #'addp) '(2 (3 4) 5))
-3
+              > (rfind-if (fint #'numberp #'addp) '(2 (3 4) 5))
+              3
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5044,16 +5076,16 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun ttrav (rec &optional (base #'identity))
-  (labels ((self (tree)
-                 (if (atom tree)
-                     (if (functionp base)
-                         (funcall base tree)
-                         base)
-                     (funcall rec (self (car tree))
-                              (if (cdr tree)
-                                  (self (cdr tree)))))))
-    #'self))
+              (defun ttrav (rec &optional (base #'identity))
+                (labels ((self (tree)
+                               (if (atom tree)
+                                   (if (functionp base)
+                                       (funcall base tree)
+                                       base)
+                                   (funcall rec (self (car tree))
+                                            (if (cdr tree)
+                                                (self (cdr tree)))))))
+                  #'self))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5062,7 +5094,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(ttrav #'cons #'identity)
+              (ttrav #'cons #'identity)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5071,12 +5103,12 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-; our-copy-tree
-(ttrav #'cons)
-; count-leaves
-(ttrav #'(lambda (l r) (+ l (or r 1))) 1)
-; flatten
-(ttrav #'nconc #'mklist)
+              ; our-copy-tree
+              (ttrav #'cons)
+              ; count-leaves
+              (ttrav #'(lambda (l r) (+ l (or r 1))) 1)
+              ; flatten
+              (ttrav #'nconc #'mklist)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5085,8 +5117,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(trec #'(lambda (o l r) (nconc (funcall l) (funcall r)))
-      #'mklist)
+              (trec #'(lambda (o l r) (nconc (funcall l) (funcall r)))
+                    #'mklist)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5095,8 +5127,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(trec #'(lambda (o l r) (or (funcall l) (funcall r)))
-      #'(lambda (tree) (and (oddp tree) tree)))
+              (trec #'(lambda (o l r) (or (funcall l) (funcall r)))
+                    #'(lambda (tree) (and (oddp tree) tree)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5105,20 +5137,20 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun trec (rec &optional (base #'identity))
-  (labels
-    ((self (tree)
-           (if (atom tree)
-               (if (functionp base)
-                   (funcall base tree)
-                   base)
-               (funcall rec tree
-                        #'(lambda ()
-                            (self (car tree)))
-                        #'(lambda ()
-                            (if (cdr tree)
-                                (self (cdr tree))))))))
-    #'self))
+              (defun trec (rec &optional (base #'identity))
+                (labels
+                  ((self (tree)
+                         (if (atom tree)
+                             (if (functionp base)
+                                 (funcall base tree)
+                                 base)
+                             (funcall rec tree
+                                      #'(lambda ()
+                                          (self (car tree)))
+                                      #'(lambda ()
+                                          (if (cdr tree)
+                                              (self (cdr tree))))))))
+                  #'self))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5129,7 +5161,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(find-if #.(compose #'oddp #'truncate) lst)
+              (find-if #.(compose #'oddp #'truncate) lst)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5142,19 +5174,19 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  > (run-node 'people)
-  Is the person a man?
-  >> yes
-  Is he living?
-  >> no
-  Was he American?
-  >> yes
-  Is he on a coin?
-  >> yes
-  Is the coin a penny?
-  >> yes
-  LINCOLN
-              LISP
+              > (run-node 'people)
+              Is the person a man?
+              >> yes
+              Is he living?
+              >> no
+              Was he American?
+              >> yes
+              Is he on a coin?
+              >> yes
+              Is the coin a penny?
+              >> yes
+              LINCOLN
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5162,9 +5194,9 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  (defnode 'people "Is the person a man?"
-           'male 'female)
-              LISP
+              (defnode 'people "Is the person a man?"
+                       'male 'female)
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5172,16 +5204,16 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  (defstruct node contents yes no)
-  
-  (defvar *nodes* (make-hash-table))
-  
-  (defun defnode (name conts &optional yes no)
-    (setf (gethash name *nodes*)
-          (make-node :contents conts
-                     :yes yes
-                     :no no)))
-              LISP
+              (defstruct node contents yes no)
+
+              (defvar *nodes* (make-hash-table))
+
+              (defun defnode (name conts &optional yes no)
+                (setf (gethash name *nodes*)
+                      (make-node :contents conts
+                                 :yes yes
+                                 :no no)))
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5189,13 +5221,13 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  (defnode 'people "Is the person a man?" 'male 'female)
-  (defnode 'male "Is he living?" 'liveman 'deadman)
-  (defnode 'deadman "Was he American?" 'us 'them)
-  (defnode 'us "Is he on a coin?" 'coin 'cidence)
-  (defnode 'coin "Is the coin a penny?" 'penny 'coins)
-  (defnode 'penny 'lincoln)
-              LISP
+              (defnode 'people "Is the person a man?" 'male 'female)
+              (defnode 'male "Is he living?" 'liveman 'deadman)
+              (defnode 'deadman "Was he American?" 'us 'them)
+              (defnode 'us "Is he on a coin?" 'coin 'cidence)
+              (defnode 'coin "Is the coin a penny?" 'penny 'coins)
+              (defnode 'penny 'lincoln)
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5203,15 +5235,15 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  (defun run-node (name)
-    (let ((n (gethash name *nodes*)))
-      (cond ((node-yes n)
-             (format t "~A~%>> " (node-contents n))
-             (case (read)
-               (yes (run-node (node-yes n)))
-               (t (run-node (node-no n)))))
-            (t (node-contents n)))))
-              LISP
+              (defun run-node (name)
+                (let ((n (gethash name *nodes*)))
+                  (cond ((node-yes n)
+                         (format t "~A~%>> " (node-contents n))
+                         (case (read)
+                           (yes (run-node (node-yes n)))
+                           (t (run-node (node-no n)))))
+                        (t (node-contents n)))))
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5221,18 +5253,18 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  (defvar *nodes* (make-hash-table))
-  
-  (defun defnode (name conts &optional yes no)
-    (setf (gethash name *nodes*)
-          (if yes
-              #'(lambda ()
-                  (format t "~A~%>> " conts)
-                  (case (read)
-                    (yes (funcall (gethash yes *nodes*)))
-                    (t (funcall (gethash no *nodes*)))))
-              #'(lambda () conts))))
-              LISP
+              (defvar *nodes* (make-hash-table))
+
+              (defun defnode (name conts &optional yes no)
+                (setf (gethash name *nodes*)
+                      (if yes
+                          #'(lambda ()
+                              (format t "~A~%>> " conts)
+                              (case (read)
+                                (yes (funcall (gethash yes *nodes*)))
+                                (t (funcall (gethash no *nodes*)))))
+                          #'(lambda () conts))))
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5240,10 +5272,10 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  (funcall (gethash 'people *nodes*))
-  Is the person a man?
-  >>
-              LISP
+              (funcall (gethash 'people *nodes*))
+              Is the person a man?
+              >>
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5251,29 +5283,29 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  (defvar *nodes* nil)
-  
-  (defun defnode (&rest args)
-    (push args *nodes*)
-    args)
-  
-  (defun compile-net (root)
-    (let ((node (assoc root *nodes*)))
-      (if (null node)
-          nil
-          (let ((conts (second node))
-                (yes (third node))
-                (no (fourth node)))
-            (if yes
-                (let ((yes-fn (compile-net yes))
-                      (no-fn (compile-net no)))
-                  #'(lambda ()
-                      (format t "~A~%>> " conts)
-                      (funcall (if (eq (read) 'yes)
-                                   yes-fn
-                                   no-fn))))
-                #'(lambda () conts))))))
-              LISP
+              (defvar *nodes* nil)
+
+              (defun defnode (&rest args)
+                (push args *nodes*)
+                args)
+
+              (defun compile-net (root)
+                (let ((node (assoc root *nodes*)))
+                  (if (null node)
+                      nil
+                      (let ((conts (second node))
+                            (yes (third node))
+                            (no (fourth node)))
+                        (if yes
+                            (let ((yes-fn (compile-net yes))
+                                  (no-fn (compile-net no)))
+                              #'(lambda ()
+                                  (format t "~A~%>> " conts)
+                                  (funcall (if (eq (read) 'yes)
+                                               yes-fn
+                                               no-fn))))
+                            #'(lambda () conts))))))
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5281,11 +5313,11 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-  > (setq n (compile-net 'people))
-  #<Compiled-Function BF3C06>
-  > (funcall n)
-  Is the person a man?
-              LISP
+              > (setq n (compile-net 'people))
+              #<Compiled-Function BF3C06>
+              > (funcall n)
+              Is the person a man?
+            LISP
           end
           it { is_expected.to eq 99999999999 }
         end
@@ -5401,11 +5433,11 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro nif (expr pos zero neg)
-  `(case (truncate (signum ,expr))
-     (1 ,pos)
-     (0 ,zero)
-     (-1 ,neg)))
+              (defmacro nif (expr pos zero neg)
+                `(case (truncate (signum ,expr))
+                   (1 ,pos)
+                   (0 ,zero)
+                   (-1 ,neg)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5414,12 +5446,12 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro nif (expr pos zero neg)
-  (list 'case
-        (list 'truncate (list 'signum expr))
-        (list 1 pos)
-        (list 0 zero)
-        (list -1 neg)))
+              (defmacro nif (expr pos zero neg)
+                (list 'case
+                      (list 'truncate (list 'signum expr))
+                      (list 1 pos)
+                      (list 0 zero)
+                      (list -1 neg)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5428,10 +5460,10 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(case (truncate (signum x))
-  (1 'p)
-  (0 'z)
-  (-1 'n))
+              (case (truncate (signum x))
+                (1 'p)
+                (0 'z)
+                (-1 'n))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5440,12 +5472,12 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (setq b '(1 2 3))
-(1 2 3)
-> `(a ,b c)
-(A (1 2 3) C)
-> `(a ,@b c)
-(A 1 2 3 C)
+              > (setq b '(1 2 3))
+              (1 2 3)
+              > `(a ,b c)
+              (A (1 2 3) C)
+              > `(a ,@b c)
+              (A 1 2 3 C)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5454,10 +5486,10 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(when (eligible obj)
-  (do-this)
-  (do-that)
-  obj)
+              (when (eligible obj)
+                (do-this)
+                (do-that)
+                obj)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5466,10 +5498,10 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro our-when (test &body body)
-  `(if ,test
-       (progn
-         ,@body)))
+              (defmacro our-when (test &body body)
+                `(if ,test
+                     (progn
+                       ,@body)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5478,10 +5510,10 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(if (eligible obj)
-    (progn (do-this)
-           (do-that)
-           obj))
+              (if (eligible obj)
+                  (progn (do-this)
+                         (do-that)
+                         obj))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5490,8 +5522,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defun greet (name)
-  `(hello ,name))
+              (defun greet (name)
+                `(hello ,name))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5502,7 +5534,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(member x choices :test #'eq)
+              (member x choices :test #'eq)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5511,7 +5543,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(memq x choices)
+              (memq x choices)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5520,7 +5552,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro memq (obj lst)
+              (defmacro memq (obj lst)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5529,8 +5561,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro memq (obj lst)
-  `(member
+              (defmacro memq (obj lst)
+                `(member
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5539,8 +5571,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro memq (obj lst)
-  `(member ,obj
+              (defmacro memq (obj lst)
+                `(member ,obj
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5549,8 +5581,8 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro memq (obj lst)
-  `(member ,obj ,lst :test #'eq))
+              (defmacro memq (obj lst)
+                `(member ,obj ,lst :test #'eq))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5559,7 +5591,7 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro while (test &body body)
+              (defmacro while (test &body body)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5568,10 +5600,10 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-(defmacro while (test &body body)
-  `(do ()
-     ((not ,test))
-     ,@body))
+              (defmacro while (test &body body)
+                `(do ()
+                   ((not ,test))
+                   ,@body))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5582,25 +5614,25 @@ NIL
         context '' do
           let(:str) do
             <<~LISP
-> (defmacro while (test &body body)
-    `(do ()
-       ((not ,test))
-       ,@body))
-WHILE
-> (pprint (macroexpand '(while (able) (laugh))))
-(BLOCK NIL
-       (LET NIL
-            (TAGBODY
-              #:G61
-              (IF (NOT (ABLE)) (RETURN NIL))
-              (LAUGH)
-              (GO #:G61))))
-T
-> (pprint (macroexpand-1 '(while (able) (laugh))))
-(DO NIL
-    ((NOT (ABLE)))
-    (LAUGH))
-T
+              > (defmacro while (test &body body)
+                  `(do ()
+                     ((not ,test))
+                     ,@body))
+              WHILE
+              > (pprint (macroexpand '(while (able) (laugh))))
+              (BLOCK NIL
+                     (LET NIL
+                          (TAGBODY
+                            #:G61
+                            (IF (NOT (ABLE)) (RETURN NIL))
+                            (LAUGH)
+                            (GO #:G61))))
+              T
+              > (pprint (macroexpand-1 '(while (able) (laugh))))
+              (DO NIL
+                  ((NOT (ABLE)))
+                  (LAUGH))
+              T
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5609,8 +5641,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defmacro mac (expr)
-  `(pprint (macroexpand-1 ',expr)))
+              (defmacro mac (expr)
+                `(pprint (macroexpand-1 ',expr)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5619,7 +5651,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(pprint (macroexpand-1 '(or x y)))
+              (pprint (macroexpand-1 '(or x y)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5628,7 +5660,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(mac (or x y))
+              (mac (or x y))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5637,10 +5669,10 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (setq exp (macroexpand-1 '(memq 'a '(a b c))))
-(MEMBER (QUOTE A) (QUOTE (A B C)) :TEST (FUNCTION EQ))
-> (eval exp)
-(A B C)
+              > (setq exp (macroexpand-1 '(memq 'a '(a b c))))
+              (MEMBER (QUOTE A) (QUOTE (A B C)) :TEST (FUNCTION EQ))
+              > (eval exp)
+              (A B C)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5651,8 +5683,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defun foo (x y z)
-  (+ x y z))
+              (defun foo (x y z)
+                (+ x y z))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5661,7 +5693,7 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(foo 1 2 3)
+              (foo 1 2 3)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5670,9 +5702,9 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (destructuring-bind (x (y) . z) '(a (b) c d)
-    (list x y z))
-(A B (C D))
+              > (destructuring-bind (x (y) . z) '(a (b) c d)
+                  (list x y z))
+              (A B (C D))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5681,8 +5713,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(dolist (x '(a b c))
-  (print x))
+              (dolist (x '(a b c))
+                (print x))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5691,12 +5723,12 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defmacro our-dolist ((var list &optional result) &body body)
-  `(progn
-     (mapc #'(lambda (,var) ,@body)
-           ,list)
-     (let ((,var nil))
-       ,result)))
+              (defmacro our-dolist ((var list &optional result) &body body)
+                `(progn
+                   (mapc #'(lambda (,var) ,@body)
+                         ,list)
+                   (let ((,var nil))
+                     ,result)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5705,10 +5737,10 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defmacro when-bind ((var expr) &body body)
-  `(let ((,var ,expr))
-     (when ,var
-       ,@body)))
+              (defmacro when-bind ((var expr) &body body)
+                `(let ((,var ,expr))
+                   (when ,var
+                     ,@body)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5717,8 +5749,8 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(when-bind (input (get-user-input))
-           (process input))
+              (when-bind (input (get-user-input))
+                         (process input))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5727,9 +5759,9 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(let ((input (get-user-input)))
-  (when input
-    (process input)))
+              (let ((input (get-user-input)))
+                (when input
+                  (process input)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5740,22 +5772,22 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defmacro our-expander (name) `(get ,name 'expander))
+              (defmacro our-expander (name) `(get ,name 'expander))
 
-(defmacro our-defmacro (name parms &body body)
-  (let ((g (gensym)))
-    `(progn
-       (setf (our-expander ',name)
-             #'(lambda (,g)
-                 (block ,name
-                        (destructuring-bind ,parms (cdr ,g)
-                          ,@body))))
-       ',name)))
+              (defmacro our-defmacro (name parms &body body)
+                (let ((g (gensym)))
+                  `(progn
+                     (setf (our-expander ',name)
+                           #'(lambda (,g)
+                               (block ,name
+                                      (destructuring-bind ,parms (cdr ,g)
+                                        ,@body))))
+                     ',name)))
 
-(defun our-macroexpand-1 (expr)
-  (if (and (consp expr) (our-expander (car expr)))
-      (funcall (our-expander (car expr)) expr)
-      expr))
+              (defun our-macroexpand-1 (expr)
+                (if (and (consp expr) (our-expander (car expr)))
+                    (funcall (our-expander (car expr)) expr)
+                    expr))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5764,9 +5796,9 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(let ((op 'setq))
-  (defmacro our-setq (var val)
-    (list op var val)))
+              (let ((op 'setq))
+                (defmacro our-setq (var val)
+                  (list op var val)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5777,13 +5809,13 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(do ((w 3)
-     (x 1 (1+ x))
-     (y 2 (1+ y))
-     (z))
-  ((> x 10) (princ z) y)
-  (princ x)
-  (princ y))
+              (do ((w 3)
+                   (x 1 (1+ x))
+                   (y 2 (1+ y))
+                   (z))
+                ((> x 10) (princ z) y)
+                (princ x)
+                (princ y))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5792,14 +5824,14 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(prog ((w 3) (x 1) (y 2) (z nil))
-      foo
-      (if (> x 10)
-          (return (progn (princ z) y)))
-      (princ x)
-      (princ y)
-      (psetq x (1+ x) y (1+ y))
-      (go foo))
+              (prog ((w 3) (x 1) (y 2) (z nil))
+                    foo
+                    (if (> x 10)
+                        (return (progn (princ z) y)))
+                    (princ x)
+                    (princ y)
+                    (psetq x (1+ x) y (1+ y))
+                    (go foo))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5808,10 +5840,10 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (let ((a 1))
-    (setq a 2 b a)
-    (list a b))
-(2 2)
+              > (let ((a 1))
+                  (setq a 2 b a)
+                  (list a b))
+              (2 2)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5820,10 +5852,10 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (let ((a 1))
-(psetq a 2 b a)
-(list a b))
-(2 1)
+              > (let ((a 1))
+              (psetq a 2 b a)
+              (list a b))
+              (2 1)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5832,29 +5864,29 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defmacro our-do (bindforms (test &rest result) &body body)
-  (let ((label (gensym)))
-    `(prog ,(make-initforms bindforms)
-           ,label
-           (if ,test
-               (return (progn ,@result)))
-           ,@body
-           (psetq ,@(make-stepforms bindforms))
-           (go ,label))))
+              (defmacro our-do (bindforms (test &rest result) &body body)
+                (let ((label (gensym)))
+                  `(prog ,(make-initforms bindforms)
+                         ,label
+                         (if ,test
+                             (return (progn ,@result)))
+                         ,@body
+                         (psetq ,@(make-stepforms bindforms))
+                         (go ,label))))
 
-(defun make-initforms (bindforms)
-  (mapcar #'(lambda (b)
-              (if (consp b)
-                  (list (car b) (cadr b))
-                  (list b nil)))
-          bindforms))
+              (defun make-initforms (bindforms)
+                (mapcar #'(lambda (b)
+                            (if (consp b)
+                                (list (car b) (cadr b))
+                                (list b nil)))
+                        bindforms))
 
-(defun make-stepforms (bindforms)
-  (mapcan #'(lambda (b)
-              (if (and (consp b) (third b))
-                  (list (car b) (third b))
-                  nil))
-          bindforms))
+              (defun make-stepforms (bindforms)
+                (mapcan #'(lambda (b)
+                            (if (and (consp b) (third b))
+                                (list (car b) (third b))
+                                nil))
+                        bindforms))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5865,22 +5897,22 @@ T
         context '' do
           let(:str) do
             <<~LISP
-(defmacro our-and (&rest args)
-  (case (length args)
-    (0 t)
-    (1 (car args))
-    (t `(if ,(car args)
-            (our-and ,@(cdr args))))))
+              (defmacro our-and (&rest args)
+                (case (length args)
+                  (0 t)
+                  (1 (car args))
+                  (t `(if ,(car args)
+                          (our-and ,@(cdr args))))))
 
-(defmacro our-andb (&rest args)
-  (if (null args)
-      t
-      (labels ((expander (rest)
-                         (if (cdr rest)
-                             `(if ,(car rest)
-                                  ,(expander (cdr rest)))
-                             (car rest))))
-        (expander args))))
+              (defmacro our-andb (&rest args)
+                (if (null args)
+                    t
+                    (labels ((expander (rest)
+                                       (if (cdr rest)
+                                           `(if ,(car rest)
+                                                ,(expander (cdr rest)))
+                                           (car rest))))
+                      (expander args))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5891,14 +5923,14 @@ T
         context '' do
           let(:str) do
             <<~LISP
-> (defmacro mac (x) `(1+ ,x))
-MAC
-> (setq fn (compile nil `(lambda (y) (mac y))))
-#<Compiled-Function BF7E7E>
-> (defmacro mac (x) `(+ ,x 100))
-MAC
-> (funcall fn 1)
-2
+              > (defmacro mac (x) `(1+ ,x))
+              MAC
+              > (setq fn (compile nil `(lambda (y) (mac y))))
+              #<Compiled-Function BF7E7E>
+              > (defmacro mac (x) `(+ ,x 100))
+              MAC
+              > (funcall fn 1)
+              2
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5909,7 +5941,7 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defun second (x) (cadr x))
+              (defun second (x) (cadr x))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5918,7 +5950,7 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defmacro second (x) `(cadr ,x))
+              (defmacro second (x) `(cadr ,x))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5927,9 +5959,9 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defun noisy-second (x)
-  (princ "Someone is taking a cadr!")
-  (cadr x))
+              (defun noisy-second (x)
+                (princ "Someone is taking a cadr!")
+                (cadr x))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5938,10 +5970,10 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defmacro noisy-second (x)
-  `(progn
-     (princ "Someone is taking a cadr!")
-     (cadr ,x)))
+              (defmacro noisy-second (x)
+                `(progn
+                   (princ "Someone is taking a cadr!")
+                   (cadr ,x)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5950,8 +5982,8 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defun sum (&rest args)
-  (apply #'+ args))
+              (defun sum (&rest args)
+                (apply #'+ args))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5960,8 +5992,8 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defmacro sum (&rest args)
-  `(apply #'+ (list ,@args)))
+              (defmacro sum (&rest args)
+                `(apply #'+ (list ,@args)))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5970,8 +6002,8 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defmacro sum (&rest args)
-  `(+ ,@args))
+              (defmacro sum (&rest args)
+                `(+ ,@args))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5980,9 +6012,9 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defun foo (x y z)
-  (list x (let ((x y))
-            (list x z))))
+              (defun foo (x y z)
+                (list x (let ((x y))
+                          (list x z))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -5991,9 +6023,9 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-(defmacro foo (x y z)
-  `(list ,x (let ((x ,y))
-              (list x ,z))))
+              (defmacro foo (x y z)
+                `(list ,x (let ((x ,y))
+                            (list x ,z))))
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -6004,11 +6036,11 @@ MAC
         context '' do
           let(:str) do
             <<~LISP
-> (symbol-macrolet ((hi (progn (print "Howdy")
-                               1)))
-                   (+ hi 2))
-"Howdy"
-3
+              > (symbol-macrolet ((hi (progn (print "Howdy")
+                                             1)))
+                                 (+ hi 2))
+              "Howdy"
+              3
             LISP
           end
           it { is_expected.to eq 99999999999 }
