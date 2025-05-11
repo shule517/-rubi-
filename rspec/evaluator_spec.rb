@@ -550,6 +550,19 @@ describe Rubi::Evaluator do
         end
       end
 
+      context '&optionalの引数' do
+        let(:str) do
+          # TODO: サンプルコードを変更する
+          <<~LISP
+            (lambda (x &optional change)
+                    (if change
+                       (setq n x)
+                       (+ x n))))
+          LISP
+         end
+         it { is_expected.to eq 9 } # 最後の結果が返ってくる
+       end
+
       context '実行する式が複数ある場合' do
         context '最後の結果が返ってくる' do
           let(:str) do
@@ -1436,6 +1449,17 @@ describe Rubi::Evaluator do
         let(:str) { "(/ 1.2 2)" }
         it { is_expected.to eq 0.6 }
       end
+    end
+
+    describe '#incf' do
+      let(:str) do
+        <<~LISP
+          (setq x 10)
+          (incf x)
+          x
+        LISP
+      end
+      it { is_expected.to eq 11 }
     end
 
     describe '#mod' do
@@ -3275,10 +3299,16 @@ describe Rubi::Evaluator do
             <<~LISP
               (let ((counter 0))
                 (defun new-id () (incf counter))
-                (defun reset-id () (setq counter 0)))
+                (defun reset-id () (setq counter 0))
+                (new-id)
+                (reset-id)
+                (new-id)
+                (new-id)
+                counter
+              )
             LISP
           end
-          it { is_expected.to eq :"reset-id" }
+          it { is_expected.to eq 2 }
         end
 
         context "(defun make-adder (n)" do
@@ -3368,6 +3398,7 @@ describe Rubi::Evaluator do
               (setq addx (make-adderb 1))
               (funcall addx 3)
             LISP
+            # TODO: &optional
           end
           it { is_expected.to eq 4 }
         end
