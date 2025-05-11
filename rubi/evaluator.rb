@@ -121,9 +121,12 @@ module Rubi
 
       # incf
       lisp_eval(<<~LISP)
-        (defmacro incf(x)
-          `(setq x (+ x 1)))
+        (defmacro incf (x)
+          (list 'setq x (list '+ x 1)))
       LISP
+      # TODO: ほんとは`,を使いたい
+      # (defmacro incf(x)
+      # `(setq ,x (+ ,x 1)))
 
       # nth
       lisp_eval(<<~LISP)

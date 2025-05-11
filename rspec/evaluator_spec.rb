@@ -3556,7 +3556,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [11, 12, 13] }
         end
 
-        context "TODO: incfをlet内で実行すると、おかしいかも (let ((counter 0))" do
+        context "(let ((counter 0))" do
           context '元のコード' do
             let(:str) do
               <<~LISP
