@@ -3918,7 +3918,7 @@ describe Rubi::Evaluator do
         end
 
         context "TODO: mapcar #'instances-in lsts ここが原因っぽい (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))" do
-          context '原作' do
+          context 'On Lispのサンプルコード' do
             let(:str) do
               <<~LISP
                 (defun count-instances (obj lsts)
@@ -4226,15 +4226,12 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:c, :b, :a] }
         end
 
-        context "" do
+        context "(setq lst '(a b c)) (bad-reverse lst)" do
           let(:str) do
             <<~LISP
-              > (setq lst '(a b c))
-              (A B C)
-              > (bad-reverse lst)
-              NIL
-              > lst
-              (C B A)
+              (setq lst '(a b c)) ; => (A B C)
+              (bad-reverse lst) ; => NIL
+              lst ; => (C B A)
             LISP
           end
           it { is_expected.to eq 99999999999 }
