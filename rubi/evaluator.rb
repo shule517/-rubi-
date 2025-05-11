@@ -256,6 +256,7 @@ module Rubi
             newvalue = eval(value, lexical_hash, stack_count + 1)
             lexical_hash[var_name] = newvalue
             puts "#{nest}ローカル変数がある場合は、ローカル変数を変更する(#{var_name} = #{newvalue}) => lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
+            lexical_hash[var_name]
           else
             # ローカル変数がない場合は、グローバル変数を定義する
             newvalue = eval(value, lexical_hash, stack_count + 1)

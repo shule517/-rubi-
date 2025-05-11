@@ -3659,7 +3659,7 @@ describe Rubi::Evaluator do
           it { is_expected.to be_instance_of Proc }
         end
 
-        context "(funcall add2 5)" do
+        context "TODO: 普通にバグってるぽい。(funcall add2 5)" do
           let(:str) do
             <<~LISP
               (defun make-adder (n)
