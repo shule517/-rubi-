@@ -70,7 +70,7 @@ module Rubi
           array = eval(b, lexical_hash, stack_count + 1)
           array.map do |element|
             puts "#{nest}mapcar(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-            proc.call(proc_params: [element], lexical_hash: lexical_hash.dup, stack_count: stack_count, nest: nest)
+            proc.call(proc_params: [element], lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
           end
         else
           # 引数が3つの場合
@@ -84,7 +84,7 @@ module Rubi
             puts "#{nest}mapcar(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
             param1 = element
             param2 = array2[index]
-            proc.call(proc_params: [param1, param2], lexical_hash: lexical_hash.dup, stack_count: stack_count, nest: nest)
+            proc.call(proc_params: [param1, param2], lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
           end
         end
       end
@@ -551,7 +551,7 @@ module Rubi
         var, number, result = a
         puts "#{nest}1. ループ回数を評価する(number: #{number}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         number = eval(number, lexical_hash, stack_count + 1)
-        new_lexical_hash = lexical_hash.dup
+        new_lexical_hash = lexical_hash
         number.times.with_index do |index|
           new_lexical_hash[var] = index
           puts "#{nest}2. #{index + 1}ループ目(b: #{b}, new_lexical_hash(object_id: #{new_lexical_hash.object_id}): #{new_lexical_hash})"
@@ -603,7 +603,7 @@ module Rubi
       elsif lexical_hash.key?(function)
         # 登録されている関数を呼び出す
         puts "#{nest}ローカル関数(#{function})が見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        lexical_hash[function].call(proc_params: params, lexical_hash: lexical_hash.dup, stack_count: stack_count, nest: nest)
+        lexical_hash[function].call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
       else
         puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         raise "対応する関数(#{function})が見つかりません(params: #{params})"
