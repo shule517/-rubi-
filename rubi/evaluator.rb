@@ -24,7 +24,7 @@ module Rubi
           else
             result = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reduce(operator)
             result = nil if result.instance_of?(FalseClass)
-            puts "(#{operator} #{proc_params}) -> #{result}"
+            puts "#{nest}(#{operator} #{proc_params}) -> #{result}"
             result
           end
         end
@@ -33,6 +33,11 @@ module Rubi
       func_hash[:mod] = Proc.new do |proc_params:, lexical_hash:|
         a, b = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         a % b
+      end
+
+      func_hash[:expt] = Proc.new do |proc_params:, lexical_hash:|
+        a, b = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        a ** b
       end
 
       func_hash[:append] = Proc.new do |proc_params:, lexical_hash:|
@@ -328,11 +333,13 @@ module Rubi
           eval(expression, lexical_hash, stack_count + 1)
         else
           func_name = a
-          puts "#{nest}1. シンボルから関数を取り出す(func_name: #{func_name})"
+          puts "#{nest}1. シンボルから関数を取り出す(func_name: #{func_name}, lexical_hash: #{lexical_hash})"
           if func_hash.key?(func_name)
-            func_hash[func_name]
+            func_hash[func_name] # グローバルの定義を参照する
+          elsif lexical_hash.key?(func_name)
+            lexical_hash[func_name] # ローカル変数を参照する
           else
-            raise "#{func_name}の関数が見つかりません(func_hash: #{func_hash})"
+            raise "#{func_name}の関数が見つかりません(func_hash: #{func_hash}, lexical_hash: #{lexical_hash})"
           end
         end
       elsif function == :"symbol-function"

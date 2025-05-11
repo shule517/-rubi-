@@ -987,6 +987,16 @@ describe Rubi::Evaluator do
         end
       end
 
+      context 'labelsの中で定義した関数を取り出す' do
+        let(:str) do
+          <<~LISP
+              (labels ((instances-in () 2))
+                #'instances-in)
+            LISP
+        end
+        it { is_expected.to be_instance_of Proc }
+      end
+
       context '組み込み関数の場合' do
         %w(+ - * / < > <= >=).each do |func|
           context "#'#{func}の場合" do
@@ -3908,20 +3918,32 @@ describe Rubi::Evaluator do
         end
 
         context "TODO: mapcar #'instances-in lsts ここが原因っぽい (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))" do
-          let(:str) do
-            <<~LISP
-              (defun count-instances (obj lsts)
-                (labels ((instances-in (lst)
-                           (if (consp lst)
-                               (+ (if (eq (car lst) obj) 1 0)
-                                  (instances-in (cdr lst)))
-                               0)))
-                  (mapcar #'instances-in lsts)))
-              (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
-            LISP
+          context '原作' do
+            let(:str) do
+              <<~LISP
+                (defun count-instances (obj lsts)
+                  (labels ((instances-in (lst)
+                             (if (consp lst)
+                                 (+ (if (eq (car lst) obj) 1 0)
+                                    (instances-in (cdr lst)))
+                                 0)))
+                    (mapcar #'instances-in lsts)))
+                (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
+              LISP
+            end
+            # TODO: mapcar #'instances-in lsts ここが原因っぽい
+            it { is_expected.to eq [1, 2, 1, 2] }
           end
-          # TODO: mapcar #'instances-in lsts ここが原因っぽい
-          it { is_expected.to eq [1, 2, 1, 2] }
+
+          context '問題の部分を切り出す' do
+            let(:str) do
+              <<~LISP
+                (labels ((instances-in () 2))
+                  #'instances-in)
+              LISP
+            end
+            it { is_expected.to be_instance_of Proc }
+          end
         end
       end
 
@@ -4357,7 +4379,7 @@ describe Rubi::Evaluator do
       end
 
       context '命令的プログラミングの裏返し' do
-        context "TODO: exptが未実装。(defun fun (x) (list 'a (expt (car x) 2)))" do
+        context "(defun fun (x) (list 'a (expt (car x) 2)))" do
           let(:str) do
             <<~LISP
               (defun fun (x)
@@ -4368,7 +4390,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, 1] }
         end
 
-        context "TODO: exptが未実装。(defun imp (x)" do
+        context "(defun imp (x)" do
           let(:str) do
             <<~LISP
               (defun imp (x)
@@ -4377,24 +4399,6 @@ describe Rubi::Evaluator do
                   (setq sqr (expt y 2))
                   (list 'a sqr)))
               (imp '(1 2 3))
-            LISP
-          end
-          it { is_expected.to eq [:a, 1] }
-        end
-
-        context "TODO: exptが未実装。(list 'a (expt y 2)))" do
-          let(:str) do
-            <<~LISP
-              (list 'a (expt y 2)))
-            LISP
-          end
-          it { is_expected.to eq [:a, 1] }
-        end
-
-        context "TODO: exptが未実装。(list 'a (expt (car x) 2))" do
-          let(:str) do
-            <<~LISP
-              (list 'a (expt (car x) 2))
             LISP
           end
           it { is_expected.to eq [:a, 1] }
@@ -4454,7 +4458,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(defun f (x) (let ((val (g x))) ; ここでvalを書き換えていいものか？ ))" do
           let(:str) do
             <<~LISP
               (defun f (x)
@@ -4473,29 +4477,49 @@ describe Rubi::Evaluator do
                 (append expression '(oh my)))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq :exclaim }
         end
 
-        context "" do
+        context "(exclaim '(lions and tigers and bears))" do
           let(:str) do
             <<~LISP
-              > (exclaim '(lions and tigers and bears))
-              (LIONS AND TIGERS AND BEARS OH MY)
-              > (nconc * '(goodness))
-              (LIONS AND TIGERS AND BEARS OH MY GOODNESS)
+              (defun exclaim (expression)
+                (append expression '(oh my)))
+
+              (exclaim '(lions and tigers and bears)) ; => (LIONS AND TIGERS AND BEARS OH MY)
+            LISP
+          end
+          it { is_expected.to eq [:lions, :and, :tigers, :and, :bears, :oh, :my] }
+        end
+
+        context "TODO: nconcが未実装。(nconc * '(goodness))" do
+          let(:str) do
+            <<~LISP
+              (defun exclaim (expression)
+                (append expression '(oh my)))
+
+              (exclaim '(lions and tigers and bears)) ; => (LIONS AND TIGERS AND BEARS OH MY)
+
+              (nconc * '(goodness)) ; => (LIONS AND TIGERS AND BEARS OH MY GOODNESS)
             LISP
           end
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(exclaim '(fixnums and bignums and floats))" do
           let(:str) do
             <<~LISP
-              > (exclaim '(fixnums and bignums and floats))
-              (FIXNUMS AND BIGNUMS AND FLOATS OH MY GOODNESS)
+              (defun exclaim (expression)
+                (append expression '(oh my)))
+
+              (exclaim '(lions and tigers and bears)) ; => (LIONS AND TIGERS AND BEARS OH MY)
+
+              (nconc * '(goodness)) ; => (LIONS AND TIGERS AND BEARS OH MY GOODNESS)
+
+              (exclaim '(fixnums and bignums and floats)) ; => (FIXNUMS AND BIGNUMS AND FLOATS OH MY GOODNESS)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [:fixnums, :and, :bignums, :and, :floats, :oh, :my, :goodness] }
         end
 
         context "(defun exclaim (expression) (append expression (list 'oh 'my)))" do
@@ -4941,21 +4965,19 @@ describe Rubi::Evaluator do
       end
 
       context '対応付け' do
-        context "" do
+        context "(map0-n #'1+ 5)" do
           let(:str) do
             <<~LISP
-              > (map0-n #'1+ 5)
-              (1 2 3 4 5 6)
+              (map0-n #'1+ 5) ; => (1 2 3 4 5 6)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [1, 2, 3, 4, 5, 6] }
         end
 
-        context "" do
+        context "(mapa-b #'1+ -2 0 .5)" do
           let(:str) do
             <<~LISP
-              > (mapa-b #'1+ -2 0 .5)
-              (-1 -0.5 0.0 0.5 1.0)
+              (mapa-b #'1+ -2 0 .5) ; => (-1 -0.5 0.0 0.5 1.0)
             LISP
           end
           it { is_expected.to eq 99999999999 }
@@ -4984,7 +5006,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(mapcar #'sqrt (append list1 list2))" do
           let(:str) do
             <<~LISP
               (mapcar #'sqrt (append list1 list2))
@@ -4993,7 +5015,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(mapcars #'sqrt list1 list2)" do
           let(:str) do
             <<~LISP
               (mapcars #'sqrt list1 list2)
@@ -5073,7 +5095,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(mapa-b #'fn a b c)" do
           let(:str) do
             <<~LISP
               (mapa-b #'fn a b c)
@@ -5082,7 +5104,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(collect (#Mfn (scan-range :from a :upto b :by c)))" do
           let(:str) do
             <<~LISP
               (collect (#Mfn (scan-range :from a :upto b :by c)))
@@ -5141,7 +5163,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(break-loop #'eval #'(lambda (x) (eq x :q)) >> )" do
           let(:str) do
             <<~LISP
               > (break-loop #'eval #'(lambda (x) (eq x :q)) ">> ")
@@ -5164,7 +5186,7 @@ describe Rubi::Evaluator do
       end
 
       context 'シンボルとストリング' do
-        context "" do
+        context '(mkstr pi " pieces of " `pi)' do
           let(:str) do
             <<~LISP
               > (mkstr pi " pieces of " 'pi)
@@ -5218,7 +5240,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(explode 'bomb)" do
           let(:str) do
             <<~LISP
               > (explode 'bomb)
