@@ -84,6 +84,7 @@ module Rubi
         end
       end
 
+      # TODO: 遅くなってる。高速化したい。
       # 組み込み関数の定義
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
       lisp_eval("(defun 1+ (x) (+ x 1))")
