@@ -2085,6 +2085,40 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#copy-tree' do
+      context 'コピーする' do
+        let(:str) do
+          <<~LISP
+            (copy-tree '((1 2) (3 4)))
+          LISP
+        end
+        it { is_expected.to eq [[1, 2], [3, 4]] }
+      end
+
+      context 'メモリを比較する(copyできているか確認する)' do
+        let(:str) do
+          <<~LISP
+            (setq a '((1 2) (3 4)))
+            (setq b (copy-tree a))
+            (eq a b)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'メモリを比較する(deep copyできているか確認する)' do
+        let(:str) do
+          <<~LISP
+            (setq a '((1 2) (3 4)))
+            (setq b (copy-tree a))
+            (eq (car a) (car b))
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+    end
+
+
     describe '#=' do
       context '式同士' do
         context '一致する場合' do
@@ -3617,14 +3651,13 @@ describe Rubi::Evaluator do
                         (setq n x)
                         (+ x n))))
               (setq addx (make-adderb 1))
-              (funcall addx 3)
+              (funcall addx 3) ; => 4
             LISP
-            # TODO: &optional
           end
           it { is_expected.to eq 4 }
         end
 
-        context "(funcall addx 100 t)" do
+        context "(funcall addx 100 t) (funcall addx 100 t)" do
           let(:str) do
             <<~LISP
               (defun make-adderb (n)
@@ -3633,14 +3666,14 @@ describe Rubi::Evaluator do
                         (setq n x)
                         (+ x n))))
               (setq addx (make-adderb 1))
-              (funcall addx 3)
-              (funcall addx 100 t)
+              (funcall addx 3) ; => 4
+              (funcall addx 100 t) ; => 100
             LISP
           end
           it { is_expected.to eq 100 }
         end
 
-        context "(funcall addx 3)" do
+        context "TODO: 単純にバグってそう。(funcall addx 3) (funcall addx 100 t) (funcall addx 3)" do
           let(:str) do
             <<~LISP
               (defun make-adderb (n)
@@ -3649,9 +3682,9 @@ describe Rubi::Evaluator do
                         (setq n x)
                         (+ x n))))
               (setq addx (make-adderb 1))
-              (funcall addx 3)
-              (funcall addx 100 t)
-              (funcall addx 3)
+              (funcall addx 3) ; => 4
+              (funcall addx 100 t) ; => 100
+              (funcall addx 3) ; => 103
             LISP
           end
           it { is_expected.to eq 103 }
@@ -3673,10 +3706,16 @@ describe Rubi::Evaluator do
               (setq cities (make-dbms '((boston . us) (paris . france))))
             LISP
           end
-          it { is_expected.to eq 999999 } # TODO: Proc３つにへんこうする
+          it do
+            result = subject
+            expect(result.size).to eq 3
+            expect(result[0]).to be_instance_of Proc
+            expect(result[1]).to be_instance_of Proc
+            expect(result[2]).to be_instance_of Proc
+          end
         end
 
-        context "(funcall (car cities) 'boston)" do
+        context "TODO: 単純にバグってそう。(funcall (car cities) 'boston)" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)
@@ -3690,13 +3729,13 @@ describe Rubi::Evaluator do
                       (setf db (delete key db :key #'car))
                       key)))
               (setq cities (make-dbms '((boston . us) (paris . france))))
-              (funcall (car cities) 'boston)
+              (funcall (car cities) 'boston) ; => us
             LISP
           end
           it { is_expected.to eq :us }
         end
 
-        context "(funcall (second cities) 'london 'england)" do
+        context "TODO: 単純にバグってそう。(funcall (second cities) 'london 'england)" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)
@@ -3710,14 +3749,14 @@ describe Rubi::Evaluator do
                       (setf db (delete key db :key #'car))
                       key)))
               (setq cities (make-dbms '((boston . us) (paris . france))))
-              (funcall (car cities) 'boston)
-              (funcall (second cities) 'london 'england)
+              (funcall (car cities) 'boston) ; => us
+              (funcall (second cities) 'london 'england) ; => london
             LISP
           end
           it { is_expected.to eq :london }
         end
 
-        context "(funcall (car cities) 'london)" do
+        context "TODO: 単純にバグってそう。(funcall (car cities) 'london)" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)
@@ -3731,15 +3770,15 @@ describe Rubi::Evaluator do
                       (setf db (delete key db :key #'car))
                       key)))
               (setq cities (make-dbms '((boston . us) (paris . france))))
-              (funcall (car cities) 'boston)
-              (funcall (second cities) 'london 'england)
-              (funcall (car cities) 'london)
+              (funcall (car cities) 'boston) ; => us
+              (funcall (second cities) 'london 'england) ; => london
+              (funcall (car cities) 'london) ; => england
             LISP
           end
           it { is_expected.to eq :england }
         end
 
-        context "(funcall (car cities) 'london)" do
+        context "TODO: ↑を対応したら仕様が分かりそう。(funcall (car cities) 'london)" do
           let(:str) do
             <<~LISP
               (defun lookup (key db)

@@ -460,6 +460,10 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.eql?(b) # 一致しない場合は、nilを返す
+      elsif function == :"copy-tree"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        a = params.shift
+        eval(a, lexical_hash, stack_count + 1).dup
       elsif function == :"="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
