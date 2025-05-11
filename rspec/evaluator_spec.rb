@@ -3294,7 +3294,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [11, 12, 13] }
         end
 
-        context "(let ((counter 0))" do
+        context "TODO: incfがない (let ((counter 0))" do
           let(:str) do
             <<~LISP
               (let ((counter 0))
@@ -3403,7 +3403,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 4 }
         end
 
-        context "(funcall addx 100 t)" do
+        context "TODO: &optionalが未実装 (funcall addx 100 t)" do
           let(:str) do
             <<~LISP
               (defun make-adderb (n)
@@ -3452,7 +3452,7 @@ describe Rubi::Evaluator do
               (setq cities (make-dbms '((boston . us) (paris . france))))
             LISP
           end
-          it { is_expected.to eq 999999 }
+          it { is_expected.to eq 999999 } # TODO: Proc３つにへんこうする
         end
 
         context "(funcall (car cities) 'boston)" do
@@ -3583,9 +3583,8 @@ describe Rubi::Evaluator do
                                0)))
                   (mapcar #'instances-in lsts)))
             LISP
-            # TODO: callする
           end
-          it { is_expected.to eq [4, 7, 9, 5] }
+          it { is_expected.to eq :'count-instances' }
         end
 
         context "(count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))" do
@@ -3601,6 +3600,7 @@ describe Rubi::Evaluator do
               (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
             LISP
           end
+          # TODO: mapcar #'instances-in lsts ここが原因っぽい
           it { is_expected.to eq [1, 2, 1, 2] }
         end
       end
@@ -3633,7 +3633,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 6 }
         end
 
-        context "(defun our-length (lst)" do
+        context "TODO: 無限ループする (defun our-length (lst)" do
           let(:str) do
             <<~LISP
               (defun our-length (lst)
@@ -3648,7 +3648,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 5 }
         end
 
-        context "(proclaim '(optimize speed))" do
+        context "TODO: proclaimが未実装 (proclaim '(optimize speed))" do
           let(:str) do
             <<~LISP
               (proclaim '(optimize speed))
@@ -3658,7 +3658,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 5 }
         end
 
-        context "(defun triangle (n)" do
+        context "TODO: declareが未実装 (defun triangle (n)" do
           let(:str) do
             <<~LISP
               (defun triangle (n)
