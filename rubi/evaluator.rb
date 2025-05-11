@@ -53,7 +53,7 @@ module Rubi
 
       func_hash[:mapcar] = Proc.new do |proc_params:, lexical_hash:|
         # TODO: Lispのcarで実装した方がよいのでは？
-        puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b, c = proc_params
         if c.nil?
           # 引数が2つの場合
@@ -64,7 +64,7 @@ module Rubi
           raise "procがnil。(a: #{a})を評価して、procが戻ってこなかった" if proc.nil?
           array = eval(b, lexical_hash, stack_count + 1)
           array.map do |element|
-            puts "#{nest}mapcar(element: #{element}, lexical_hash: #{lexical_hash})"
+            puts "#{nest}mapcar(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
             proc.call(proc_params: [element], lexical_hash: lexical_hash.dup)
           end
         else
@@ -76,7 +76,7 @@ module Rubi
           array1 = eval(b, lexical_hash, stack_count + 1)
           array2 = eval(c, lexical_hash, stack_count + 1)
           array1.map.with_index do |element, index|
-            puts "#{nest}mapcar(element: #{element}, lexical_hash: #{lexical_hash})"
+            puts "#{nest}mapcar(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
             param1 = element
             param2 = array2[index]
             proc.call(proc_params: [param1, param2], lexical_hash: lexical_hash.dup)
@@ -186,7 +186,7 @@ module Rubi
       raise "スタック多すぎ問題" if stack_count > 100
       nest = "  " * (stack_count + 1)
       build_system_func(stack_count + 1, nest) unless built_system_func
-      puts "#{nest}eval(ast: #{ast}, lexical_hash: #{lexical_hash})"
+      puts "#{nest}eval(ast: #{ast}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
       if atom?(ast)
         return eval_atom(ast, lexical_hash, nest)
       elsif ast == []
@@ -203,16 +203,16 @@ module Rubi
         puts "#{nest}#{function}(var_params: #{var_params}, expressions: #{expressions})"
         # レキシカル変数(next_lexical_hash)を定義する
         puts "#{nest}#レキシカル変数を定義する"
-        next_lexical_hash = lexical_hash.dup
+        next_lexical_hash = lexical_hash#.dup
         var_params.each do |var_name, value|
           next_lexical_hash[var_name] = eval(value, next_lexical_hash, stack_count + 1)
         end
-        puts "#{nest}-> next_lexical_hash: #{next_lexical_hash}"
+        puts "#{nest}-> next_lexical_hash(object_id: #{next_lexical_hash.object_id}): #{next_lexical_hash}"
         puts "#{nest}#式を評価する - expressions: #{expressions}"
         expressions.map.with_index do |expression, index|
-          puts "#{nest}#{index + 1}ループ目(expression: #{expression}, next_lexical_hash: #{next_lexical_hash})"
+          puts "#{nest}#{index + 1}ループ目(expression: #{expression}, next_lexical_hash(object_id: #{next_lexical_hash.object_id}): #{next_lexical_hash})"
           result = eval(expression, next_lexical_hash, stack_count + 1)
-          puts "#{nest}-> #{result}(next_lexical_hash: #{next_lexical_hash})"
+          puts "#{nest}-> #{result}(next_lexical_hash(object_id: #{next_lexical_hash.object_id}): #{next_lexical_hash})"
           result
         end.last
       elsif function == :'let*' # TODO: letをコピーしただけ
@@ -225,7 +225,7 @@ module Rubi
         var_params.each do |var_name, value|
           next_lexical_hash[var_name] = eval(value, next_lexical_hash, stack_count + 1)
         end
-        puts "#{nest}-> next_lexical_hash: #{next_lexical_hash}"
+        puts "#{nest}-> next_lexical_hash(object_id: #{next_lexical_hash.object_id}): #{next_lexical_hash}"
         puts "#{nest}#式を評価する - expression: #{expression}"
         expression.map { |e| eval(e, next_lexical_hash, stack_count + 1) }.last
       elsif function == :labels
@@ -248,13 +248,13 @@ module Rubi
           if lexical_hash.key?(var_name)
             # ローカル変数がある場合は、ローカル変数を変更する
             newvalue = eval(value, lexical_hash, stack_count + 1)
-            puts "#{nest}ローカル変数がある場合は、ローカル変数を変更する(var_name: #{var_name}, newvalue: #{newvalue})"
             lexical_hash[var_name] = newvalue
+            puts "#{nest}ローカル変数がある場合は、ローカル変数を変更する(#{var_name} = #{newvalue}) => lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
           else
             # ローカル変数がない場合は、グローバル変数を定義する
             newvalue = eval(value, lexical_hash, stack_count + 1)
-            puts "#{nest}ローカル変数がない場合は、グローバル変数を定義する(var_name: #{var_name}, newvalue: #{newvalue})"
             var_hash[var_name] = newvalue
+            puts "#{nest}ローカル変数がない場合は、グローバル変数を定義する(#{var_name} = #{newvalue}) => var_hash: #{var_hash}"
             puts "#{nest}-> var_hash: #{var_hash}"
             var_hash[var_name]
           end
@@ -306,7 +306,7 @@ module Rubi
         end
       elsif function == :lambda
         params, *expressions = params
-        puts "#{nest}#{function}(params: #{params}, expressions: #{expressions}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         # 関数定義
         expression = expressions.last # TODO: 途中の式を実行していない
         build_lambda(params, expression, lexical_hash, stack_count, nest)
@@ -354,20 +354,20 @@ module Rubi
         var_name = eval(expression, lexical_hash, stack_count + 1)
         var_hash[var_name]
       elsif function == :list
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         puts "#{nest}-> #{result}"
         result
       elsif function == :car
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
         result.first
       elsif function == :cdr
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
         result[1..]
       elsif function == :cons
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = eval(params[0], lexical_hash, stack_count + 1)
         b = eval(params[1], lexical_hash, stack_count + 1)
         if b.nil?
@@ -382,30 +382,30 @@ module Rubi
       elsif function == :sort
         a, func = params
         list = eval(a, lexical_hash, stack_count + 1)
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         list.sort # TODO: <しか対応してない funcを参照していない
       elsif function == :null
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
         true if result.nil? || result.empty? # falseの場合は、nilを返す
       elsif function == :atom
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = params.shift
         puts "#{nest}1. 評価する(a: #{a})"
         atom = eval(a, lexical_hash, stack_count + 1)
         true if atom?(atom) # listの場合は、nilを返す
       elsif function == :quote
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         params[0] # quoteは評価しない
       elsif function == :funcall
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         array = params.map { |a| puts "#{nest}(a: #{a})";result = eval(a, lexical_hash, stack_count + 1);puts "#{nest}-> #{result}";result }
         puts "#{nest}#{function}(array: #{array})"
         eval(array, lexical_hash, stack_count + 1)
       elsif function == :defmacro
         macro_name = params.shift
         params, expression = params
-        puts "#{nest}#{function}(macro_name: #{macro_name}, params: #{params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(macro_name: #{macro_name}, params: #{params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         # マクロ定義
         macro_hash[macro_name] = build_macro(params, expression, lexical_hash, stack_count, nest)
         puts "#{nest}-> macro_hash: #{macro_hash}"
@@ -427,7 +427,7 @@ module Rubi
 
         # 同じ変数
         # (setq x "あ")(eq x x) # => true
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.equal?(b) # 一致しない場合は、nilを返す
       elsif function == :eql
@@ -447,7 +447,7 @@ module Rubi
 
         # 同じ変数
         # (setq x "あ")(eql x x) # => true
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.equal?(b) # 一致しない場合は、nilを返す
       elsif function == :equal
@@ -467,32 +467,32 @@ module Rubi
 
         # 同じ変数
         # (setq x "あ")(equal x x) # => true
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.eql?(b) # 一致しない場合は、nilを返す
       elsif function == :"="
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         puts "#{nest}#{a} == #{b} -> #{a == b}"
         true if a == b # 不一致の場合は、nilを返す
       elsif function == :"/="
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a != b # 不一致の場合は、nilを返す
       elsif function == :not
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = params.shift
         condition = eval(a, lexical_hash, stack_count + 1)
         true if condition.nil? # nil以外の場合は、nilを返す
       elsif function == :and
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         true if params.all? { |param| eval(param, lexical_hash, stack_count + 1) }
       elsif function == :or
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         true if params.any? { |param| eval(param, lexical_hash, stack_count + 1) }
       elsif function == :if
         condition, b, c = params
-        puts "#{nest}#{function}(condition: #{condition}, trueの式: #{b}, falseの式: #{c}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(condition: #{condition}, trueの式: #{b}, falseの式: #{c}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         eval_condition = eval(condition, lexical_hash, stack_count + 1)
         puts "#{nest}(eval_condition: #{eval_condition != nil}, trueの式: #{b}, falseの式: #{c})"
         if eval_condition
@@ -507,7 +507,7 @@ module Rubi
           result
         end
       elsif function == :cond
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         # (cond (t 1) (t 2) (t 3))
         # (cond ((= 1 1) (+ 1 1)) ((= 2 2) (+ 2 2)) ((= 3 3) (+ 3 3)))
         _cond, expression = params.find { |cond, _expression| eval(cond, lexical_hash, stack_count + 1) }
@@ -519,7 +519,7 @@ module Rubi
         #   (2 'cat)
         #   (otherwise 'human)) ; -> 'cat
         var = eval(params.shift, lexical_hash, stack_count + 1)
-        puts "#{nest}#{function}(var: #{var}, params: #{params.map.with_index { |param, index| "params[#{index}] => #{param}"}.join(", ")}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(var: #{var}, params: #{params.map.with_index { |param, index| "params[#{index}] => #{param}"}.join(", ")}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         params.each do |value, *expressions|
           puts "#{nest}(#{var} == #{value})"
           # elseに到着
@@ -538,23 +538,23 @@ module Rubi
         nil # 何もHITしなかった場合の戻り値
       elsif function == :dotimes
         a, b = params
-        puts "#{nest}#{function}(a: #{a}, b: #{b} lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(a: #{a}, b: #{b} lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         var, number, result = a
-        puts "#{nest}1. ループ回数を評価する(number: #{number}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}1. ループ回数を評価する(number: #{number}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         number = eval(number, lexical_hash, stack_count + 1)
         new_lexical_hash = lexical_hash.dup
         number.times.with_index do |index|
           new_lexical_hash[var] = index
-          puts "#{nest}2. #{index + 1}ループ目(b: #{b}, new_lexical_hash: #{new_lexical_hash})"
+          puts "#{nest}2. #{index + 1}ループ目(b: #{b}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
           eval(b, new_lexical_hash, stack_count + 1)
         end
         new_lexical_hash[var] = number # dotimesはループ終わったがタイミングで、変数 = ループ回数 になっている仕様っぽい
         eval(result, new_lexical_hash, stack_count + 1)
       elsif function == :progn
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last
       elsif function == :apply
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = params.shift
         puts "#{nest}(a: #{a}, params: #{params})"
         puts "#{nest}1. funcを評価する(a: #{a})"
@@ -571,32 +571,32 @@ module Rubi
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
         # まずは第１引数を評価してから、実行する
-        puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         expression = eval(function, lexical_hash, stack_count + 1)
         puts "#{nest}関数の実行:#{function}(expression: #{expression}, params: #{params})"
         expression.call(proc_params: params, lexical_hash: lexical_hash)
       elsif function.instance_of?(Proc) # funcallで関数を実行する
-        puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         function.call(proc_params: params, lexical_hash: lexical_hash)
       elsif func_hash.key?(function) # defunで登録した関数を実行する
         # 登録されている関数を呼び出す
-        puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         func = func_hash[function]
         puts "#{nest}func_hash[function]: #{func}"
         puts "#{nest}params: #{params}"
         func.call(proc_params: params, lexical_hash: lexical_hash)
       elsif macro_hash.key?(function)
         # 登録されているマクロを呼び出す
-        puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         expanded = macro_hash[function].call(*params)
-        puts "#{nest}マクロで展開された式を実行する(expanded: #{expanded}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}マクロで展開された式を実行する(expanded: #{expanded}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         eval(expanded, lexical_hash, stack_count + 1)
       elsif lexical_hash.key?(function)
         # 登録されている関数を呼び出す
-        puts "#{nest}ローカル関数(#{function})が見つかった(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}ローカル関数(#{function})が見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         lexical_hash[function].call(proc_params: params, lexical_hash: lexical_hash.dup)
       else
-        puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         raise "対応する関数(#{function})が見つかりません(params: #{params})"
       end
     end
@@ -608,7 +608,7 @@ module Rubi
       Proc.new do |proc_params:, lexical_hash:|
         new_lexical_hash = lexical_hash.merge(build_lexical_hash) # 関数の引数を引き継ぐ
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
-        puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, new_lexical_hash: #{new_lexical_hash})"
+        puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
         puts "#{nest}1. new_lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
 
         # オプショナル引数を分ける
@@ -622,7 +622,7 @@ module Rubi
 
         # 通常引数の対応
         normal_params.each.with_index do |param, index|
-          puts "#{nest}  1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, new_lexical_hash: #{new_lexical_hash})"
+          puts "#{nest}  1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
           new_lexical_hash[param] = eval(proc_params[index], new_lexical_hash, stack_count + 2)
         end
 
@@ -633,16 +633,16 @@ module Rubi
           var_name, default_value = param
           puts "#{nest}オプショナル引数(#{optional_params})を設定する(var_name: #{var_name}, value: #{value}, default_value: #{default_value})"
           if value
-            puts "#{nest}  2.1 変数を展開するために、評価する new_lexical_hash[#{var_name}] = (value: #{value}, new_lexical_hash: #{new_lexical_hash})"
+            puts "#{nest}  2.1 変数を展開するために、評価する new_lexical_hash[#{var_name}] = (value: #{value}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
             new_lexical_hash[var_name] = eval(value, new_lexical_hash, stack_count + 2)
           else
-            puts "#{nest}  2.2 引数の指定がないため、デフォルト値を採用する new_lexical_hash[#{var_name}] = (value: #{value}, new_lexical_hash: #{new_lexical_hash})"
+            puts "#{nest}  2.2 引数の指定がないため、デフォルト値を採用する new_lexical_hash[#{var_name}] = (value: #{value}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
             new_lexical_hash[var_name] = default_value
           end
         end
 
-        puts "#{nest}-> new_lexical_hash: #{new_lexical_hash}"
-        puts "#{nest}2. lambdaを実行する(expression: #{expression}, new_lexical_hash: #{new_lexical_hash})"
+        puts "#{nest}-> new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash}"
+        puts "#{nest}2. lambdaを実行する(expression: #{expression}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
         eval(expression, new_lexical_hash, stack_count + 1)
       end
     end
@@ -650,7 +650,7 @@ module Rubi
     # マクロ定義
     def build_macro(params, expression, lexical_hash, stack_count, nest)
       Proc.new do |*proc_params|
-        puts "#{nest}macroの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}macroの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
         params.each.with_index do |param, index|
           # 変数を評価せずに展開する
@@ -660,8 +660,8 @@ module Rubi
           # この時は、lexical_hash: {:var=>:x}) -> varをxに置き換えて実行する
           lexical_hash[param] = proc_params[index]
         end
-        puts "#{nest}-> lexical_hash: #{lexical_hash}"
-        puts "#{nest}2. macroを実行する(expression: #{expression}, lexical_hash: #{lexical_hash})"
+        puts "#{nest}-> lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
+        puts "#{nest}2. macroを実行する(expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         expanded = eval(expression, lexical_hash, stack_count + 1)
         puts "#{nest}-> 展開した式: #{expanded}"
         expanded
