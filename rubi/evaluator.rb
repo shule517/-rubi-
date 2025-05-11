@@ -88,6 +88,7 @@ module Rubi
       # 組み込み関数の定義
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
       lisp_eval("(defun 1+ (x) (+ x 1))")
+      lisp_eval("(defun zerop (n) (= n 0))")
       lisp_eval(<<~LISP)
         (defun length (lst)
           (if (null lst)
@@ -106,6 +107,20 @@ module Rubi
             )
           )
         )
+      LISP
+
+      # incf
+      lisp_eval(<<~LISP)
+        (defmacro incf(x)
+          `(setq x (+ x 1)))
+      LISP
+
+      # nth
+      lisp_eval(<<~LISP)
+        (defun nth (index lst)
+          (let ((result lst))
+            (dotimes (n index (car result))
+              (setq result (cdr result)))))
       LISP
 
       # TODO: 要リファクタリング。sortをLispで実装してみた。
@@ -136,7 +151,8 @@ module Rubi
 
       # TODO: compileを仮実装
       lisp_eval("(defun compile (x) nil)")
-      lisp_eval("(defun compiled-function-p (x) t)")
+      lisp_eval("(defun compiled-function-p (x) nil)")
+      lisp_eval("(defun proclaim (x) nil)")
 
       puts "#### ↑ 初期化 ↑ ####"
     end
@@ -221,10 +237,14 @@ module Rubi
           puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
           if lexical_hash.key?(var_name)
             # ローカル変数がある場合は、ローカル変数を変更する
-            lexical_hash[var_name] = value
+            newvalue = eval(value, lexical_hash, stack_count + 1)
+            puts "#{nest}ローカル変数がある場合は、ローカル変数を変更する(var_name: #{var_name}, newvalue: #{newvalue})"
+            lexical_hash[var_name] = newvalue
           else
             # ローカル変数がない場合は、グローバル変数を定義する
-            var_hash[var_name] = eval(value, lexical_hash, stack_count + 1)
+            newvalue = eval(value, lexical_hash, stack_count + 1)
+            puts "#{nest}ローカル変数がない場合は、グローバル変数を定義する(var_name: #{var_name}, newvalue: #{newvalue})"
+            var_hash[var_name] = newvalue
             puts "#{nest}-> var_hash: #{var_hash}"
             var_hash[var_name]
           end
@@ -509,13 +529,17 @@ module Rubi
       elsif function == :dotimes
         a, b = params
         puts "#{nest}#{function}(a: #{a}, b: #{b} lexical_hash: #{lexical_hash})"
-        var, number = a
+        var, number, result = a
+        puts "#{nest}1. ループ回数を評価する(number: #{number}, lexical_hash: #{lexical_hash})"
         number = eval(number, lexical_hash, stack_count + 1)
+        new_lexical_hash = lexical_hash.dup
         number.times.with_index do |index|
-          new_lexical_hash = lexical_hash.dup
           new_lexical_hash[var] = index
+          puts "#{nest}2. #{index + 1}ループ目(b: #{b}, new_lexical_hash: #{new_lexical_hash})"
           eval(b, new_lexical_hash, stack_count + 1)
         end
+        new_lexical_hash[var] = number # dotimesはループ終わったがタイミングで、変数 = ループ回数 になっている仕様っぽい
+        eval(result, new_lexical_hash, stack_count + 1)
       elsif function == :progn
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last
