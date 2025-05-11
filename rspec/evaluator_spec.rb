@@ -550,18 +550,82 @@ describe Rubi::Evaluator do
         end
       end
 
-      context '&optionalの引数' do
-        let(:str) do
-          # TODO: サンプルコードを変更する
-          <<~LISP
+      context 'オプション引数(&optional)' do
+        context 'デフォルト値を省略した場合は、nilになる' do
+          let(:str) do
+            <<~LISP
+              (defun foo (a b &optional c d)
+                (format t "a=~a b=~a c=~a d=~a~%" a b c d))
+              
+              (foo 2 3 4)     ;=> a=2 b=3 c=4 d=NIL
+            LISP
+          end
+          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+        end
+
+        context 'デフォルト値を指定した場合' do
+          let(:str) do
+            <<~LISP
+              (defun foo (a b &optional (c -1) (d -1))
+                (format t "a=~a b=~a c=~a d=~a~%" a b c d))
+              
+              (foo 2 3 4)     ;=> a=2 b=3 c=4 d=-1
+            LISP
+          end
+          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+        end
+
+        context 'OnLispのサンプルコード' do
+          let(:str) do
+            # TODO: サンプルコードを変更する
+            <<~LISP
             (lambda (x &optional change)
                     (if change
                        (setq n x)
                        (+ x n))))
           LISP
-         end
-         it { is_expected.to eq 9 } # 最後の結果が返ってくる
-       end
+          end
+          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+        end
+      end
+
+      context '残り引数(&rest)' do
+        let(:str) do
+          <<~LISP
+            (defun foo (a b &rest values)
+            (format t "a=~a b=~a values=~a~%" a b values))
+            
+            (foo 2 3 4 5 6)    ;=> a=2 b=3 values=(4 5 6)
+          LISP
+        end
+        it { is_expected.to eq 9 } # 最後の結果が返ってくる
+      end
+
+      context 'キーワード引数(&key)' do
+        context 'デフォルト値を省略した場合は、nilになる' do
+          let(:str) do
+            <<~LISP
+              (defun foo (&key a b c d)
+                (format t "a=~d b=~d c=~d d=~d~%" a b c d))
+              
+              (foo :d 10 :c 20)   ;=> a=NIL b=NIL c=20 d=10
+            LISP
+          end
+          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+        end
+
+        context 'デフォルト値を指定した場合' do
+          let(:str) do
+            <<~LISP
+              (defun foo (&key (a 0) (b 0) (c 0) (d 0))
+                (format t "a=~d b=~d c=~d d=~d~%" a b c d))
+              
+              (foo :d 10 :c 20)   ;=> a=0 b=0 c=20 d=10
+            LISP
+          end
+          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+        end
+      end
 
       context '実行する式が複数ある場合' do
         context '最後の結果が返ってくる' do
