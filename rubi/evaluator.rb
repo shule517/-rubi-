@@ -606,7 +606,8 @@ module Rubi
     # 関数定義
     def build_lambda(params, expression, build_lexical_hash, stack_count, nest)
       Proc.new do |proc_params:, lexical_hash:|
-        new_lexical_hash = lexical_hash.merge(build_lexical_hash) # 関数の引数を引き継ぐ
+        lexical_hash.merge!(build_lexical_hash) # 関数の引数を引き継ぐ
+        new_lexical_hash = lexical_hash
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
         puts "#{nest}1. new_lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
