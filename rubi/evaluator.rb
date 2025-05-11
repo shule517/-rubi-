@@ -545,7 +545,7 @@ module Rubi
         new_lexical_hash = lexical_hash.dup
         number.times.with_index do |index|
           new_lexical_hash[var] = index
-          puts "#{nest}2. #{index + 1}ループ目(b: #{b}, new_lexical_hash(object_id: #{lexical_hash.object_id}): #{new_lexical_hash})"
+          puts "#{nest}2. #{index + 1}ループ目(b: #{b}, new_lexical_hash(object_id: #{new_lexical_hash.object_id}): #{new_lexical_hash})"
           eval(b, new_lexical_hash, stack_count + 1)
         end
         new_lexical_hash[var] = number # dotimesはループ終わったがタイミングで、変数 = ループ回数 になっている仕様っぽい
