@@ -600,10 +600,37 @@ module Rubi
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, new_lexical_hash: #{new_lexical_hash})"
         puts "#{nest}1. new_lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
-        params.each.with_index do |param, index|
+
+        # オプショナル引数を分ける
+        optional_index = params.index(:"&optional")
+        if optional_index
+          normal_params = params[0...optional_index]
+          optional_params = params[optional_index+1..]
+        else
+          normal_params = params
+        end
+
+        # 通常引数の対応
+        normal_params.each.with_index do |param, index|
           puts "#{nest}  1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, new_lexical_hash: #{new_lexical_hash})"
           new_lexical_hash[param] = eval(proc_params[index], new_lexical_hash, stack_count + 2)
         end
+
+        # オプショナル引数の対応
+        Array(optional_params).each.with_index do |param, index|
+          proc_params_index = index + normal_params.size
+          value = proc_params[proc_params_index]
+          var_name, default_value = param
+          puts "#{nest}オプショナル引数(#{optional_params})を設定する(var_name: #{var_name}, value: #{value}, default_value: #{default_value})"
+          if value
+            puts "#{nest}  2.1 変数を展開するために、評価する new_lexical_hash[#{var_name}] = (value: #{value}, new_lexical_hash: #{new_lexical_hash})"
+            new_lexical_hash[var_name] = eval(value, new_lexical_hash, stack_count + 2)
+          else
+            puts "#{nest}  2.2 引数の指定がないため、デフォルト値を採用する new_lexical_hash[#{var_name}] = (value: #{value}, new_lexical_hash: #{new_lexical_hash})"
+            new_lexical_hash[var_name] = default_value
+          end
+        end
+
         puts "#{nest}-> new_lexical_hash: #{new_lexical_hash}"
         puts "#{nest}2. lambdaを実行する(expression: #{expression}, new_lexical_hash: #{new_lexical_hash})"
         eval(expression, new_lexical_hash, stack_count + 1)

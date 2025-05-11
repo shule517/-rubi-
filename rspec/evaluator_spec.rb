@@ -551,41 +551,80 @@ describe Rubi::Evaluator do
       end
 
       context 'オプション引数(&optional)' do
-        context 'デフォルト値を省略した場合は、nilになる' do
-          let(:str) do
-            <<~LISP
-              (defun foo (a b &optional c d)
-                (format t "a=~a b=~a c=~a d=~a~%" a b c d))
-              
-              (foo 2 3 4)     ;=> a=2 b=3 c=4 d=NIL
-            LISP
+        context '引数を渡してない場合は、nilになる' do
+          context 'すべて引数を設定した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional c d)
+                  (list a b c d))
+                
+                (foo 2 3 4 5) ;=> a=2 b=3 c=4 d=5
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, 5] }
           end
-          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+
+          context '１つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional c d)
+                  (list a b c d))
+                
+                (foo 2 3 4) ;=> a=2 b=3 c=4 d=NIL
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, nil] }
+          end
+
+          context '２つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional c d)
+                  (list a b c d))
+                
+                (foo 2 3) ;=> a=2 b=3 c=nil d=nil
+              LISP
+            end
+            it { is_expected.to eq [2, 3, nil, nil] }
+          end
         end
 
         context 'デフォルト値を指定した場合' do
-          let(:str) do
-            <<~LISP
-              (defun foo (a b &optional (c -1) (d -1))
-                (format t "a=~a b=~a c=~a d=~a~%" a b c d))
-              
-              (foo 2 3 4)     ;=> a=2 b=3 c=4 d=-1
-            LISP
-          end
-          it { is_expected.to eq 9 } # 最後の結果が返ってくる
-        end
+          context 'すべて引数を設定した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional (c -1) (d -2))
+                  (list a b c d))
 
-        context 'OnLispのサンプルコード' do
-          let(:str) do
-            # TODO: サンプルコードを変更する
-            <<~LISP
-              (lambda (x &optional change)
-                      (if change
-                         (setq n x)
-                         (+ x n))))
-            LISP
+                (foo 2 3 4 5) ;=> a=2 b=3 c=4 d=5
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, 5] }
           end
-          it { is_expected.to eq 9 } # 最後の結果が返ってくる
+
+          context '１つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional (c -1) (d -2))
+                  (list a b c d))
+                
+                (foo 2 3 4) ;=> a=2 b=3 c=4 d=-2
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, -2] }
+          end
+
+          context '２つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional (c -1) (d -2))
+                  (list a b c d))
+                
+                (foo 2 3) ;=> a=2 b=3 c=-1 d=-2
+              LISP
+            end
+            it { is_expected.to eq [2, 3, -1, -2] }
+          end
         end
       end
 
@@ -723,6 +762,84 @@ describe Rubi::Evaluator do
           LISP
         end
         it { is_expected.to eq 3 }
+      end
+
+      context 'オプション引数(&optional)' do
+        context '引数を渡してない場合は、nilになる' do
+          context 'すべて引数を設定した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional c d)
+                  (list a b c d))
+                
+                (foo 2 3 4 5) ;=> a=2 b=3 c=4 d=5
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, 5] }
+          end
+
+          context '１つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional c d)
+                  (list a b c d))
+                
+                (foo 2 3 4) ;=> a=2 b=3 c=4 d=NIL
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, nil] }
+          end
+
+          context '２つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional c d)
+                  (list a b c d))
+                
+                (foo 2 3) ;=> a=2 b=3 c=nil d=nil
+              LISP
+            end
+            it { is_expected.to eq [2, 3, nil, nil] }
+          end
+        end
+
+        context 'デフォルト値を指定した場合' do
+          context 'すべて引数を設定した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional (c -1) (d -2))
+                  (list a b c d))
+
+                (foo 2 3 4 5) ;=> a=2 b=3 c=4 d=5
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, 5] }
+          end
+
+          context '１つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional (c -1) (d -2))
+                  (list a b c d))
+                
+                (foo 2 3 4) ;=> a=2 b=3 c=4 d=-2
+              LISP
+            end
+            it { is_expected.to eq [2, 3, 4, -2] }
+          end
+
+          context '２つ省略した場合' do
+            let(:str) do
+              <<~LISP
+                (defun foo (a b &optional (c -1) (d -2))
+                  (list a b c d))
+                
+                (foo 2 3) ;=> a=2 b=3 c=-1 d=-2
+              LISP
+            end
+            it { is_expected.to eq [2, 3, -1, -2] }
+          end
+        end
       end
 
       context '関数を定義して実行する(double)' do
@@ -3507,7 +3624,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 4 }
         end
 
-        context "TODO: &optionalが未実装 (funcall addx 100 t)" do
+        context "(funcall addx 100 t)" do
           let(:str) do
             <<~LISP
               (defun make-adderb (n)
