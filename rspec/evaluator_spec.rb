@@ -2116,8 +2116,16 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq nil }
       end
-    end
 
+      context "TODO: 普通にバグってる。OnLispのサンプルコード" do
+        let(:str) do
+          <<~LISP
+            (mapcar #'copy-tree '((a b) (c d e)))
+          LISP
+        end
+        it { is_expected.to eq [[:a, :b], [:c, :d, :e]] }
+      end
+    end
 
     describe '#=' do
       context '式同士' do
@@ -3025,17 +3033,6 @@ describe Rubi::Evaluator do
       end
     end
 
-    describe '#copy-tree' do
-      context "OnLispのサンプルコード" do
-        let(:str) do
-          <<~LISP
-            (mapcar #'copy-tree '((a b) (c d e)))
-          LISP
-        end
-        it { is_expected.to eq [[:a, :b], [:c, :d, :e]] }
-      end
-    end
-
     describe '#get' do
       context 'グローバル変数を取得する' do
         let(:str) do
@@ -3801,7 +3798,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [4, 7, 9, 5] }
         end
 
-        context "TODO: copy-treeが未実装 (mapcar #'copy-tree '((a b) (c d e)))" do
+        context "TODO: 普通にバグってる。(mapcar #'copy-tree '((a b) (c d e)))" do
           let(:str) do
             <<~LISP
               (mapcar #'copy-tree '((a b) (c d e)))

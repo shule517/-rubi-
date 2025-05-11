@@ -84,6 +84,11 @@ module Rubi
         end
       end
 
+      func_hash[:"copy-tree"] = Proc.new do |proc_params:, lexical_hash:|
+        a = proc_params.shift
+        eval(a, lexical_hash, stack_count + 1).dup #TODO: ほんとはdeep_dupしたい
+      end
+
       # TODO: 遅くなってる。高速化したい。
       # 組み込み関数の定義
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
@@ -460,10 +465,6 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         true if a.eql?(b) # 一致しない場合は、nilを返す
-      elsif function == :"copy-tree"
-        puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
-        a = params.shift
-        eval(a, lexical_hash, stack_count + 1).dup
       elsif function == :"="
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         a, b = params.map { |a| eval(a, lexical_hash, stack_count + 1) }
