@@ -203,7 +203,7 @@ module Rubi
         puts "#{nest}#{function}(var_params: #{var_params}, expressions: #{expressions})"
         # レキシカル変数(next_lexical_hash)を定義する
         puts "#{nest}#レキシカル変数を定義する"
-        next_lexical_hash = lexical_hash# TODO: 必要なのか？ → .dup
+        next_lexical_hash = lexical_hash.dup
         var_params.each do |var_name, value|
           next_lexical_hash[var_name] = eval(value, next_lexical_hash, stack_count + 1)
         end
@@ -213,6 +213,7 @@ module Rubi
           puts "#{nest}#{index + 1}ループ目(expression: #{expression}, next_lexical_hash: #{next_lexical_hash})"
           result = eval(expression, next_lexical_hash, stack_count + 1)
           puts "#{nest}-> #{result}(next_lexical_hash: #{next_lexical_hash})"
+          result
         end.last
       elsif function == :'let*' # TODO: letをコピーしただけ
         var_params = params.shift
