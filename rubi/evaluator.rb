@@ -88,6 +88,7 @@ module Rubi
       # 組み込み関数の定義
       lisp_eval("(defun evenp (x) (= (mod x 2) 0))")
       lisp_eval("(defun 1+ (x) (+ x 1))")
+      lisp_eval("(defun zerop (n) (= n 0))")
       lisp_eval(<<~LISP)
         (defun length (lst)
           (if (null lst)
@@ -141,7 +142,8 @@ module Rubi
 
       # TODO: compileを仮実装
       lisp_eval("(defun compile (x) nil)")
-      lisp_eval("(defun compiled-function-p (x) t)")
+      lisp_eval("(defun compiled-function-p (x) nil)")
+      lisp_eval("(defun proclaim (x) nil)")
 
       puts "#### ↑ 初期化 ↑ ####"
     end
@@ -514,13 +516,15 @@ module Rubi
       elsif function == :dotimes
         a, b = params
         puts "#{nest}#{function}(a: #{a}, b: #{b} lexical_hash: #{lexical_hash})"
-        var, number = a
+        var, number, result = a
         number = eval(number, lexical_hash, stack_count + 1)
+        new_lexical_hash = lexical_hash.dup
         number.times.with_index do |index|
-          new_lexical_hash = lexical_hash.dup
           new_lexical_hash[var] = index
           eval(b, new_lexical_hash, stack_count + 1)
         end
+        new_lexical_hash[var] = number # dotimesはループ終わったがタイミングで、変数 = ループ回数 になっている仕様っぽい
+        eval(result, new_lexical_hash, stack_count + 1)
       elsif function == :progn
         puts "#{nest}#{function}(params: #{params}, lexical_hash: #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last

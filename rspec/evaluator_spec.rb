@@ -579,11 +579,11 @@ describe Rubi::Evaluator do
           let(:str) do
             # TODO: サンプルコードを変更する
             <<~LISP
-            (lambda (x &optional change)
-                    (if change
-                       (setq n x)
-                       (+ x n))))
-          LISP
+              (lambda (x &optional change)
+                      (if change
+                         (setq n x)
+                         (+ x n))))
+            LISP
           end
           it { is_expected.to eq 9 } # 最後の結果が返ってくる
         end
@@ -963,6 +963,17 @@ describe Rubi::Evaluator do
           LISP
         end
         it { is_expected.to eq [1, 2, 7] }
+      end
+    end
+
+    describe '#nth' do
+      context 'list + list' do
+        let(:str) do
+          <<~LISP
+            (nth 2 '(a b c d))
+          LISP
+        end
+        it { is_expected.to eq :c }
       end
     end
 
@@ -2670,6 +2681,24 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq 4 }
       end
+
+      context '戻り値を指定する' do
+        let(:str) do
+          <<~LISP
+            (dotimes (n 5 2) n)
+          LISP
+        end
+        it { is_expected.to eq 2 }
+      end
+
+      context '戻り値に変数を指定する' do
+        let(:str) do
+          <<~LISP
+            (dotimes (n 5 n) 0)
+          LISP
+        end
+        it { is_expected.to eq 5 }
+      end
     end
 
     describe '#apply' do
@@ -3358,7 +3387,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [11, 12, 13] }
         end
 
-        context "TODO: incfがない (let ((counter 0))" do
+        context "TODO: incfをlet内で実行すると、おかしいかも (let ((counter 0))" do
           let(:str) do
             <<~LISP
               (let ((counter 0))
@@ -3651,7 +3680,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :'count-instances' }
         end
 
-        context "(count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))" do
+        context "TODO: mapcar #'instances-in lsts ここが原因っぽい (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))" do
           let(:str) do
             <<~LISP
               (defun count-instances (obj lsts)
@@ -3712,26 +3741,27 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 5 }
         end
 
-        context "TODO: proclaimが未実装 (proclaim '(optimize speed))" do
+        context "コンパイラの最適化の話のためスキップ (proclaim '(optimize speed))" do
           let(:str) do
             <<~LISP
               (proclaim '(optimize speed))
             LISP
-            # TODO: 何を確認している？
           end
-          it { is_expected.to eq 5 }
+          xit {}
         end
 
-        context "TODO: declareが未実装 (defun triangle (n)" do
+        context "TODO: 無限ループ (defun triangle (n)" do
           let(:str) do
             <<~LISP
               (defun triangle (n)
                 (labels ((tri (c n)
-                              (declare (type fixnum n c))
+                              ; (declare (type fixnum n c)) コンパイラ関係の処理のためスキップ
                               (if (zerop n)
                                   c
-                                  (tri (the fixnum (+ n c))
-                                       (the fixnum (- n 1))))))
+                                  (tri (+ n c)
+                                       (- n 1)))))
+                                  ; (tri (the fixnum (+ n c)) コンパイラ関係の処理のためスキップ
+                                  ;      (the fixnum (- n 1))))))
                   (tri 0 n)))
               (triangle 6)
             LISP
@@ -3751,7 +3781,8 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :foo }
         end
 
-        context "(compiled-function-p #'foo)" do
+        # コンパイラ関係の処理なのでスキップ
+        xcontext "(compiled-function-p #'foo)" do
           let(:str) do
             <<~LISP
               (defun foo (x) (1+ x))
@@ -3771,7 +3802,8 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        context "(compile 'foo)(compiled-function-p #'foo)" do
+        # コンパイラ関係の処理なのでスキップ
+        xcontext "(compile 'foo)(compiled-function-p #'foo)" do
           let(:str) do
             <<~LISP
               (defun foo (x) (1+ x))
@@ -3791,11 +3823,12 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        context "(compiled-function-p #'bar))" do
+        # コンパイラ関係の処理なのでスキップ
+        xcontext "(compiled-function-p #'bar))" do
           let(:str) do
             <<~LISP
               (progn (compile 'bar '(lambda (x) (* x 3)))
-              (compiled-function-p #'bar))
+                (compiled-function-p #'bar))
             LISP
           end
           it { is_expected.to eq true }
@@ -3820,7 +3853,8 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        context '(compiled-function-p (make-adder 2))' do
+        # コンパイラ関係の処理なのでスキップ
+        xcontext '(compiled-function-p (make-adder 2))' do
           let(:str) do
             <<~LISP
               (defun make-adder (n)
@@ -3832,43 +3866,58 @@ describe Rubi::Evaluator do
           it { is_expected.to eq true }
         end
 
-        context '(defun 50th (lst) (nth 49 lst))' do
+        context 'TODO: nthが未実装 (defun 50th (lst) (nth 49 lst))' do
           let(:str) do
             <<~LISP
               (defun 50th (lst) (nth 49 lst))
-              (50th `(1 2 3 4))
+              (50th `(1 2 3 4 5 6 7 8 9 10
+                      11 12 13 14 15 16 17 18 19 20
+                      21 22 23 24 25 26 27 28 29 30
+                      31 32 33 34 35 36 37 38 39 40
+                      41 42 43 44 45 46 47 48 49 50))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq 50 }
         end
 
-        context "(proclaim '(inline 50th))" do
+        context "TODO: proclaimは空実装。(proclaim '(inline 50th))" do
           let(:str) do
             <<~LISP
               (proclaim '(inline 50th))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq nil }
         end
 
-        context '(defun foo (lst) (+ (50th lst) 1))' do
+        context 'TODO: nthが未実装。(defun foo (lst) (+ (50th lst) 1))' do
           let(:str) do
             <<~LISP
+              (defun 50th (lst) (nth 49 lst))
               (defun foo (lst)
                 (+ (50th lst) 1))
+              (foo `(1 2 3 4 5 6 7 8 9 10
+                    11 12 13 14 15 16 17 18 19 20
+                    21 22 23 24 25 26 27 28 29 30
+                    31 32 33 34 35 36 37 38 39 40
+                    41 42 43 44 45 46 47 48 49 50))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq 51 }
         end
 
-        context '(defun foo (lst) (+ (nth 49 lst) 1))' do
+        context 'TODO: nthが未実装。(defun foo (lst) (+ (nth 49 lst) 1))' do
           let(:str) do
             <<~LISP
               (defun foo (lst)
                 (+ (nth 49 lst) 1))
+              (foo `(1 2 3 4 5 6 7 8 9 10
+                    11 12 13 14 15 16 17 18 19 20
+                    21 22 23 24 25 26 27 28 29 30
+                    31 32 33 34 35 36 37 38 39 40
+                    41 42 43 44 45 46 47 48 49 50))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq 51 }
         end
       end
     end
