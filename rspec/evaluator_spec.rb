@@ -967,13 +967,24 @@ describe Rubi::Evaluator do
     end
 
     describe '#nth' do
-      context 'list + list' do
-        let(:str) do
-          <<~LISP
-            (nth 2 '(a b c d))
-          LISP
-        end
+      context 'index:0の場合' do
+        let(:str) { "(nth 0 '(a b c))" }
+        it { is_expected.to eq :a }
+      end
+
+      context 'index:1の場合' do
+        let(:str) { "(nth 1 '(a b c))" }
+        it { is_expected.to eq :b }
+      end
+
+      context 'index:2の場合' do
+        let(:str) { "(nth 2 '(a b c))" }
         it { is_expected.to eq :c }
+      end
+
+      context 'indexがはみ出した場合' do
+        let(:str) { "(nth 3 '(a b c))" }
+        it { is_expected.to eq nil }
       end
     end
 
@@ -3866,7 +3877,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq true }
         end
 
-        context 'TODO: nthが未実装 (defun 50th (lst) (nth 49 lst))' do
+        context '(defun 50th (lst) (nth 49 lst))' do
           let(:str) do
             <<~LISP
               (defun 50th (lst) (nth 49 lst))
@@ -3889,7 +3900,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        context 'TODO: nthが未実装。(defun foo (lst) (+ (50th lst) 1))' do
+        context '(defun foo (lst) (+ (50th lst) 1))' do
           let(:str) do
             <<~LISP
               (defun 50th (lst) (nth 49 lst))
@@ -3905,7 +3916,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 51 }
         end
 
-        context 'TODO: nthが未実装。(defun foo (lst) (+ (nth 49 lst) 1))' do
+        context '(defun foo (lst) (+ (nth 49 lst) 1))' do
           let(:str) do
             <<~LISP
               (defun foo (lst)
