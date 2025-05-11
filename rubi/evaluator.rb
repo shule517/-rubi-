@@ -108,6 +108,11 @@ module Rubi
         )
       LISP
 
+      lisp_eval(<<~LISP)
+        (defmacro incf(x)
+          `(setq x (+ x 1)))
+      LISP
+
       # TODO: 要リファクタリング。sortをLispで実装してみた。
       # lisp_eval(<<~LISP)
       #   (defun private-sort (lst func)
