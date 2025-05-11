@@ -4250,7 +4250,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(defun exclaim (expression) (append expression '(oh my)))" do
           let(:str) do
             <<~LISP
               (defun exclaim (expression)
@@ -4282,7 +4282,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(defun exclaim (expression) (append expression (list 'oh 'my)))" do
           let(:str) do
             <<~LISP
               (defun exclaim (expression)
@@ -4296,7 +4296,7 @@ describe Rubi::Evaluator do
 
     context '4. ユーティリティ関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/utilityFunctions.html' do
       context 'ユーティリティの誕生' do
-        context "" do
+        context "(defun all-nicknames (names)" do
           let(:str) do
             <<~LISP
               (defun all-nicknames (names)
@@ -4309,7 +4309,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(mapcan #'nicknames people)" do
           let(:str) do
             <<~LISP
               (mapcan #'nicknames people)
@@ -4318,7 +4318,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(let ((town (find-if #'bookshops towns))) (values town (bookshops town)))" do
           let(:str) do
             <<~LISP
               (let ((town (find-if #'bookshops towns)))
@@ -4328,7 +4328,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(defun find-books (towns)" do
           let(:str) do
             <<~LISP
               (defun find-books (towns)
@@ -4343,7 +4343,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(defun find2 (fn lst)" do
           let(:str) do
             <<~LISP
               (defun find2 (fn lst)
@@ -4358,7 +4358,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(find2 #'bookshops towns)" do
           let(:str) do
             <<~LISP
               (find2 #'bookshops towns)
@@ -4389,7 +4389,7 @@ describe Rubi::Evaluator do
       end
 
       context 'リストに対する操作' do
-        context "" do
+        context "(proclaim '(inline last1 single append1 conc1 mklist))" do
           let(:str) do
             <<~LISP
               (proclaim '(inline last1 single append1 conc1 mklist))
@@ -4424,7 +4424,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(= (length lst) 1)" do
           let(:str) do
             <<~LISP
               (= (length lst) 1)
@@ -4433,7 +4433,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(mapcan #'(lambda (d) (mklist (lookup d))) data)" do
           let(:str) do
             <<~LISP
               (mapcan #'(lambda (d) (mklist (lookup d)))
@@ -4443,7 +4443,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(> (length x) (length y))" do
           let(:str) do
             <<~LISP
               (> (length x) (length y))
@@ -4452,15 +4452,14 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "TODO: filterが未実装。(filter #'(lambda (x) (if (numberp x) (1+ x))) '(a 1 2 b 3 c d 4))" do
           let(:str) do
             <<~LISP
-              > (filter #'(lambda (x) (if (numberp x) (1+ x)))
-                  '(a 1 2 b 3 c d 4))
-              (2 3 4 5)
+              (filter #'(lambda (x) (if (numberp x) (1+ x)))
+                '(a 1 2 b 3 c d 4)) ; => (2 3 4 5)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [2, 3, 4, 5] }
         end
 
         context "" do
@@ -4495,14 +4494,13 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "TODO: groupが未実装。(group '(a b c d e f g) 2)" do
           let(:str) do
             <<~LISP
-              > (group '(a b c d e f g) 2)
-              ((A B) (C D) (E F) (G))
+              (group '(a b c d e f g) 2) ; => ((A B) (C D) (E F) (G))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [[:a, :b], [:c, :d], [:e, :f], [:g]] }
         end
 
         context "" do
@@ -4531,24 +4529,22 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "TODO: flattenが未実装。(flatten '(a (b c) ((d e) f)))" do
           let(:str) do
             <<~LISP
-              > (flatten '(a (b c) ((d e) f)))
-              (A B C D E F)
+              (flatten '(a (b c) ((d e) f))) ; => (A B C D E F)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [:a, :b, :c, :d, :e, :f] }
         end
 
-        context "" do
+        context "TODO: pruneが未実装。(prune #'evenp '(1 2 (3 (4 5) 6) 7 8 (9)))" do
           let(:str) do
             <<~LISP
-              > (prune #'evenp '(1 2 (3 (4 5) 6) 7 8 (9)))
-              (1 (3 (5)) 7 (9))
+              (prune #'evenp '(1 2 (3 (4 5) 6) 7 8 (9))) ; => (1 (3 (5)) 7 (9))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [1, [3, [5]], 7, [9]] }
         end
       end
 
