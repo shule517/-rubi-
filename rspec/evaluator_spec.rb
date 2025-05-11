@@ -3547,20 +3547,83 @@ describe Rubi::Evaluator do
         end
 
         context "TODO: incfをlet内で実行すると、おかしいかも (let ((counter 0))" do
-          let(:str) do
-            <<~LISP
-              (let ((counter 0))
-                (defun new-id () (incf counter))
-                (defun reset-id () (setq counter 0))
-                (new-id)
-                (reset-id)
-                (new-id)
-                (new-id)
-                counter
-              )
-            LISP
+          context '元のコード' do
+            let(:str) do
+              <<~LISP
+                (let ((counter 0))
+                  (defun new-id () (incf counter))
+                  (defun reset-id () (setq counter 0))
+                  (new-id)
+                  (reset-id)
+                  (new-id)
+                  (new-id)
+                  counter)
+              LISP
+            end
+            it { is_expected.to eq 2 }
           end
-          it { is_expected.to eq 2 }
+
+          context 'incfをsetqに置き換えた' do
+            let(:str) do
+              <<~LISP
+                (let ((counter 0))
+                  (defun new-id () (setq counter (+ counter 1)))
+                  (defun reset-id () (setq counter 0))
+                  (new-id)
+                  (reset-id)
+                  (new-id)
+                  (new-id)
+                  counter)
+              LISP
+            end
+            it { is_expected.to eq 2 }
+          end
+
+          context 'incfをsetqに置き換えたxxx' do
+            let(:str) do
+              <<~LISP
+                (let ((counter 0))
+                  (defun new-id () (setq counter (+ counter 1)))
+                  (defun reset-id () (setq counter 0))
+                  (new-id)
+                  ; (reset-id)
+                  ; (new-id)
+                  ; (new-id)
+                  counter)
+              LISP
+            end
+            it { is_expected.to eq 1 }
+          end
+
+          context '関数経由でsetqを実行する' do
+            let(:str) do
+              <<~LISP
+                (let ((counter 0))
+                  (setq counter (+ counter 1))
+                  (defun reset-id () (setq counter 0))
+                  (reset-id)
+                  counter)
+              LISP
+            end
+            it { is_expected.to eq 0 }
+          end
+
+          context '関数を使わずに直接setqを実行する' do
+            let(:str) do
+              <<~LISP
+                (let ((counter 0))
+                  (setq counter (+ counter 1))
+                  ; (defun new-id () (setq counter (+ counter 1)))
+                  ; (defun reset-id () (setq counter 0))
+                  ; (new-id)
+                  ; (reset-id)
+                  ; (new-id)
+                  ; (new-id)
+                  counter)
+              LISP
+            end
+            it { is_expected.to eq 1 }
+          end
         end
 
         context "(defun make-adder (n)" do
