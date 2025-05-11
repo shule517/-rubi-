@@ -247,6 +247,7 @@ module Rubi
           puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
           if lexical_hash.key?(var_name)
             # ローカル変数がある場合は、ローカル変数を変更する
+            puts "#{nest}ローカル変数を見つけた(#{var_name}) => lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
             newvalue = eval(value, lexical_hash, stack_count + 1)
             lexical_hash[var_name] = newvalue
             puts "#{nest}ローカル変数がある場合は、ローカル変数を変更する(#{var_name} = #{newvalue}) => lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
@@ -609,7 +610,6 @@ module Rubi
         lexical_hash.merge!(build_lexical_hash) # 関数の引数を引き継ぐ
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
 
         # オプショナル引数を分ける
         optional_index = params.index(:"&optional")
@@ -621,12 +621,15 @@ module Rubi
         end
 
         # 通常引数の対応
+        puts "#{nest}1. lexical_hashに通常引数を展開していく(normal_params: #{normal_params}, proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         normal_params.each.with_index do |param, index|
           puts "#{nest}  1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 2)
         end
+        puts "#{nest}-> 1. lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
 
         # オプショナル引数の対応
+        puts "#{nest}2. lexical_hashにオプショナル引数を展開していく(optional_params: #{optional_params}, proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         Array(optional_params).each.with_index do |param, index|
           proc_params_index = index + normal_params.size
           value = proc_params[proc_params_index]
@@ -641,8 +644,8 @@ module Rubi
           end
         end
 
-        puts "#{nest}-> lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
-        puts "#{nest}2. lambdaを実行する(expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        puts "#{nest}-> 2. lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
+        puts "#{nest}3. lambdaを実行する(expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         eval(expression, lexical_hash, stack_count + 1)
       end
     end
