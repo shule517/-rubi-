@@ -3701,44 +3701,53 @@ describe Rubi::Evaluator do
             <<~LISP
               (progn (compile 'bar '(lambda (x) (* x 3)))
               (compiled-function-p #'bar))
-              ; T
             LISP
           end
           it { is_expected.to eq true }
         end
 
-        context '' do
+        context '(let ((y 2)) (defun foo (x) (+ x y)))' do
           let(:str) do
             <<~LISP
-              > (let ((y 2))
-              (defun foo (x) (+ x y)))
+              (let ((y 2))
+                (defun foo (x) (+ x y)))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq :foo }
         end
 
-        context '' do
+        context "(compile 'make-adder)" do
           let(:str) do
             <<~LISP
-              > (compile 'make-adder)
-              MAKE-ADDER
-              > (compiled-function-p (make-adder 2))
-              T
+              (compile 'make-adder)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq nil }
         end
 
-        context '' do
+        context '(compiled-function-p (make-adder 2))' do
+          let(:str) do
+            <<~LISP
+              (defun make-adder (n)
+                #'(lambda (x) (+ x n)))
+              (compile 'make-adder)
+              (compiled-function-p (make-adder 2))
+            LISP
+          end
+          it { is_expected.to eq true }
+        end
+
+        context '(defun 50th (lst) (nth 49 lst))' do
           let(:str) do
             <<~LISP
               (defun 50th (lst) (nth 49 lst))
+              (50th `(1 2 3 4))
             LISP
           end
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "(proclaim '(inline 50th))" do
           let(:str) do
             <<~LISP
               (proclaim '(inline 50th))
@@ -3747,7 +3756,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '(defun foo (lst) (+ (50th lst) 1))' do
           let(:str) do
             <<~LISP
               (defun foo (lst)
@@ -3757,7 +3766,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '(defun foo (lst) (+ (nth 49 lst) 1))' do
           let(:str) do
             <<~LISP
               (defun foo (lst)
