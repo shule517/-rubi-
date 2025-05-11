@@ -3935,7 +3935,7 @@ describe Rubi::Evaluator do
 
     context '3. 関数的プログラミング: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionalProgramming.html' do
       context '関数的デザイン' do
-        context '(defun bad-reverse (lst)' do
+        context 'TODO: truncateが未実装。(defun bad-reverse (lst)' do
           let(:str) do
             <<~LISP
               (defun bad-reverse (lst)
@@ -3951,7 +3951,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [3, 2, 1] }
         end
 
-        context '(defun bad-reverse (lst)' do
+        context 'TODO: truncateが未実装。(defun bad-reverse (lst)' do
           let(:str) do
             <<~LISP
               (defun bad-reverse (lst)
@@ -3969,7 +3969,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        context '(defun bad-reverse (lst)' do
+        context 'TODO: truncateが未実装。(defun bad-reverse (lst)' do
           let(:str) do
             <<~LISP
               (defun bad-reverse (lst)
@@ -3988,7 +3988,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:c, :b, :a] }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq lst '(a b c))
@@ -4002,7 +4002,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq lst '(a b c))
@@ -4016,7 +4016,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '(defun good-reverse (lst)' do
           let(:str) do
             <<~LISP
               (defun good-reverse (lst)
@@ -4030,7 +4030,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '#TODO: reverseが未実装。(reverse lst)' do
           let(:str) do
             <<~LISP
               (reverse lst)
@@ -4039,7 +4039,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '#TODO: reverseが未実装。(setq lst (reverse lst))' do
           let(:str) do
             <<~LISP
               (setq lst (reverse lst))
@@ -4048,7 +4048,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '#TODO: nreverseが未実装。(nreverse lst)' do
           let(:str) do
             <<~LISP
               (nreverse lst)
@@ -4057,21 +4057,18 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "#TODO: nreverseが未実装。(setq lst '(a b c)) (nreverse lst) lst" do
           let(:str) do
             <<~LISP
-              > (setq lst '(a b c))
-              (A B C)
-              > (nreverse lst)
-              (C B A)
-              > lst
-              (A)
+              (setq lst '(a b c)) ; => (A B C)
+              (nreverse lst) ; => (C B A)
+              lst ; => (A)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [:a] }
         end
 
-        context '' do
+        context '(nconc x y)' do
           let(:str) do
             <<~LISP
               (nconc x y)
@@ -4080,7 +4077,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '(setq x (nconc x y))' do
           let(:str) do
             <<~LISP
               (setq x (nconc x y))
@@ -4089,7 +4086,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               set setq setf psetf psetq incf decf push pop pushnew
@@ -4099,7 +4096,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (truncate 26.21875)
@@ -4110,44 +4107,41 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context 'TODO: truncateが未実装。(= (truncate 26.21875) 26)' do
           let(:str) do
             <<~LISP
-              > (= (truncate 26.21875) 26)
-              T
+              (= (truncate 26.21875) 26) ; => T
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq true }
         end
 
-        context '' do
+        context '(multiple-value-bind (int frac) (truncate 26.21875) (list int frac))' do
           let(:str) do
             <<~LISP
-              > (multiple-value-bind (int frac) (truncate 26.21875)
-                  (list int frac))
-              (26 0.21875)
+              (multiple-value-bind (int frac) (truncate 26.21875) ; => (26 0.21875)
+                (list int frac))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [26, 0.21875] }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
-              > (defun powers (x)
-                  (values x (sqrt x) (expt x 2)))
-              POWERS
-              > (multiple-value-bind (base root square) (powers 4)
-                  (list base root square))
-              (4 2.0 16)
+              (defun powers (x)
+                (values x (sqrt x) (expt x 2))) ; => POWERS
+
+              (multiple-value-bind (base root square) (powers 4)
+                (list base root square)) ; => (4 2.0 16)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [4, 2.0, 16] }
         end
       end
 
       context '命令的プログラミングの裏返し' do
-        context "(defun fun (x)" do
+        context "TODO: exptが未実装。(defun fun (x) (list 'a (expt (car x) 2)))" do
           let(:str) do
             <<~LISP
               (defun fun (x)
@@ -4158,7 +4152,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, 1] }
         end
 
-        context "(defun imp (x)" do
+        context "TODO: exptが未実装。(defun imp (x)" do
           let(:str) do
             <<~LISP
               (defun imp (x)
@@ -4172,7 +4166,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, 1] }
         end
 
-        context "(list 'a (expt y 2)))" do
+        context "TODO: exptが未実装。(list 'a (expt y 2)))" do
           let(:str) do
             <<~LISP
               (list 'a (expt y 2)))
@@ -4181,7 +4175,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, 1] }
         end
 
-        context "(list 'a (expt (car x) 2))" do
+        context "TODO: exptが未実装。(list 'a (expt (car x) 2))" do
           let(:str) do
             <<~LISP
               (list 'a (expt (car x) 2))
@@ -4192,7 +4186,7 @@ describe Rubi::Evaluator do
       end
 
       context '関数的インタフェイス' do
-        context "(defun qualify (expr)" do
+        context "TODO: nconcが未実装。(defun qualify (expr)" do
           let(:str) do
             <<~LISP
               (defun qualify (expr)
@@ -4203,7 +4197,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, 1] }
         end
 
-        context '' do
+        context '(let ((x 0)) (defun total (y) (incf x y)))' do
           let(:str) do
             <<~LISP
               (let ((x 0))
@@ -4214,7 +4208,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "(defun ok (x) (nconc (list 'a x) (list 'c)))" do
           let(:str) do
             <<~LISP
               (defun ok (x)
@@ -4224,7 +4218,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "(defun not-ok (x) (nconc (list 'a) x (list 'c)))" do
           let(:str) do
             <<~LISP
               (defun not-ok (x)
@@ -4234,7 +4228,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context '(defun anything (x) (+ x *anything*))' do
           let(:str) do
             <<~LISP
               (defun anything (x)
@@ -4244,7 +4238,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun f (x)
@@ -4256,7 +4250,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun exclaim (expression)
@@ -4266,7 +4260,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (exclaim '(lions and tigers and bears))
@@ -4278,7 +4272,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (exclaim '(fixnums and bignums and floats))
@@ -4288,7 +4282,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun exclaim (expression)
@@ -4302,7 +4296,7 @@ describe Rubi::Evaluator do
 
     context '4. ユーティリティ関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/utilityFunctions.html' do
       context 'ユーティリティの誕生' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun all-nicknames (names)
@@ -4315,7 +4309,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mapcan #'nicknames people)
@@ -4324,7 +4318,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (let ((town (find-if #'bookshops towns)))
@@ -4334,7 +4328,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun find-books (towns)
@@ -4349,7 +4343,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun find2 (fn lst)
@@ -4364,7 +4358,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (find2 #'bookshops towns)
@@ -4395,7 +4389,7 @@ describe Rubi::Evaluator do
       end
 
       context 'リストに対する操作' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (proclaim '(inline last1 single append1 conc1 mklist))
@@ -4419,7 +4413,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (last1 "blub")
@@ -4430,7 +4424,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (= (length lst) 1)
@@ -4439,7 +4433,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mapcan #'(lambda (d) (mklist (lookup d)))
@@ -4449,7 +4443,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (> (length x) (length y))
@@ -4458,7 +4452,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (filter #'(lambda (x) (if (numberp x) (1+ x)))
@@ -4469,7 +4463,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun longer (x y)
@@ -4501,7 +4495,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (group '(a b c d e f g) 2)
@@ -4511,7 +4505,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun flatten (x)
@@ -4537,7 +4531,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (flatten '(a (b c) ((d e) f)))
@@ -4547,7 +4541,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (prune #'evenp '(1 2 (3 (4 5) 6) 7 8 (9)))
@@ -4559,7 +4553,7 @@ describe Rubi::Evaluator do
       end
 
       context '検索' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun find2 (fn lst)
@@ -4596,7 +4590,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (before 'a 'b '(a b c d))
@@ -4606,7 +4600,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (< (position 'a '(a b c d)) (position 'b '(a b c d)))
@@ -4615,7 +4609,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (before 'a 'b '(a))
@@ -4625,7 +4619,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (after 'a 'b '(b a d))
@@ -4637,7 +4631,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (duplicate 'a '(a b c a d))
@@ -4647,7 +4641,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (split-if #'(lambda (x) (> x 4))
@@ -4659,7 +4653,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun most (fn lst)
@@ -4701,7 +4695,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (most #'length '((a b) (a b c) (a) (e f g)))
@@ -4712,7 +4706,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (best #'> '(1 2 3 4 5))
@@ -4722,7 +4716,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (mostn #'length '((a b) (a b c) (a) (e f g)))
@@ -4735,7 +4729,7 @@ describe Rubi::Evaluator do
       end
 
       context '対応付け' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (map0-n #'1+ 5)
@@ -4745,7 +4739,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (mapa-b #'1+ -2 0 .5)
@@ -4755,7 +4749,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun mapa-b (fn a b &optional (step 1))
@@ -4768,7 +4762,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun our-mapcan (fn &rest lsts)
@@ -4778,7 +4772,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mapcar #'sqrt (append list1 list2))
@@ -4787,7 +4781,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mapcars #'sqrt list1 list2)
@@ -4796,7 +4790,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun map0-n (fn n)
@@ -4821,7 +4815,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun mappend (fn &rest lsts)
@@ -4846,7 +4840,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (rmapcar #'princ '(1 2 (3 4 (5) 6) 7 (8 9)))
@@ -4857,7 +4851,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (rmapcar #'+ '(1 (2 (3) 4)) '(10 (20 (30) 40)))
@@ -4867,7 +4861,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mapa-b #'fn a b c)
@@ -4876,7 +4870,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (collect (#Mfn (scan-range :from a :upto b :by c)))
@@ -4887,7 +4881,7 @@ describe Rubi::Evaluator do
       end
 
       context '入出力' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun readlist (&rest args)
@@ -4912,7 +4906,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (readlist)
@@ -4923,7 +4917,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (prompt "Enter a number between ~A and ~A.~%>> " 1 10)
@@ -4935,7 +4929,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (break-loop #'eval #'(lambda (x) (eq x :q)) ">> ")
@@ -4944,7 +4938,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               >> (+ 2 3)
@@ -4958,7 +4952,7 @@ describe Rubi::Evaluator do
       end
 
       context 'シンボルとストリング' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (mkstr pi " pieces of " 'pi)
@@ -4968,7 +4962,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (symb 'ar "Madi" #\L #\L 0)
@@ -4978,7 +4972,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (let ((s (symb '(a b))))
@@ -4989,7 +4983,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun mkstr (&rest args)
@@ -5012,7 +5006,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (explode 'bomb)
@@ -5063,7 +5057,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, 1] }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun joiner (obj)
@@ -5075,7 +5069,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun join (&rest args)
@@ -5085,7 +5079,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun make-adder (n)
@@ -5095,7 +5089,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq add3 (make-adder 3))
@@ -5107,7 +5101,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun complement (fn)
@@ -5117,7 +5111,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (remove-if (complement #'oddp) '(1 2 3 4 5 6))
@@ -5138,7 +5132,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :red }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defvar *!equivs* (make-hash-table))
@@ -5153,7 +5147,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (def! #'remove-if #'delete-if)
@@ -5162,7 +5156,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (delete-if #'oddp lst)
@@ -5171,7 +5165,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (funcall (! #'remove-if) #'oddp lst)
@@ -5180,7 +5174,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               ((! remove-if) oddp lst)
@@ -5207,7 +5201,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :red }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq slowid (memoize #'(lambda (x) (sleep 5) x)))
@@ -5225,7 +5219,7 @@ describe Rubi::Evaluator do
       end
 
       context '関数を合成する' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun compose (&rest fns)
@@ -5242,7 +5236,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (compose #'list #'1+)
@@ -5251,7 +5245,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               #'(lambda (x) (list (1+ x)))
@@ -5260,7 +5254,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (funcall (compose #'1+ #'find-if) #'oddp '(2 3 4))
@@ -5270,7 +5264,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun complement (pred)
@@ -5280,7 +5274,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun fif (if then &optional else)
@@ -5307,7 +5301,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mapcar #'(lambda (x)
@@ -5320,7 +5314,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mapcar (fif #'slave #'owner #'employer)
@@ -5330,7 +5324,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (find-if #'(lambda (x)
@@ -5341,7 +5335,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (find-if (fint #'signed #'sealed #'delivered) docs)
@@ -5365,7 +5359,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 5 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun our-every (fn lst)
@@ -5378,7 +5372,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun lrec (rec &optional base)
@@ -5396,7 +5390,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (lrec #'(lambda (x f) (1+ (funcall f))) 0)
@@ -5405,7 +5399,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (lrec #'(lambda (x f) (and (oddp x) (funcall f))) t)
@@ -5414,7 +5408,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               ; copy-list
@@ -5432,7 +5426,7 @@ describe Rubi::Evaluator do
       end
 
       context '部分ツリーでの再帰' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (a b c) = (a . (b . (c . nil)))
@@ -5442,7 +5436,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq x '(a b)
@@ -5455,7 +5449,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (eq x (car (copy-tree listx)))
@@ -5465,7 +5459,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun our-copy-tree (tree)
@@ -5478,7 +5472,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun count-leaves (tree)
@@ -5492,7 +5486,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (count-leaves '((a b (c d)) (e) f))
@@ -5502,7 +5496,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (flatten '((a b (c d)) (e) f ()))
@@ -5512,7 +5506,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun flatten (tree)
@@ -5525,7 +5519,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun rfind-if (fn tree)
@@ -5538,7 +5532,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (rfind-if (fint #'numberp #'addp) '(2 (3 4) 5))
@@ -5548,7 +5542,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun ttrav (rec &optional (base #'identity))
@@ -5566,7 +5560,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (ttrav #'cons #'identity)
@@ -5575,7 +5569,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               ; our-copy-tree
@@ -5589,7 +5583,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (trec #'(lambda (o l r) (nconc (funcall l) (funcall r)))
@@ -5599,7 +5593,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (trec #'(lambda (o l r) (or (funcall l) (funcall r)))
@@ -5609,7 +5603,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun trec (rec &optional (base #'identity))
@@ -5633,7 +5627,7 @@ describe Rubi::Evaluator do
       end
 
       context 'いつ関数を作るべきか' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (find-if #.(compose #'oddp #'truncate) lst)
@@ -5646,7 +5640,7 @@ describe Rubi::Evaluator do
 
     context '6. 表現としての関数: https://www.asahi-net.or.jp/~kc7k-nd/onlispjhtml/functionsAsRepresentation.html' do
       context 'ネットワーク' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (run-node 'people)
@@ -5666,7 +5660,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defnode 'people "Is the person a man?"
@@ -5676,7 +5670,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defstruct node contents yes no)
@@ -5693,7 +5687,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defnode 'people "Is the person a man?" 'male 'female)
@@ -5707,7 +5701,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun run-node (name)
@@ -5725,7 +5719,7 @@ describe Rubi::Evaluator do
       end
 
       context 'ネットワークのコンパイル' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defvar *nodes* (make-hash-table))
@@ -5744,7 +5738,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (funcall (gethash 'people *nodes*))
@@ -5755,7 +5749,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defvar *nodes* nil)
@@ -5785,7 +5779,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq n (compile-net 'people))
@@ -5905,7 +5899,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:z, :p, :n] }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro nif (expr pos zero neg)
@@ -5918,7 +5912,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro nif (expr pos zero neg)
@@ -5932,7 +5926,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (case (truncate (signum x))
@@ -5944,7 +5938,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq b '(1 2 3))
@@ -5958,7 +5952,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (when (eligible obj)
@@ -5970,7 +5964,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro our-when (test &body body)
@@ -5982,7 +5976,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (if (eligible obj)
@@ -5994,7 +5988,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun greet (name)
@@ -6006,7 +6000,7 @@ describe Rubi::Evaluator do
       end
 
       context '単純なマクロの定義' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (member x choices :test #'eq)
@@ -6015,7 +6009,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (memq x choices)
@@ -6024,7 +6018,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro memq (obj lst)
@@ -6033,7 +6027,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro memq (obj lst)
@@ -6043,7 +6037,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro memq (obj lst)
@@ -6053,7 +6047,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro memq (obj lst)
@@ -6063,7 +6057,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro while (test &body body)
@@ -6072,7 +6066,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro while (test &body body)
@@ -6086,7 +6080,7 @@ describe Rubi::Evaluator do
       end
 
       context 'マクロ展開の確認' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (defmacro while (test &body body)
@@ -6113,7 +6107,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro mac (expr)
@@ -6123,7 +6117,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (pprint (macroexpand-1 '(or x y)))
@@ -6132,7 +6126,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (mac (or x y))
@@ -6141,7 +6135,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (setq exp (macroexpand-1 '(memq 'a '(a b c))))
@@ -6155,7 +6149,7 @@ describe Rubi::Evaluator do
       end
 
       context '引数リストの構造化代入' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun foo (x y z)
@@ -6165,7 +6159,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (foo 1 2 3)
@@ -6174,7 +6168,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (destructuring-bind (x (y) . z) '(a (b) c d)
@@ -6185,7 +6179,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (dolist (x '(a b c))
@@ -6195,7 +6189,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro our-dolist ((var list &optional result) &body body)
@@ -6209,7 +6203,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro when-bind ((var expr) &body body)
@@ -6221,7 +6215,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (when-bind (input (get-user-input))
@@ -6231,7 +6225,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (let ((input (get-user-input)))
@@ -6244,7 +6238,7 @@ describe Rubi::Evaluator do
       end
 
       context 'マクロのモデル' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro our-expander (name) `(get ,name 'expander))
@@ -6268,7 +6262,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (let ((op 'setq))
@@ -6281,7 +6275,7 @@ describe Rubi::Evaluator do
       end
 
       context 'プログラムとしてのマクロ' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (do ((w 3)
@@ -6296,7 +6290,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (prog ((w 3) (x 1) (y 2) (z nil))
@@ -6312,7 +6306,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (let ((a 1))
@@ -6324,7 +6318,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (let ((a 1))
@@ -6336,7 +6330,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro our-do (bindforms (test &rest result) &body body)
@@ -6369,7 +6363,7 @@ describe Rubi::Evaluator do
       end
 
       context 'マクロのスタイル' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro our-and (&rest args)
@@ -6395,7 +6389,7 @@ describe Rubi::Evaluator do
       end
 
       context 'マクロへの依存' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (defmacro mac (x) `(1+ ,x))
@@ -6413,7 +6407,7 @@ describe Rubi::Evaluator do
       end
 
       context '関数からマクロへ' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun second (x) (cadr x))
@@ -6422,7 +6416,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro second (x) `(cadr ,x))
@@ -6431,7 +6425,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun noisy-second (x)
@@ -6442,7 +6436,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro noisy-second (x)
@@ -6454,7 +6448,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun sum (&rest args)
@@ -6464,7 +6458,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro sum (&rest args)
@@ -6474,7 +6468,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro sum (&rest args)
@@ -6484,7 +6478,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defun foo (x y z)
@@ -6495,7 +6489,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               (defmacro foo (x y z)
@@ -6508,7 +6502,7 @@ describe Rubi::Evaluator do
       end
 
       context 'シンボル・マクロ' do
-        context '' do
+        context "" do
           let(:str) do
             <<~LISP
               > (symbol-macrolet ((hi (progn (print "Howdy")
