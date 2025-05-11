@@ -529,7 +529,7 @@ describe Rubi::Evaluator do
           it do
             proc = subject
             expect(proc).to be_instance_of(Proc)
-            expect(proc.call(proc_params: [], lexical_hash: {})).to eq 3
+            expect(proc.call(proc_params: [], lexical_hash: {}, stack_count: 0, nest: "")).to eq 3
           end
         end
       end
@@ -545,7 +545,7 @@ describe Rubi::Evaluator do
           it do
             proc = subject
             expect(proc).to be_instance_of(Proc)
-            expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 5
+            expect(proc.call(proc_params: [3], lexical_hash: {}, stack_count: 0, nest: "")).to eq 5
           end
         end
       end
@@ -894,7 +894,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {}, stack_count: 0, nest: "")).to eq 6
         end
       end
 
@@ -919,7 +919,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {}, stack_count: 0, nest: "")).to eq 6
         end
       end
 
@@ -947,7 +947,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {}, stack_count: 0, nest: "")).to eq 6
         end
       end
 
@@ -972,7 +972,7 @@ describe Rubi::Evaluator do
         it do
           proc = subject
           expect(proc).to be_instance_of(Proc)
-          expect(proc.call(proc_params: [3], lexical_hash: {})).to eq 6
+          expect(proc.call(proc_params: [3], lexical_hash: {}, stack_count: 0, nest: "")).to eq 6
         end
       end
 

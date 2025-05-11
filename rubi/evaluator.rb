@@ -18,7 +18,7 @@ module Rubi
 
       puts "#### ↓ 初期化 ↓ ####"
       %i(+ - * / < > <= >=).each do |operator|
-        func_hash[operator] = Proc.new do |proc_params:, lexical_hash:|
+        func_hash[operator] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
           if proc_params.empty?
             0
           else
@@ -30,17 +30,17 @@ module Rubi
         end
       end
 
-      func_hash[:mod] = Proc.new do |proc_params:, lexical_hash:|
+      func_hash[:mod] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         a, b = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         a % b
       end
 
-      func_hash[:expt] = Proc.new do |proc_params:, lexical_hash:|
+      func_hash[:expt] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         a, b = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         a ** b
       end
 
-      func_hash[:append] = Proc.new do |proc_params:, lexical_hash:|
+      func_hash[:append] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         # TODO: Lispで実装した方がよいのでは？
         eval_params = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)
 
@@ -56,7 +56,7 @@ module Rubi
         end
       end
 
-      func_hash[:mapcar] = Proc.new do |proc_params:, lexical_hash:|
+      func_hash[:mapcar] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         # TODO: Lispのcarで実装した方がよいのでは？
         puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b, c = proc_params
@@ -70,7 +70,7 @@ module Rubi
           array = eval(b, lexical_hash, stack_count + 1)
           array.map do |element|
             puts "#{nest}mapcar(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-            proc.call(proc_params: [element], lexical_hash: lexical_hash.dup)
+            proc.call(proc_params: [element], lexical_hash: lexical_hash.dup, stack_count: stack_count, nest: nest)
           end
         else
           # 引数が3つの場合
@@ -84,12 +84,12 @@ module Rubi
             puts "#{nest}mapcar(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
             param1 = element
             param2 = array2[index]
-            proc.call(proc_params: [param1, param2], lexical_hash: lexical_hash.dup)
+            proc.call(proc_params: [param1, param2], lexical_hash: lexical_hash.dup, stack_count: stack_count, nest: nest)
           end
         end
       end
 
-      func_hash[:"copy-tree"] = Proc.new do |proc_params:, lexical_hash:|
+      func_hash[:"copy-tree"] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         a = proc_params.shift
         eval(a, lexical_hash, stack_count + 1).dup #TODO: ほんとはdeep_dupしたい
       end
@@ -575,7 +575,7 @@ module Rubi
         # (apply #'+ (append '(1) '(2)))
         eval_params = params.map { |param| Array(eval(param, lexical_hash, stack_count + 1)) }.reduce(&:+)
         puts "#{nest}-> (eval_params: #{eval_params})"
-        func.call(proc_params: eval_params, lexical_hash: lexical_hash)
+        func.call(proc_params: eval_params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
       elsif function.instance_of?(Array) # lambdaを実行する
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
@@ -583,17 +583,17 @@ module Rubi
         puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         expression = eval(function, lexical_hash, stack_count + 1)
         puts "#{nest}関数の実行:#{function}(expression: #{expression}, params: #{params})"
-        expression.call(proc_params: params, lexical_hash: lexical_hash)
+        expression.call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
       elsif function.instance_of?(Proc) # funcallで関数を実行する
         puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        function.call(proc_params: params, lexical_hash: lexical_hash)
+        function.call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
       elsif func_hash.key?(function) # defunで登録した関数を実行する
         # 登録されている関数を呼び出す
         puts "#{nest}#{function}関数が見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         func = func_hash[function]
         puts "#{nest}func_hash[function]: #{func}"
         puts "#{nest}params: #{params}"
-        func.call(proc_params: params, lexical_hash: lexical_hash)
+        func.call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
       elsif macro_hash.key?(function)
         # 登録されているマクロを呼び出す
         puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
@@ -603,7 +603,7 @@ module Rubi
       elsif lexical_hash.key?(function)
         # 登録されている関数を呼び出す
         puts "#{nest}ローカル関数(#{function})が見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        lexical_hash[function].call(proc_params: params, lexical_hash: lexical_hash.dup)
+        lexical_hash[function].call(proc_params: params, lexical_hash: lexical_hash.dup, stack_count: stack_count, nest: nest)
       else
         puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         raise "対応する関数(#{function})が見つかりません(params: #{params})"
@@ -614,7 +614,7 @@ module Rubi
 
     # 関数定義
     def build_lambda(params, expression, build_lexical_hash, stack_count, nest)
-      Proc.new do |proc_params:, lexical_hash:|
+      Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         lexical_hash.merge!(build_lexical_hash) # 関数の引数を引き継ぐ
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
         puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
