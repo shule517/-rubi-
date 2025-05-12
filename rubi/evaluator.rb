@@ -91,7 +91,8 @@ module Rubi
 
       func_hash[:"copy-tree"] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         a = proc_params.shift
-        eval(a, lexical_hash, stack_count + 1).dup #TODO: ほんとはdeep_dupしたい
+        result = eval(a, lexical_hash, stack_count + 1)
+        Marshal.load(Marshal.dump(result))
       end
 
       # TODO: 遅くなってる。高速化したい。
