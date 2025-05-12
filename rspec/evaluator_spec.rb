@@ -427,6 +427,19 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99 } # グローバル変数yが作成される
         end
       end
+
+      context "(setq add2 (make-adder 2) add10 (make-adder 10))" do
+        let(:str) do
+          <<~LISP
+            (defun make-adder (n)
+              #'(lambda (x) (+ x n)))
+            (setq add2 (make-adder 2)
+              add10 (make-adder 10))
+            (funcall add2 5)
+          LISP
+        end
+        it { is_expected.to eq 7 }
+      end
     end
 
     describe '#setf' do
