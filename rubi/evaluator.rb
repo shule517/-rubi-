@@ -211,7 +211,13 @@ module Rubi
         puts "#{nest}#{function}(var_params: #{var_params}, expressions: #{expressions})"
         # レキシカル変数(next_lexical_hash)を定義する
         puts "#{nest}#レキシカル変数を定義する"
-        next_lexical_hash = lexical_hash#.dup
+
+        # letをネストした時に、1階層目に2階層目の処理内容を反映させないように「.dup」する
+        # (let ((x 1))
+        #   (let ((x 2))
+        #     x) ; => 2
+        # x) ; => 1
+        next_lexical_hash = lexical_hash.dup
         var_params.each do |var_name, value|
           next_lexical_hash[var_name] = eval(value, next_lexical_hash, stack_count + 1)
         end
