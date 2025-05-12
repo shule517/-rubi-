@@ -574,14 +574,13 @@ module Rubi
         var, number, result = a
         puts "#{nest}1. ループ回数を評価する(number: #{number}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         number = eval(number, lexical_hash.dup, stack_count + 1)
-        new_lexical_hash = lexical_hash
         number.times.with_index do |index|
-          new_lexical_hash[var] = index
-          puts "#{nest}2. #{index + 1}ループ目(b: #{b}, new_lexical_hash(object_id: #{new_lexical_hash.object_id}): #{new_lexical_hash})"
-          eval(b, new_lexical_hash, stack_count + 1)
+          lexical_hash[var] = index
+          puts "#{nest}2. #{index + 1}ループ目(b: #{b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+          eval(b, lexical_hash, stack_count + 1)
         end
-        new_lexical_hash[var] = number # dotimesはループ終わったがタイミングで、変数 = ループ回数 になっている仕様っぽい
-        eval(result, new_lexical_hash, stack_count + 1)
+        lexical_hash[var] = number # dotimesはループ終わったがタイミングで、変数 = ループ回数 になっている仕様っぽい
+        eval(result, lexical_hash, stack_count + 1)
       elsif function == :progn
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         params.map { |param| eval(param, lexical_hash, stack_count + 1) }.last
