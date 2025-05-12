@@ -96,8 +96,8 @@ describe Rubi::Parser do
 
       context "`,の変数展開②" do
         let(:str) { "`(a (,b c))" }
-        before { expect(ast).to eq [:`, [:a, [:",b", :c]]] }
-        it { is_expected.to eq [[:quote, [1, [:unquote, [:+, 1, 2]]]]] }
+        before { expect(ast).to eq [:`, [:a, [:",", :b, :c]]] }
+        it { is_expected.to eq [[:quote, [:a, [[:unquote, :b], :c]]]] }
       end
 
       context "#'の場合" do
