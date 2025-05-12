@@ -5980,7 +5980,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "TODO: defvarが未実装。(defvar *nodes* nil)" do
           let(:str) do
             <<~LISP
               (defvar *nodes* nil)
@@ -6178,38 +6178,36 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
-          context "(setq b '(1 2 3))" do
-            let(:str) do
-              <<~LISP
-                (setq b '(1 2 3)) ; => (1 2 3)
-              LISP
-            end
-            it { is_expected.to eq [1, 2, 3] }
+        context "(setq b '(1 2 3))" do
+          let(:str) do
+            <<~LISP
+              (setq b '(1 2 3)) ; => (1 2 3)
+            LISP
           end
-
-          context '`(a ,b c)' do
-            let(:str) do
-              <<~LISP
-                (setq b '(1 2 3)) ; => (1 2 3)
-                `(a ,b c) ; => (A (1 2 3) C)
-              LISP
-            end
-            it { is_expected.to eq [:a, [1, 2, 3], :c] }
-          end
-
-          context '`(a ,@b c)' do
-            let(:str) do
-              <<~LISP
-                (setq b '(1 2 3)) ; => (1 2 3)
-                `(a ,@b c) ; => (A 1 2 3 C)
-              LISP
-            end
-            it { is_expected.to eq [:a, 1, 2, 3, :c] }
-          end
+          it { is_expected.to eq [1, 2, 3] }
         end
 
-        context "" do
+        context '`(a ,b c)' do
+          let(:str) do
+            <<~LISP
+              (setq b '(1 2 3)) ; => (1 2 3)
+              `(a ,b c) ; => (A (1 2 3) C)
+            LISP
+          end
+          it { is_expected.to eq [:a, [1, 2, 3], :c] }
+        end
+
+        context '`(a ,@b c)' do
+          let(:str) do
+            <<~LISP
+              (setq b '(1 2 3)) ; => (1 2 3)
+              `(a ,@b c) ; => (A 1 2 3 C)
+            LISP
+          end
+          it { is_expected.to eq [:a, 1, 2, 3, :c] }
+        end
+
+        context "TODO: whenが未実装。(when (eligible obj)" do
           let(:str) do
             <<~LISP
               (when (eligible obj)
@@ -6221,7 +6219,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "TODO: eligibleが未実装。(defmacro our-when (test &body body)" do
           let(:str) do
             <<~LISP
               (defmacro our-when (test &body body)
@@ -6233,7 +6231,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(if (eligible obj)" do
           let(:str) do
             <<~LISP
               (if (eligible obj)
@@ -6245,7 +6243,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(defun greet (name)" do
           let(:str) do
             <<~LISP
               (defun greet (name)
