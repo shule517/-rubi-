@@ -12,6 +12,55 @@ describe Rubi::Evaluator do
     end
     let(:tokens) { Rubi::Tokenizer.new.split_tokens(str) }
 
+    describe '#レキシカルスコープ系の確認' do
+      context '#let -> let内で宣言した変数を参照する(aは未定義)' do
+        let(:str) do
+          <<~LISP
+              (let ((a 2) ; aはlet内ではまだ未定義
+                    (b (+ a 3))) ; ← a まだ未定義
+                (list a b))
+            LISP
+        end
+        it { expect { subject }.to raise_error }
+      end
+
+      context '#let -> let内で宣言した変数を参照する(aを外部で定義)' do
+        let(:str) do
+          <<~LISP
+              (setq a 10)
+              (let ((a 2)
+                    (b (+ a 3)))  ; ← 外の a（10）を参照して b = 13
+                (list a b))
+            LISP
+        end
+        it { is_expected.to eq [2, 13] }
+      end
+
+      context '#let -> letをネストして、1階層目の変数を評価' do
+        let(:str) do
+          <<~LISP
+            (let ((x 1))
+              (let ((x 2))
+                x)
+              x)
+          LISP
+        end
+        it { is_expected.to eq 1 }
+      end
+
+      context '#dotimes -> (length list)回ループする' do
+        let(:str) do
+          <<~LISP
+            (setq x 0)
+            (dotimes (n (length (list 1 2 3)))
+              (setq x (+ 1 x)))
+            x
+          LISP
+        end
+        it { is_expected.to eq 3 }
+      end
+    end
+
     describe '#let' do
       context '#let*との比較' do
         context 'let内で宣言した変数を参照する(aは未定義)' do
