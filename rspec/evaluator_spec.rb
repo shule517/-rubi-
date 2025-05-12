@@ -6104,7 +6104,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq nil }
         end
 
-        context "(defmacro nif (expr pos zero neg)  バッククォート版" do
+        context "TODO: truncateが未実装。(defmacro nif (expr pos zero neg)  バッククォート版" do
           let(:str) do
             <<~LISP
               (defmacro nif (expr pos zero neg)
@@ -6139,7 +6139,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:z, :p, :n] }
         end
 
-        context "" do
+        context "(defmacro nif (expr pos zero neg)" do
           let(:str) do
             <<~LISP
               (defmacro nif (expr pos zero neg)
@@ -6152,7 +6152,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "(defmacro nif (expr pos zero neg)" do
           let(:str) do
             <<~LISP
               (defmacro nif (expr pos zero neg)
@@ -6166,7 +6166,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "" do
+        context "TODO: truncateが未実装。(case (truncate (signum x))" do
           let(:str) do
             <<~LISP
               (case (truncate (signum x))
@@ -6179,17 +6179,34 @@ describe Rubi::Evaluator do
         end
 
         context "" do
-          let(:str) do
-            <<~LISP
-              > (setq b '(1 2 3))
-              (1 2 3)
-              > `(a ,b c)
-              (A (1 2 3) C)
-              > `(a ,@b c)
-              (A 1 2 3 C)
-            LISP
+          context "(setq b '(1 2 3))" do
+            let(:str) do
+              <<~LISP
+                (setq b '(1 2 3)) ; => (1 2 3)
+              LISP
+            end
+            it { is_expected.to eq [1, 2, 3] }
           end
-          it { is_expected.to eq 99999999999 }
+
+          context '`(a ,b c)' do
+            let(:str) do
+              <<~LISP
+                (setq b '(1 2 3)) ; => (1 2 3)
+                `(a ,b c) ; => (A (1 2 3) C)
+              LISP
+            end
+            it { is_expected.to eq [:a, [1, 2, 3], :c] }
+          end
+
+          context '`(a ,@b c)' do
+            let(:str) do
+              <<~LISP
+                (setq b '(1 2 3)) ; => (1 2 3)
+                `(a ,@b c) ; => (A 1 2 3 C)
+              LISP
+            end
+            it { is_expected.to eq [:a, 1, 2, 3, :c] }
+          end
         end
 
         context "" do
