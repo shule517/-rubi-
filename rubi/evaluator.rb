@@ -704,10 +704,10 @@ module Rubi
 
     def eval_atom(ast, lexical_hash, nest)
       if lexical_hash.key?(ast)
-        puts "#{nest}-> ローカル変数を返す #{lexical_hash[ast]}"
+        puts "#{nest}-> ローカル変数を返す(#{ast}) #{lexical_hash[ast]}"
         lexical_hash[ast] # レキシカルスコープの変数を参照する
       elsif var_hash.key?(ast)
-        puts "#{nest}-> グローバル変数を返す #{var_hash[ast]}"
+        puts "#{nest}-> グローバル変数を返す(#{ast}) #{var_hash[ast]}"
         var_hash[ast] # グローバル変数を参照する
       elsif ast == :t
         true
