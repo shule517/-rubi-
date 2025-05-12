@@ -50,5 +50,15 @@ describe Rubi::Tokenizer do
       end
       it { is_expected.to eq [:"'", :"(", 1, 2, :a, :")"] }
     end
+
+    context "`,の変数展開①" do
+      let(:str) { "`(1 ,(+ 1 2))" }
+      it { is_expected.to eq [:`, :"(", 1, :",", :"(", :+, 1, 2, :")", :")"] }
+    end
+
+    context "`,の変数展開②" do
+      let(:str) { "`(a (,b c))" }
+      it { is_expected.to eq [:`, :"(", :a, :"(", :",", :b, :c, :")", :")"] }
+    end
   end
 end
