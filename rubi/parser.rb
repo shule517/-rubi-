@@ -52,6 +52,10 @@ module Rubi
             token = ast.shift
             token = expand_syntactic_sugar(token) if list?(token)
             array << [:unquote, token]
+          elsif token == :",@"
+            token = ast.shift
+            token = expand_syntactic_sugar(token) if list?(token)
+            array << [:"unquote-splicing", token]
           else
             # 変更なし。そのまま追加する。
             array << token

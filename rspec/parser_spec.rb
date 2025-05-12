@@ -100,6 +100,12 @@ describe Rubi::Parser do
         it { is_expected.to eq [[:quote, [:a, [[:unquote, :b], :c]]]] }
       end
 
+      context ",@の変数展開" do
+        let(:str) { "`(a ,@b c)" }
+        before { expect(ast).to eq [:`, [:a, :",@", :b, :c]] }
+        it { is_expected.to eq [[:quote, [:a, [:"unquote-splicing", :b], :c]]] }
+      end
+
       context "#'の場合" do
         let(:str) { "#'double" }
         before { expect(ast).to eq [:"#'", :double] }
