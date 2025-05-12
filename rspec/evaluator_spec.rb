@@ -6082,6 +6082,15 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:a, [2, :c]] }
         end
 
+        context "`(1 ,(+ 1 2))" do
+          let(:str) do
+            <<~LISP
+              `(1 ,(+ 1 2))
+            LISP
+          end
+          it { is_expected.to eq [1, 3] }
+        end
+
         context "(defmacro nil! (var) `(setq ,var nil))" do
           let(:str) do
             <<~LISP

@@ -407,8 +407,13 @@ module Rubi
         atom = eval(a, lexical_hash, stack_count + 1)
         true if atom?(atom) # listの場合は、nilを返す
       elsif function == :quote
-        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        params[0] # quoteは評価しない
+        expressions = params[0] # quoteは評価しない
+        puts "#{nest}#{function}(expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        expressions.map { |expression| eval(expression, lexical_hash, stack_count + 1) }
+      elsif function == :unquote
+        expressions = params[0]
+        puts "#{nest}#{function}(expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        eval(expressions, lexical_hash, stack_count + 1)
       elsif function == :funcall
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         array = params.map { |a| puts "#{nest}(a: #{a})";result = eval(a, lexical_hash, stack_count + 1);puts "#{nest}-> #{result}";result }

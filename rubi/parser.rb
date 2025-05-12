@@ -23,6 +23,10 @@ module Rubi
       !ast.is_a?(Array)
     end
 
+    def list?(ast)
+      !atom?(ast)
+    end
+
     def expand_syntactic_sugar(ast)
       array = []
       until ast.empty? do
@@ -34,6 +38,7 @@ module Rubi
             # ↓
             # [:quote, [1, 2, :a]]
             token = ast.shift
+            token = expand_syntactic_sugar(token) if list?(token)
             array << [:quote, token]
           elsif token == :"#'"
             # 関数参照を展開する
@@ -41,7 +46,12 @@ module Rubi
             # ↓
             # [[:function, :double]]
             token = ast.shift
+            token = expand_syntactic_sugar(token) if list?(token)
             array << [:function, token]
+          elsif token == :","
+            token = ast.shift
+            token = expand_syntactic_sugar(token) if list?(token)
+            array << [:unquote, token]
           else
             # 変更なし。そのまま追加する。
             array << token

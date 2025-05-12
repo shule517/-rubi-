@@ -88,16 +88,16 @@ describe Rubi::Parser do
         end
       end
 
-      context "`,の変数展開" do
-        let(:str) do
-          <<~LISP
-            (setx 1)
-            `(a ,x c)
-          LISP
-        end
-        let(:str) { "`(a ,x c)" }
-        before { expect(ast).to eq [:"`", [:a, :',x', :c]] }
-        it { is_expected.to eq [:cons, :"`", :a, [:cons, :x, [:cons, :"`", :c, :nil]]] }
+      context "`,の変数展開①" do
+        let(:str) { "`(1 ,(+ 1 2))" }
+        before { expect(ast).to eq [:`, [1, :",", [:+, 1, 2]]] }
+        it { is_expected.to eq [[:quote, [1, [:unquote, [:+, 1, 2]]]]] }
+      end
+
+      context "`,の変数展開②" do
+        let(:str) { "`(a (,b c))" }
+        before { expect(ast).to eq [:`, [:a, [:",b", :c]]] }
+        it { is_expected.to eq [[:quote, [1, [:unquote, [:+, 1, 2]]]]] }
       end
 
       context "#'の場合" do
