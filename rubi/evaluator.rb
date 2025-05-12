@@ -573,7 +573,7 @@ module Rubi
         puts "#{nest}#{function}(a: #{a}, b: #{b} lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         var, number, result = a
         puts "#{nest}1. ループ回数を評価する(number: #{number}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        number = eval(number, lexical_hash, stack_count + 1)
+        number = eval(number, lexical_hash.dup, stack_count + 1)
         new_lexical_hash = lexical_hash
         number.times.with_index do |index|
           new_lexical_hash[var] = index
