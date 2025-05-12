@@ -409,20 +409,22 @@ module Rubi
       elsif function == :quote
         expressions = params[0] # quoteは評価しない
         puts "#{nest}#{function}(expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        expressions.map do |expression|
-          if list?(expression)
-            if expression[0] == :unquote
-              puts "#{nest}expression[0] == :unquote -> (expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-              eval(expression, lexical_hash, stack_count + 1) # 評価する
-            else
-              puts "#{nest}expression[0] != :unquote -> (expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-              expression
-            end
-          else
-            puts "#{nest}atom?(expression) -> (expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-            expression # 評価しない
-          end
-        end
+        # TODO:
+        # expressions.map do |expression|
+        #   if list?(expression)
+        #     if expression[0] == :unquote
+        #       puts "#{nest}expression[0] == :unquote -> (expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        #       eval(expression, lexical_hash, stack_count + 1) # 評価する
+        #     else
+        #       puts "#{nest}expression[0] != :unquote -> (expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        #       expression
+        #     end
+        #   else
+        #     puts "#{nest}atom?(expression) -> (expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        #     expression # 評価しない
+        #   end
+        # end
+        expressions # 評価しない
       elsif function == :unquote
         expressions = params[0]
         puts "#{nest}#{function}(expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
