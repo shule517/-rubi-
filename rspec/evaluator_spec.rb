@@ -29,8 +29,8 @@ describe Rubi::Evaluator do
           let(:str) do
             <<~LISP
                 (setq a 10)
-                (let ((a 2)
-                      (b (+ a 3)))  ; ← 外の a（10）を参照して b = 13
+                (let ((a 2) ; ← このタイミングではaは未定義
+                      (b (+ a 3)))  ; ← このタイミングではaは未定義。外の a（10）を参照して b = 13
                   (list a b))
               LISP
           end
