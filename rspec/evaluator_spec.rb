@@ -61,6 +61,19 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq 3 }
       end
+
+      context "TODO: レキシカルスコープ系の問題なのかな？ (setq add2 (make-adder 2) add10 (make-adder 10))" do
+        let(:str) do
+          <<~LISP
+            (defun make-adder (n)
+              #'(lambda (x) (+ x n)))
+            (setq add2 (make-adder 2)
+              add10 (make-adder 10))
+            (funcall add2 5)
+          LISP
+        end
+        it { is_expected.to eq 7 }
+      end
     end
 
     describe '#let' do
