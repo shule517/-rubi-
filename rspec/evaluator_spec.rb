@@ -4380,9 +4380,17 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [:c, :b, :a] }
         end
 
-        context "(setq lst '(a b c)) (bad-reverse lst)" do
+        context "TODO: truncateが未実装。(setq lst '(a b c)) (bad-reverse lst)" do
           let(:str) do
             <<~LISP
+              (defun bad-reverse (lst)
+                (let* ((len (length lst))
+                       (ilimit (truncate (/ len 2))))
+                  (do ((i 0 (1+ i))
+                       (j (1- len) (1- j)))
+                      ((>= i ilimit))
+                    (rotatef (nth i lst) (nth j lst)))))
+
               (setq lst '(a b c)) ; => (A B C)
               (bad-reverse lst) ; => NIL
               lst ; => (C B A)
@@ -4394,15 +4402,19 @@ describe Rubi::Evaluator do
         context "(setq lst '(a b c))" do
           let(:str) do
             <<~LISP
-              > (setq lst '(a b c))
-              (A B C)
-              > (good-reverse lst)
-              (C B A)
-              > lst
-              (A B C)
+              (defun good-reverse (lst)
+                (labels ((rev (lst acc)
+                         (if (null lst)
+                             acc
+                             (rev (cdr lst) (cons (car lst) acc)))))
+                  (rev lst nil)))
+
+              (setq lst '(a b c)) ; => (A B C)
+              (good-reverse lst) ; => (C B A)
+              lst ; => (A B C)
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq [:a, :b, :c] }
         end
 
         context '(defun good-reverse (lst)' do
@@ -4416,7 +4428,7 @@ describe Rubi::Evaluator do
                   (rev lst nil)))
             LISP
           end
-          it { is_expected.to eq 99999999999 }
+          it { is_expected.to eq :"good-reverse" }
         end
 
         context '#TODO: reverseが未実装。(reverse lst)' do
@@ -4485,11 +4497,10 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "(truncate 26.21875)" do
+        context "TODO: truncateが未実装。(truncate 26.21875)" do
           let(:str) do
             <<~LISP
-              > (truncate 26.21875)
-              26
+              (truncate 26.21875) ; => 26
               0.21875
             LISP
           end
@@ -4700,7 +4711,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 99999999999 }
         end
 
-        context "(mapcan #'nicknames people)" do
+        context "TODO: mapcanが未実装。(mapcan #'nicknames people)" do
           let(:str) do
             <<~LISP
               (mapcan #'nicknames people)
