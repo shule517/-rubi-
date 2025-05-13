@@ -1376,6 +1376,33 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq [1, 2, 3] }
       end
+
+      context "'(boston . us)" do
+        let(:str) do
+          <<~LISP
+            '(boston . us)
+          LISP
+        end
+        it { is_expected.to eq [:boston, :".", :us] }
+      end
+
+      context "(car '(boston . us))" do
+        let(:str) do
+          <<~LISP
+            (car '(boston . us))
+          LISP
+        end
+        it { is_expected.to eq :boston }
+      end
+
+      context "(cdr '(boston . us))" do
+        let(:str) do
+          <<~LISP
+            (cdr '(boston . us))
+          LISP
+        end
+        it { is_expected.to eq :us }
+      end
     end
 
     describe '#null' do
@@ -3860,6 +3887,20 @@ describe Rubi::Evaluator do
             expect(result[1]).to be_instance_of Proc
             expect(result[2]).to be_instance_of Proc
           end
+        end
+
+        context "TODO: 単純にバグってそう。(funcall (car cities) 'boston)" do
+          let(:str) do
+            <<~LISP
+              (defun test (key)
+                (cdr (assoc key db)))
+              (test '((boston . us) (paris . france)))
+
+              (setq cities (make-dbms '((boston . us) (paris . france))))
+              (funcall (car cities) 'boston) ; => us
+            LISP
+          end
+          it { is_expected.to eq :us }
         end
 
         context "TODO: 単純にバグってそう。(funcall (car cities) 'boston)" do
