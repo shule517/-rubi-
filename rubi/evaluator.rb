@@ -61,18 +61,22 @@ module Rubi
         puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b, c = proc_params
         if c.nil?
+          puts "#{nest}引数が2つの場合(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           # 引数が2つの場合
           # (mapcar
           #   #'(lambda (x) (+ x 10))
-          #   '(1 2 3))
+          #     '(1 2 3))
+          puts "#{nest}1. 関数を取り出す(a: #{a}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           proc = eval(a, lexical_hash, stack_count + 1)
           raise "procがnil。(a: #{a})を評価して、procが戻ってこなかった" if proc.nil?
+          puts "#{nest}2. 引数を評価する(b: #{b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           array = eval(b, lexical_hash, stack_count + 1)
-          array.map do |element|
-            puts "#{nest}mapcar(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-            proc.call(proc_params: [element], lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
+          array.map.with_index do |element, index|
+            puts "#{nest}3. #{index+1}回目のループ(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+            proc.call(proc_params: Array(element), lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
           end
         else
+          puts "#{nest}引数が3つの場合(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           # 引数が3つの場合
           # (mapcar #'+
           #   '(1 2 3)
