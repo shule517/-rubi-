@@ -112,6 +112,12 @@ describe Rubi::Parser do
         it { is_expected.to eq [[:cons, [:quote, :a], [:quote, :b]]] }
       end
 
+      context "(1 . 2)の展開" do
+        let(:str) { "(1 . 2)" }
+        before { expect(ast).to eq [[1, :".", 2]] }
+        it { is_expected.to eq [[:cons, 1, 2]] }
+      end
+
       context "#'の場合" do
         let(:str) { "#'double" }
         before { expect(ast).to eq [:"#'", :double] }

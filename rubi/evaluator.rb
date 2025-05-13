@@ -397,6 +397,14 @@ module Rubi
         else
           result[1..]
         end
+      elsif function == :assoc
+        # TODO: 実装中
+        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        a, b = params
+        eval_a = eval(a, lexical_hash, stack_count + 1)
+        eval_b = eval(b, lexical_hash, stack_count + 1)
+        puts "#{nest}(eval_a: #{eval_a}, eval_b: #{eval_b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        eval_b.find { |c| eval(c, lexical_hash, stack_count + 1).car == eval_a }
       elsif function == :cons
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = eval(params[0], lexical_hash, stack_count + 1)

@@ -17,10 +17,10 @@ describe Rubi::Evaluator do
         context '#let -> let内で宣言した変数を参照する(aは未定義)' do
           let(:str) do
             <<~LISP
-                (let ((a 2) ; aはlet内ではまだ未定義
-                      (b (+ a 3))) ; ← a まだ未定義
-                  (list a b))
-              LISP
+              (let ((a 2) ; aはlet内ではまだ未定義
+                    (b (+ a 3))) ; ← a まだ未定義
+                (list a b))
+            LISP
           end
           it { expect { subject }.to raise_error }
         end
@@ -28,11 +28,11 @@ describe Rubi::Evaluator do
         context '#let -> let内で宣言した変数を参照する(aを外部で定義)' do
           let(:str) do
             <<~LISP
-                (setq a 10)
-                (let ((a 2) ; ← このタイミングではaは未定義
-                      (b (+ a 3)))  ; ← このタイミングではaは未定義。外の a（10）を参照して b = 13
-                  (list a b))
-              LISP
+              (setq a 10)
+              (let ((a 2) ; ← このタイミングではaは未定義
+                    (b (+ a 3)))  ; ← このタイミングではaは未定義。外の a（10）を参照して b = 13
+                (list a b))
+            LISP
           end
           it { is_expected.to eq [2, 13] }
         end
@@ -1067,9 +1067,9 @@ describe Rubi::Evaluator do
       context 'labelsの中で定義した関数を取り出す' do
         let(:str) do
           <<~LISP
-              (labels ((instances-in () 2))
-                #'instances-in)
-            LISP
+            (labels ((instances-in () 2))
+              #'instances-in)
+          LISP
         end
         it { is_expected.to be_instance_of Proc }
       end
@@ -1303,6 +1303,21 @@ describe Rubi::Evaluator do
       it { is_expected.to eq [2, 3] }
     end
 
+    describe '#assoc' do
+      let(:str) do
+        <<~LISP
+          (setq alist '((a . 1) (b . 2) (c . 3)))
+          (assoc 'b alist) ; => (b . 2)
+        LISP
+      end
+      it do
+        result = subject
+        expect(result).to be_instance_of(Rubi::Cons)
+        expect(result.car).to eq :b
+        expect(result.cdr).to eq 2
+      end
+    end
+
     describe '#cons' do
       context '(cons atom atom) ペアを作る' do
         let(:str) do
@@ -1315,6 +1330,20 @@ describe Rubi::Evaluator do
           expect(result).to be_instance_of(Rubi::Cons)
           expect(result.car).to eq :a
           expect(result.cdr).to eq :b
+        end
+      end
+
+      context '(1 . 2)' do
+        let(:str) do
+          <<~LISP
+            (1 . 2)
+          LISP
+        end
+        it do
+          result = subject
+          expect(result).to be_instance_of(Rubi::Cons)
+          expect(result.car).to eq 1
+          expect(result.cdr).to eq 2
         end
       end
 

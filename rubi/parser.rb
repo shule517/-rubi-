@@ -72,11 +72,15 @@ module Rubi
             array << token
           end
         else
-          # リストの場合
-          # [[:funcall, :"'", :+, 1, 2]]
-          # ↓
-          # [[:funcall, [:quote, :+], 1, 2]]
-          array << expand_syntactic_sugar(token)
+          if token.size == 3 && token[1] == :"."
+            array << [:cons, token[0], token[2]]
+          else
+            # リストの場合
+            # [[:funcall, :"'", :+, 1, 2]]
+            # ↓
+            # [[:funcall, [:quote, :+], 1, 2]]
+            array << expand_syntactic_sugar(token)
+          end
         end
       end
       array
