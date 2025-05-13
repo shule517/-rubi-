@@ -1383,7 +1383,12 @@ describe Rubi::Evaluator do
             '(boston . us)
           LISP
         end
-        it { is_expected.to eq [:boston, :".", :us] }
+        it do
+          result = subject
+          expect(result).to be_instance_of(Rubi::Cons)
+          expect(result.car).to eq :boston
+          expect(result.cdr).to eq :us
+        end
       end
 
       context "(car '(boston . us))" do
@@ -3768,8 +3773,10 @@ describe Rubi::Evaluator do
             <<~LISP
               (defun make-adder (n)
                 #'(lambda (x) (+ x n)))
+
               (setq add2 (make-adder 2)
                 add10 (make-adder 10))
+
               (funcall add2 5)
             LISP
           end

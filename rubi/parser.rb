@@ -38,8 +38,19 @@ module Rubi
             # ↓
             # [:quote, [1, 2, :a]]
             token = ast.shift
-            token = expand_syntactic_sugar(token) if list?(token)
-            array << [:quote, token]
+            if list?(token)
+              if token.size == 3 && token[1] == :"."
+                # '(a . b)
+                # ↓
+                # (cons (quote boston) (quote us))
+                array << [:cons, [:quote, token[0]], [:quote, token[2]]]
+              else
+                token = expand_syntactic_sugar(token)
+                array << [:quote, token]
+              end
+            else
+              array << [:quote, token]
+            end
           elsif token == :"#'"
             # 関数参照を展開する
             # [:"#'", :double]

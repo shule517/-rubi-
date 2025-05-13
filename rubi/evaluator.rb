@@ -384,11 +384,19 @@ module Rubi
       elsif function == :car
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
-        result.first
+        if result.is_a?(Rubi::Cons)
+          result.car
+        else
+          result.first
+        end
       elsif function == :cdr
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
-        result[1..]
+        if result.is_a?(Rubi::Cons)
+          result.cdr
+        else
+          result[1..]
+        end
       elsif function == :cons
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = eval(params[0], lexical_hash, stack_count + 1)
