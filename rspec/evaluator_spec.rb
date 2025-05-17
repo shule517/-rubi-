@@ -1347,6 +1347,38 @@ describe Rubi::Evaluator do
         end
       end
 
+      context "(car '(a . 1))" do
+        let(:str) do
+          <<~LISP
+            (car '(a . 1))
+          LISP
+        end
+        it { is_expected.to eq :a }
+      end
+
+      context "(car '((a . 1) (b . 2) (c . 3)))" do
+        let(:str) do
+          <<~LISP
+            (car '((a . 1) (b . 2) (c . 3))) ; => (A . 1)
+          LISP
+        end
+        it do
+          result = subject
+          expect(result).to be_instance_of(Rubi::Cons)
+          expect(result.car).to eq :a
+          expect(result.cdr).to eq 1
+        end
+      end
+
+      context "(car (car '((a . 1) (b . 2) (c . 3))))" do
+        let(:str) do
+          <<~LISP
+            (car (car '((a . 1) (b . 2) (c . 3))))
+          LISP
+        end
+        it { is_expected.to eq :a }
+      end
+
       context '(cons atom list)' do
         let(:str) do
           <<~LISP

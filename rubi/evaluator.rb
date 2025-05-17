@@ -384,6 +384,7 @@ module Rubi
       elsif function == :car
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
+        puts "#{nest}-> result: #{result}"
         if result.is_a?(Rubi::Cons)
           result.car
         else
@@ -399,12 +400,14 @@ module Rubi
         end
       elsif function == :assoc
         # TODO: 実装中
+        # (setq alist '((a . 1) (b . 2) (c . 3)))
+        # (assoc 'b alist) ; => (b . 2)
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = params
         eval_a = eval(a, lexical_hash, stack_count + 1)
         eval_b = eval(b, lexical_hash, stack_count + 1)
         puts "#{nest}(eval_a: #{eval_a}, eval_b: #{eval_b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        eval_b.find { |c| eval(c, lexical_hash, stack_count + 1).car == eval_a }
+        eval_b.find { |c| puts "ループ ->";cons = eval(c, lexical_hash, stack_count + 1);pp cons: cons;cons.car == eval_a }
       elsif function == :cons
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = eval(params[0], lexical_hash, stack_count + 1)
@@ -451,6 +454,7 @@ module Rubi
         #     expression # 評価しない
         #   end
         # end
+        puts "#{nest}-> expressions: #{expressions}"
         expressions # 評価しない
       elsif function == :unquote
         expressions = params[0]
