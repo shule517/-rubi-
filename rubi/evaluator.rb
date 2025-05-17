@@ -422,19 +422,7 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
         puts "#{nest}result: #{result} params: #{params}"
-        if result.nil?
-          puts "#{nest}-> nil"
-          nil
-        elsif result.is_a?(Rubi::Cons)
-          puts "#{nest}-> #{result.cdr} ※consの場合"
-          result.cdr
-        elsif result[1] == :"."
-          puts "#{nest}-> #{result[2]} ※a . b形式の場合" # TODO: consに変換して対応できないのか？
-          result[2]
-        else
-          puts "#{nest}-> #{result[1..]} ※配列の場合"
-          result[1..]
-        end
+        cdr(result)
       elsif function == :assoc
         # (setq alist '((a . 1) (b . 2) (c . 3)))
         # (assoc 'b alist) ; => (b . 2)
@@ -713,8 +701,24 @@ module Rubi
     def car(x)
       if x.is_a?(Rubi::Cons)
         x.car
-      elsif x.is_a?(Array)
+      elsif x.is_a?(Array) # [a, b] => a / [a . b] => a
         x.first
+      end
+    end
+
+    def cdr(x)
+      if x.nil?
+        puts "-> nil"
+        nil
+      elsif x.is_a?(Rubi::Cons)
+        puts "-> #{x.cdr} ※consの場合"
+        x.cdr
+      elsif x[1] == :"."
+        puts "-> #{x[2]} ※a . b形式の場合" # TODO: consに変換して対応できないのか？
+        x[2]
+      else
+        puts "-> #{x[1..]} ※配列の場合"
+        x[1..]
       end
     end
 
