@@ -4134,7 +4134,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :london }
         end
 
-        context "TODO: 単純にバグってそう。(funcall (car cities) 'london) ; => england" do
+        context "TODO: pushが呼ばれてないのがおかしそう。(funcall (car cities) 'london) ; => england" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)
@@ -4158,17 +4158,6 @@ describe Rubi::Evaluator do
             LISP
           end
           it { is_expected.to eq :england }
-        end
-
-        context "TODO: ↑を対応したら仕様が分かりそう。(funcall (car cities) 'london)" do
-          let(:str) do
-            <<~LISP
-              (defun lookup (key db)
-                (funcall (car db) key))
-            LISP
-            # TODO: callする
-          end
-          it { is_expected.to eq 999999 }
         end
       end
 
