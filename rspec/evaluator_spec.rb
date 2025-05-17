@@ -4327,17 +4327,17 @@ describe Rubi::Evaluator do
           context '問題の部分を切り出す instances-in' do
             let(:str) do
               <<~LISP
+                (setq obj `a)
                 (defun instances-in (lst)
                   (if (consp lst)
                     (+ (if (eq (car lst) obj) 1 0)
                       (instances-in (cdr lst)))
                     0))
 
-                (instances-in `(a b c))
-                ; (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
+                (instances-in `(a b c a))
               LISP
             end
-            it { is_expected.to eq [1, 2, 1, 2] }
+            it { is_expected.to eq 2 }
           end
 
           context "問題の部分を切り出す #'" do
