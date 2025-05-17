@@ -1690,6 +1690,15 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq true }
       end
+
+      context '配列の場合' do
+        let(:str) do
+          <<~LISP
+            (consp `(1 2))
+          LISP
+        end
+        it { is_expected.to eq true }
+      end
     end
 
     describe '#atom' do

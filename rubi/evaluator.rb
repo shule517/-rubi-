@@ -43,7 +43,7 @@ module Rubi
       func_hash[:consp] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         puts "#{nest}push(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         value = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }.first
-        true if value.is_a?(Rubi::Cons)
+        true if value.is_a?(Rubi::Cons) ||value.is_a?(Array) # ArrayはConsの集合です
       end
 
       func_hash[:append] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
@@ -720,7 +720,7 @@ module Rubi
         # 通常引数の対応
         puts "#{nest}1. lexical_hashに通常引数を展開していく(normal_params: #{normal_params}, proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         normal_params.each.with_index do |param, index|
-          puts "#{nest}  1.1 変数を展開するために、評価する(index: #{index}, proc_params: #{proc_params}, proc_params[index]: #{proc_params[index]}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+          puts "#{nest}  1.1(#{index}ループ目) 変数を展開するために、評価する(param: #{param}, proc_params[index]: #{proc_params[index]}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 2)
         end
         puts "#{nest}-> 1. lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
