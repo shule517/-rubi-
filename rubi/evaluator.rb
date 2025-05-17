@@ -253,9 +253,12 @@ module Rubi
         #   (let ((x 2))
         #     x) ; => 2
         # x) ; => 1
+        # 1. 元の環境で評価する
+        values = var_params.map { |var_name, value| eval(value, lexical_hash, stack_count + 1) }
+        # 2. 新しい環境を作る
         next_lexical_hash = lexical_hash.dup
-        var_params.each do |var_name, value|
-          next_lexical_hash[var_name] = eval(value, next_lexical_hash, stack_count + 1)
+        var_params.each.with_index do |(var_name, value), index|
+          next_lexical_hash[var_name] = values[index]
         end
         puts "#{nest}-> next_lexical_hash(object_id: #{next_lexical_hash.object_id}): #{next_lexical_hash}"
         puts "#{nest}#式を評価する - expressions: #{expressions}"
