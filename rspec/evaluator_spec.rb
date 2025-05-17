@@ -1657,7 +1657,7 @@ describe Rubi::Evaluator do
     end
 
     describe '#funcall' do
-      context '(quote +)' do
+      context '(funcall (quote +) 1 2)' do
         let(:str) do
           <<~LISP
             (funcall (quote +) 1 2)
@@ -1666,13 +1666,22 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
-      context "'+" do
+      context "(funcall '+ 1 2)" do
         let(:str) do
           <<~LISP
             (funcall '+ 1 2)
           LISP
         end
         it { is_expected.to eq 3 }
+      end
+
+      context "(funcall '+ (+ 1 2) 3)" do
+        let(:str) do
+          <<~LISP
+            (funcall '+ (+ 1 2) 3)
+          LISP
+        end
+        it { is_expected.to eq 6 }
       end
     end
 
