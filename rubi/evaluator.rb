@@ -417,11 +417,7 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
         puts "#{nest}-> result: #{result}"
-        if result.is_a?(Rubi::Cons)
-          result.car
-        else
-          result.first
-        end
+        car(result)
       elsif function == :cdr
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
@@ -447,7 +443,7 @@ module Rubi
         eval_a = eval(a, lexical_hash, stack_count + 1)
         eval_b = eval(b, lexical_hash, stack_count + 1)
         puts "#{nest}(eval_a: #{eval_a}, eval_b: #{eval_b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        eval_b.find { |c| puts "#{nest}ループ -> c: #{c}"; c.first == eval_a }
+        eval_b.find { |c| puts "#{nest}ループ -> c: #{c}"; car(c) == eval_a }
       elsif function == :cons
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = eval(params[0], lexical_hash, stack_count + 1)
@@ -713,6 +709,14 @@ module Rubi
     end
 
     private
+
+    def car(x)
+      if x.is_a?(Rubi::Cons)
+        x.car
+      elsif x.is_a?(Array)
+        x.first
+      end
+    end
 
     # 関数定義
     def build_lambda(params, expression, build_lexical_hash, func_name)

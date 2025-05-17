@@ -4234,7 +4234,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :london }
         end
 
-        context "TODO: pushが呼ばれてないのがおかしそう。(funcall (car cities) 'london) ; => england" do
+        context "TODO: レキシカルスコープがおかしい？pushが呼ばれてない？(funcall (car cities) 'london) ; => england" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)
@@ -4255,6 +4255,26 @@ describe Rubi::Evaluator do
               (funcall (second cities) 'london 'england) ; => london
 
               (funcall (car cities) 'london) ; => england
+            LISP
+          end
+          it { is_expected.to eq :england }
+        end
+
+        context "↑の問題を分割した(funcall (car cities) 'london) ; => england" do
+          let(:str) do
+            <<~LISP
+              (defun find (key db)
+                (cdr (assoc key db)))
+
+              (defun add (key val db)
+                (push (cons key val) db)
+                key)
+
+              (setq db '((boston . us) (paris . france)))
+
+              (find 'boston db) ; => us
+              (add 'london 'england db) ; db[london] = england
+              (find 'london db) ; => england
             LISP
           end
           it { is_expected.to eq :england }
