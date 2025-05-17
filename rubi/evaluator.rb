@@ -118,6 +118,8 @@ module Rubi
         # aがquoteを含む式なら評価する（例：[:quote, [[1, 2], [3, 4]]]）
         if a.is_a?(Array) && a.first == :quote
           value = eval(a, lexical_hash, stack_count + 1)
+        elsif a.is_a?(Symbol)
+          value = eval(a, lexical_hash, stack_count + 1)
         else
           value = a
         end
@@ -293,16 +295,17 @@ module Rubi
         # (setq a 1 b 2 c 3)
         params.each_slice(2).map do |var_name, value|
           puts "#{nest}#{function}(var_name: #{var_name}, value: #{value})"
+          puts "#{nest}式を展開する(#{var_name} = #{value}) => lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
+          newvalue = eval(value, lexical_hash, stack_count + 1)
+
           if lexical_hash.key?(var_name)
             # ローカル変数がある場合は、ローカル変数を変更する
             puts "#{nest}ローカル変数を見つけた(#{var_name}) => lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
-            newvalue = eval(value, lexical_hash, stack_count + 1)
             lexical_hash[var_name] = newvalue
             puts "#{nest}ローカル変数がある場合は、ローカル変数を変更する(#{var_name} = #{newvalue}) => lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
             lexical_hash[var_name]
           else
             # ローカル変数がない場合は、グローバル変数を定義する
-            newvalue = eval(value, lexical_hash, stack_count + 1)
             var_hash[var_name] = newvalue
             puts "#{nest}ローカル変数がない場合は、グローバル変数を定義する(#{var_name} = #{newvalue}) => var_hash: #{var_hash}"
             puts "#{nest}-> var_hash: #{var_hash}"

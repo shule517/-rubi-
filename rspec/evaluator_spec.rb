@@ -2506,17 +2506,29 @@ describe Rubi::Evaluator do
       end
 
       context 'メモリを比較する(deep copyできているか確認する)' do
-        let(:str) do
-          <<~LISP
-            (setq a '((1 2) (3 4)))
-            (setq b (copy-tree a))
-            (eq (car a) (car b))
-          LISP
+        context 'setqのみ' do
+          let(:str) do
+            <<~LISP
+              (setq a '((1 2) (3 4)))
+              (setq b (copy-tree a))
+            LISP
+          end
+          it { is_expected.to eq [[1, 2], [3, 4]] }
         end
-        it { is_expected.to eq nil }
+
+        context 'メモリを比較' do
+          let(:str) do
+            <<~LISP
+              (setq a '((1 2) (3 4)))
+              (setq b (copy-tree a))
+              (eq (car a) (car b))
+            LISP
+          end
+          it { is_expected.to eq nil }
+        end
       end
 
-      context "TODO: 普通にバグってる。OnLispのサンプルコード" do
+      context "OnLispのサンプルコード" do
         let(:str) do
           <<~LISP
             (mapcar #'copy-tree '((a b) (c d e)))
