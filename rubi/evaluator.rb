@@ -19,6 +19,7 @@ module Rubi
       puts "#### ↓ 初期化 ↓ ####"
       %i(+ - * / < > <= >=).each do |operator|
         func_hash[operator] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+          puts "#{nest}#{operator}(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           if proc_params.empty?
             0
           else
@@ -31,11 +32,13 @@ module Rubi
       end
 
       func_hash[:mod] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+        puts "#{nest}mod(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         a % b
       end
 
       func_hash[:expt] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+        puts "#{nest}expt(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a, b = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
         a ** b
       end
@@ -47,6 +50,7 @@ module Rubi
       end
 
       func_hash[:append] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+        puts "#{nest}append(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         # TODO: Lispで実装した方がよいのでは？
         eval_params = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)
 
@@ -88,7 +92,7 @@ module Rubi
           array = eval(b, lexical_hash, stack_count + 1)
           array.map.with_index do |element, index|
             puts "#{nest}3. #{index+1}回目のループ(element: #{element}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-            proc.call(proc_params: Array(element), lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
+            proc.call(proc_params: [element], lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
           end
         else
           puts "#{nest}引数が3つの場合(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
@@ -109,6 +113,7 @@ module Rubi
       end
 
       func_hash[:"copy-tree"] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+        puts "#{nest}copy-tree(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = proc_params.shift
         result = eval(a, lexical_hash, stack_count + 1)
         Marshal.load(Marshal.dump(result))

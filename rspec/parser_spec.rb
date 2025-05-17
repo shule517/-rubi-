@@ -154,6 +154,12 @@ describe Rubi::Parser do
         it { is_expected.to eq [[:car, [:quote, [[:a, :".", 1], [:b, :".", 2], [:c, :".", 3]]]]] }
       end
 
+      context "'((a b) (c d e))" do
+        let(:str) { "'((a b) (c d e))" }
+        before { expect(ast).to eq [:"'", [[:a, :b], [:c, :d, :e]]] }
+        it { is_expected.to eq [[:quote, [[:a, :b], [:c, :d, :e]]]] }
+      end
+
       context "#'の場合" do
         let(:str) { "#'double" }
         before { expect(ast).to eq [:"#'", :double] }
