@@ -1192,6 +1192,43 @@ describe Rubi::Evaluator do
       end
     end
 
+
+    describe '#first' do
+      let(:str) do
+        <<~LISP
+          (first `(1 2 3)) ; => 1
+        LISP
+      end
+      it { is_expected.to eq 1 }
+    end
+
+    describe '#second' do
+      let(:str) do
+        <<~LISP
+          (second `(1 2 3)) ; => 2
+        LISP
+      end
+      it { is_expected.to eq 2 }
+    end
+
+    describe '#third' do
+      let(:str) do
+        <<~LISP
+          (third `(1 2 3)) ; => 3
+        LISP
+      end
+      it { is_expected.to eq 3 }
+    end
+
+    describe '#fourth' do
+      let(:str) do
+        <<~LISP
+          (fourth `(1 2 3 4)) ; => 4
+        LISP
+      end
+      it { is_expected.to eq 4 }
+    end
+
     describe '#append' do
       context 'list + list' do
         let(:str) do
@@ -4017,7 +4054,7 @@ describe Rubi::Evaluator do
           end
         end
 
-        context "TODO: 単純にバグってそう。(funcall (car cities) 'boston) ; => us" do
+        context "(funcall (car cities) 'boston) ; => us" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)

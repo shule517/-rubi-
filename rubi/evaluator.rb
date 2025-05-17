@@ -140,6 +140,10 @@ module Rubi
             (dotimes (n index (car result))
               (setq result (cdr result)))))
       LISP
+      lisp_eval("(defun first (lst) (nth 0 lst)")
+      lisp_eval("(defun second (lst) (nth 1 lst)")
+      lisp_eval("(defun third (lst) (nth 2 lst)")
+      lisp_eval("(defun fourth (lst) (nth 3 lst)")
 
       # TODO: 要リファクタリング。sortをLispで実装してみた。
       # lisp_eval(<<~LISP)
