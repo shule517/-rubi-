@@ -115,8 +115,13 @@ module Rubi
       func_hash[:"copy-tree"] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         puts "#{nest}copy-tree(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = proc_params.shift
-        result = eval(a, lexical_hash, stack_count + 1)
-        Marshal.load(Marshal.dump(result))
+        # aがquoteを含む式なら評価する（例：[:quote, [[1, 2], [3, 4]]]）
+        if a.is_a?(Array) && a.first == :quote
+          value = eval(a, lexical_hash, stack_count + 1)
+        else
+          value = a
+        end
+        Marshal.load(Marshal.dump(value))
       end
 
       # TODO: 遅くなってる。高速化したい。

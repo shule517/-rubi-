@@ -4260,7 +4260,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq [4, 7, 9, 5] }
         end
 
-        context "TODO: mapcar？が普通にバグってる。(mapcar #'copy-tree '((a b) (c d e)))" do
+        context "(mapcar #'copy-tree '((a b) (c d e)))" do
           let(:str) do
             <<~LISP
               (mapcar #'copy-tree '((a b) (c d e)))
