@@ -40,6 +40,12 @@ module Rubi
         a ** b
       end
 
+      func_hash[:consp] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+        puts "#{nest}push(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        value = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }.first
+        true if value.is_a?(Rubi::Cons)
+      end
+
       func_hash[:append] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         # TODO: Lispで実装した方がよいのでは？
         eval_params = proc_params.map { |param| eval(param, lexical_hash, stack_count + 1) }.reject(&:nil?)

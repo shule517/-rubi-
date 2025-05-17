@@ -305,6 +305,16 @@ describe Rubi::Evaluator do
         end
         it { expect { subject }.to raise_error }
       end
+
+      context 'labelsで定義したローカル関数のProcを取り出す' do
+        let(:str) do
+          <<~LISP
+            (labels ((instances-in () 2))
+              #'instances-in)
+          LISP
+        end
+        it { is_expected.to be_instance_of Proc }
+      end
     end
 
     describe '#setq' do
@@ -1641,6 +1651,44 @@ describe Rubi::Evaluator do
           LISP
         end
         it { is_expected.to eq nil }
+      end
+    end
+
+    describe '#consp' do
+      context '数値の場合' do
+        let(:str) do
+          <<~LISP
+            (consp 1)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'nilの場合' do
+        let(:str) do
+          <<~LISP
+            (consp nil)
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context '式の場合' do
+        let(:str) do
+          <<~LISP
+            (consp (+ 1 1))
+          LISP
+        end
+        it { is_expected.to eq nil }
+      end
+
+      context 'consの場合' do
+        let(:str) do
+          <<~LISP
+            (consp (cons 1 2))
+          LISP
+        end
+        it { is_expected.to eq true }
       end
     end
 
@@ -4260,14 +4308,30 @@ describe Rubi::Evaluator do
                                     (instances-in (cdr lst)))
                                  0)))
                     (mapcar #'instances-in lsts)))
+
                 (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
               LISP
             end
-            # TODO: mapcar #'instances-in lsts ここが原因っぽい
             it { is_expected.to eq [1, 2, 1, 2] }
           end
 
-          context '問題の部分を切り出す' do
+          context '問題の部分を切り出す instances-in' do
+            let(:str) do
+              <<~LISP
+                (defun instances-in (lst)
+                  (if (consp lst)
+                    (+ (if (eq (car lst) obj) 1 0)
+                      (instances-in (cdr lst)))
+                    0))
+
+                (instances-in `(a b c))
+                ; (count-instances 'a '((a b c) (d a r p a) (d a r) (a a)))
+              LISP
+            end
+            it { is_expected.to eq [1, 2, 1, 2] }
+          end
+
+          context "問題の部分を切り出す #'" do
             let(:str) do
               <<~LISP
                 (labels ((instances-in () 2))
