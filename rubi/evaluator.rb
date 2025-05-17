@@ -74,6 +74,9 @@ module Rubi
           #     '(1 2 3))
           puts "#{nest}1. 関数を取り出す(a: #{a}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           proc = eval(a, lexical_hash, stack_count + 1)
+          if proc.is_a?(Symbol)
+            proc = func_hash[proc]
+          end
           raise "procがnil。(a: #{a})を評価して、procが戻ってこなかった" if proc.nil?
           puts "#{nest}2. 引数を評価する(b: #{b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
           array = eval(b, lexical_hash, stack_count + 1)

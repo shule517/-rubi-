@@ -1170,6 +1170,38 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#mapcar' do
+      context "関数を渡した場合" do
+        let(:str) { "(mapcar #'1+ '(1 2 3)) ; => (2 3 4)" }
+        it { is_expected.to eq [2, 3, 4] }
+      end
+
+      context "関数名のシンボルを渡した場合" do
+        let(:str) { "(mapcar '1+ '(1 2 3)) ; => (2 3 4)" }
+        it { is_expected.to eq [2, 3, 4] }
+      end
+
+      context "(mapcar (lambda (x) (* x x)) '(1 2 3 4))  ; => (1 4 9 16)" do
+        let(:str) { "(mapcar (lambda (x) (* x x)) '(1 2 3 4))  ; => (1 4 9 16)" }
+        it { is_expected.to eq [1, 4, 9, 16] }
+      end
+
+      context "(mapcar #'+ '(1 2 3) '(4 5 6)) ; => (5 7 9)" do
+        let(:str) { "(mapcar #'+ '(1 2 3) '(4 5 6)) ; => (5 7 9)" }
+        it { is_expected.to eq [5, 7, 9] }
+      end
+
+      context "式を含む場合" do
+        let(:str) { "(mapcar #'1+ (append '(1 2) '(3 4))) ; => (2 3 4 5)" }
+        it { is_expected.to eq [2, 3, 4, 5] }
+      end
+
+      # context "(mapcar #'cons '(a b c) '(1 2)) ; => ((a . 1) (b . 2))" do
+      #   let(:str) { "(mapcar #'cons '(a b c) '(1 2)) ; => ((a . 1) (b . 2))" }
+      #   it { is_expected.to eq [5, 7, 9] }
+      # end
+    end
+
     describe '#nth' do
       context 'index:0の場合' do
         let(:str) { "(nth 0 '(a b c))" }
@@ -1191,7 +1223,6 @@ describe Rubi::Evaluator do
         it { is_expected.to eq nil }
       end
     end
-
 
     describe '#first' do
       let(:str) do
