@@ -393,13 +393,14 @@ module Rubi
       elsif function == :cdr
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
-        if result.is_a?(Rubi::Cons)
+        if result.nil?
+          nil
+        elsif result.is_a?(Rubi::Cons)
           result.cdr
         else
           result[1..]
         end
       elsif function == :assoc
-        # TODO: 実装中
         # (setq alist '((a . 1) (b . 2) (c . 3)))
         # (assoc 'b alist) ; => (b . 2)
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
@@ -407,7 +408,7 @@ module Rubi
         eval_a = eval(a, lexical_hash, stack_count + 1)
         eval_b = eval(b, lexical_hash, stack_count + 1)
         puts "#{nest}(eval_a: #{eval_a}, eval_b: #{eval_b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        eval_b.find { |c| puts "ループ ->";cons = eval(c, lexical_hash, stack_count + 1);pp cons: cons;cons.car == eval_a }
+        eval_b.find { |c| puts "#{nest}ループ -> c: #{c}"; c.first == eval_a }
       elsif function == :cons
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         a = eval(params[0], lexical_hash, stack_count + 1)
