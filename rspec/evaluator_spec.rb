@@ -62,7 +62,7 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
-      context "TODO: レキシカルスコープ系の問題なのかな？ (setq add2 (make-adder 2) add10 (make-adder 10))" do
+      context "TODO: レキシカルスコープ系の問題なのかな？(setq add2 (make-adder 2) add10 (make-adder 10))" do
         let(:str) do
           <<~LISP
             (defun make-adder (n)
@@ -73,6 +73,61 @@ describe Rubi::Evaluator do
           LISP
         end
         it { is_expected.to eq 7 }
+      end
+
+      context "TODO: レキシカルスコープ系の問題なのかな？(funcall addx 3) (funcall addx 100 t) (funcall addx 3)" do
+        let(:str) do
+          <<~LISP
+              (defun make-adderb (n)
+                #'(lambda (x &optional change)
+                    (if change
+                        (setq n x)
+                        (+ x n))))
+              (setq addx (make-adderb 1))
+              (funcall addx 3) ; => 4
+              (funcall addx 100 t) ; => 100
+              (funcall addx 3) ; => 103
+            LISP
+        end
+        it { is_expected.to eq 103 }
+      end
+
+      context "TODO: レキシカルスコープがおかしい？pushが呼ばれてない？(funcall (car cities) 'london) ; => england" do
+        let(:str) do
+          <<~LISP
+              (defun make-dbms (db)
+                (list
+                  #'(lambda (key)
+                      (cdr (assoc key db)))
+                  #'(lambda (key val)
+                      (push (cons key val) db)
+                      key)
+                  #'(lambda (key)
+                      (setf db (delete key db :key #'car))
+                      key)))
+
+              (setq cities (make-dbms '((boston . us) (paris . france))))
+
+              (funcall (car cities) 'boston) ; => us
+
+              (funcall (second cities) 'london 'england) ; => london
+
+              (funcall (car cities) 'london) ; => england
+            LISP
+        end
+        it { is_expected.to eq :england }
+      end
+
+      context "(defun list+ (lst n) (mapcar #'(lambda (x) (+ x n)) lst))" do
+        let(:str) do
+          <<~LISP
+              (defun list+ (lst n)
+                (mapcar #'(lambda (x) (+ x n))
+                        lst))
+              (list+ '(2 5 7 3) 2)
+            LISP
+        end
+        it { is_expected.to eq [4, 7, 9, 5] }
       end
     end
 
