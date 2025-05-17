@@ -4076,7 +4076,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :us }
         end
 
-        context "TODO: 単純にバグってそう。(funcall (second cities) 'london 'england) ; => london" do
+        context "(funcall (second cities) 'london 'england) ; => london" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)
