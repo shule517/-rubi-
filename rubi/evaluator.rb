@@ -393,11 +393,18 @@ module Rubi
       elsif function == :cdr
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         result = eval(params.first, lexical_hash, stack_count + 1)
+        puts "#{nest}result: #{result} params: #{params}"
         if result.nil?
+          puts "#{nest}-> nil"
           nil
         elsif result.is_a?(Rubi::Cons)
+          puts "#{nest}-> #{result.cdr} ※consの場合"
           result.cdr
+        elsif result[1] == :"."
+          puts "#{nest}-> #{result[2]} ※a . b形式の場合" # TODO: consに変換して対応できないのか？
+          result[2]
         else
+          puts "#{nest}-> #{result[1..]} ※配列の場合"
           result[1..]
         end
       elsif function == :assoc
@@ -471,7 +478,8 @@ module Rubi
         eval(expressions, lexical_hash, stack_count + 1)
       elsif function == :funcall
         puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        array = params.map { |a| puts "#{nest}(a: #{a})";result = eval(a, lexical_hash, stack_count + 1);puts "#{nest}-> #{result}";result }
+        array = params
+        array[0] = eval(params[0], lexical_hash, stack_count + 1) # 関数だけ評価する。引数は評価しない。
         puts "#{nest}#{function}(array: #{array})"
         eval(array, lexical_hash, stack_count + 1)
       elsif function == :defmacro

@@ -1683,6 +1683,15 @@ describe Rubi::Evaluator do
         end
         it { is_expected.to eq 6 }
       end
+
+      context "(funcall 'list 'a 'b)" do
+        let(:str) do
+          <<~LISP
+            (funcall 'list 'a 'b)
+          LISP
+        end
+        it { is_expected.to eq [:a, :b] }
+      end
     end
 
     describe '#defmacro' do
