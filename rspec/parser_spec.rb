@@ -109,13 +109,49 @@ describe Rubi::Parser do
       context "'(a . b)の展開" do
         let(:str) { "'(a . b)" }
         before { expect(ast).to eq [:"'", [:a, :".", :b]] }
-        it { is_expected.to eq [[:cons, [:quote, :a], [:quote, :b]]] }
+        it { is_expected.to eq [[:quote, [:a, :".", :b]]] }
+      end
+
+      context "'(a . 2)の展開" do
+        let(:str) { "'(a . 2)" }
+        before { expect(ast).to eq [:"'", [:a, :".", 2]] }
+        it { is_expected.to eq [[:quote, [:a, :".", 2]]] }
+      end
+
+      context "`(a . 2)の展開" do
+        let(:str) { "`(a . 2)" }
+        before { expect(ast).to eq [:"`", [:a, :".", 2]] }
+        it { is_expected.to eq [[:quote, [:a, :".", 2]]] }
+      end
+
+      context "(car '(a . 1))の展開" do
+        let(:str) { "(car '(a . 1))" }
+        before { expect(ast).to eq [[:car, :"'", [:a, :".", 1]]] }
+        it { is_expected.to eq [[:car, [:quote, [:a, :".", 1]]]] }
+      end
+
+      context "`(1 . 2)の展開" do
+        let(:str) { "`(1 . 2)" }
+        before { expect(ast).to eq [:"`", [1, :".", 2]] }
+        it { is_expected.to eq [[:quote, [1, :".", 2]]] }
       end
 
       context "(1 . 2)の展開" do
         let(:str) { "(1 . 2)" }
         before { expect(ast).to eq [[1, :".", 2]] }
-        it { is_expected.to eq [[:cons, 1, 2]] }
+        it { is_expected.to eq [[1, :".", 2]] }
+      end
+
+      context "'((a . 1) (b . 2) (c . 3)) => (quote ((a . 1) (b . 2) (c . 3)))" do
+        let(:str) { "'((a . 1) (b . 2) (c . 3))" }
+        before { expect(ast).to eq [:"'", [[:a, :".", 1], [:b, :".", 2], [:c, :".", 3]]] }
+        it { is_expected.to eq [[:quote, [[:a, :".", 1], [:b, :".", 2], [:c, :".", 3]]]] }
+      end
+
+      context "(car '((a . 1) (b . 2) (c . 3))) => (car (quote ((a . 1) (b . 2) (c . 3))))" do
+        let(:str) { "(car '((a . 1) (b . 2) (c . 3)))" }
+        before { expect(ast).to eq [[:car, :"'", [[:a, :".", 1], [:b, :".", 2], [:c, :".", 3]]]] }
+        it { is_expected.to eq [[:car, [:quote, [[:a, :".", 1], [:b, :".", 2], [:c, :".", 3]]]]] }
       end
 
       context "#'の場合" do

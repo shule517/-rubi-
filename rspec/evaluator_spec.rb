@@ -1336,7 +1336,16 @@ describe Rubi::Evaluator do
       context '(1 . 2)' do
         let(:str) do
           <<~LISP
-            (1 . 2)
+            (1 . 2) ; => 1は関数名じゃありませんエラー
+          LISP
+        end
+        it { expect { subject }.to raise_error }
+      end
+
+      context '`(1 . 2)' do
+        let(:str) do
+          <<~LISP
+            `(1 . 2) ; => (quote (1 . 2)) => (1 . 2)
           LISP
         end
         it do
@@ -1347,27 +1356,65 @@ describe Rubi::Evaluator do
         end
       end
 
-      context "(car '(a . 1))" do
+      context '`(1 . 2 3)' do
         let(:str) do
           <<~LISP
-            (car '(a . 1))
+            `(1 . 2 3) ; 引数が多いですエラー
           LISP
         end
-        it { is_expected.to eq :a }
+        it { expect { subject }.to raise_error }
       end
 
-      context "(car '((a . 1) (b . 2) (c . 3)))" do
+      context '`(a . 2)' do
         let(:str) do
           <<~LISP
-            (car '((a . 1) (b . 2) (c . 3))) ; => (A . 1)
+            `(a . 2) ; => (quote (a . 2))=> (A . 2)
           LISP
         end
         it do
           result = subject
           expect(result).to be_instance_of(Rubi::Cons)
           expect(result.car).to eq :a
-          expect(result.cdr).to eq 1
+          expect(result.cdr).to eq 2
         end
+      end
+
+      context '(a . 2)' do
+        let(:str) do
+          <<~LISP
+            (a . 2) ; => aは評価できませんエラー
+          LISP
+        end
+        it { expect { subject }.to raise_error }
+      end
+
+      context "(car '(a . 1))" do
+        let(:str) do
+          <<~LISP
+            (car '(a . 1)) ; (car (quote (a . 1))) => A
+          LISP
+        end
+        it { is_expected.to eq :a }
+      end
+
+      context "'((a . 1) (b . 2) (c . 3))" do
+        let(:str) do
+          <<~LISP
+            '((a . 1) (b . 2) (c . 3)) ; => ((A . 1) (B . 2) (C . 3))
+          LISP
+        end
+        # TODO: この扱いでいいのか？感
+        it { is_expected.to eq [[:a, :".", 1], [:b, :".", 2], [:c, :".", 3]] }
+      end
+
+      context "(car '((a . 1) (b . 2) (c . 3)))" do
+        let(:str) do
+          <<~LISP
+            (car '((a . 1) (b . 2) (c . 3))) ; (car (quote ((a . 1) (b . 2) (c . 3)))) ; => (A . 1)
+          LISP
+        end
+        # TODO: この扱いでいいのか？感
+        it { is_expected.to eq [:a, :".", 1] }
       end
 
       context "(car (car '((a . 1) (b . 2) (c . 3))))" do
@@ -4161,7 +4208,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq 6 }
         end
 
-        context "TODO: 無限ループする (defun our-length (lst)" do
+        context "(defun our-length (lst)" do
           let(:str) do
             <<~LISP
               (defun our-length (lst)
@@ -4185,7 +4232,7 @@ describe Rubi::Evaluator do
           xit {}
         end
 
-        context "TODO: 無限ループ (defun triangle (n)" do
+        context "(defun triangle (n)" do
           let(:str) do
             <<~LISP
               (defun triangle (n)

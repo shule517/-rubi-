@@ -439,6 +439,16 @@ module Rubi
       elsif function == :quote
         expressions = params[0] # quoteは評価しない
         puts "#{nest}#{function}(expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        if expressions[1] == :'.'
+          raise "引数が多いです#{expressions}" if expressions.size != 3
+          cons = Rubi::Cons.new(car: expressions[0], cdr: expressions[2])
+          puts "#{nest}-> #{cons}"
+          cons
+        else
+          puts "#{nest}-> expressions: #{expressions}"
+          expressions # 評価しない
+        end
+
         # TODO:
         # expressions.map do |expression|
         #   if list?(expression)
@@ -454,8 +464,6 @@ module Rubi
         #     expression # 評価しない
         #   end
         # end
-        puts "#{nest}-> expressions: #{expressions}"
-        expressions # 評価しない
       elsif function == :unquote
         expressions = params[0]
         puts "#{nest}#{function}(expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
@@ -658,8 +666,8 @@ module Rubi
         puts "#{nest}ローカル関数(#{function})が見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         lexical_hash[function].call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
       else
-        puts "#{nest}TODO: else -> #{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        raise "対応する関数(#{function})が見つかりません(params: #{params})"
+        puts "#{nest}'#{function}'は、関数ではありません(params: #{params} lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        raise "'#{function}'は、関数ではありません(params: #{params})"
       end
     end
 

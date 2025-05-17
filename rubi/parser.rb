@@ -39,15 +39,8 @@ module Rubi
             # [:quote, [1, 2, :a]]
             token = ast.shift
             if list?(token)
-              if token.size == 3 && token[1] == :"."
-                # '(a . b)
-                # ↓
-                # (cons (quote boston) (quote us))
-                array << [:cons, [:quote, token[0]], [:quote, token[2]]]
-              else
-                token = expand_syntactic_sugar(token)
-                array << [:quote, token]
-              end
+              token = expand_syntactic_sugar(token)
+              array << [:quote, token]
             else
               array << [:quote, token]
             end
@@ -72,15 +65,11 @@ module Rubi
             array << token
           end
         else
-          if token.size == 3 && token[1] == :"."
-            array << [:cons, token[0], token[2]]
-          else
-            # リストの場合
-            # [[:funcall, :"'", :+, 1, 2]]
-            # ↓
-            # [[:funcall, [:quote, :+], 1, 2]]
-            array << expand_syntactic_sugar(token)
-          end
+          # リストの場合
+          # [[:funcall, :"'", :+, 1, 2]]
+          # ↓
+          # [[:funcall, [:quote, :+], 1, 2]]
+          array << expand_syntactic_sugar(token)
         end
       end
       array
