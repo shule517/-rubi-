@@ -255,7 +255,7 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, func_expression: #{func_expression})"
 
         # ローカル関数を定義する
-        func = build_lambda(func_params, func_expression, lexical_hash, stack_count + 1, nest)
+        func = build_lambda(func_params, func_expression, lexical_hash, func_name)
         lexical_hash[func_name] = func # ローカル変数に関数を登録する
 
         # 式を実行する
@@ -330,13 +330,13 @@ module Rubi
         puts "#{nest}#{function}(params: #{params}, expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         # 関数定義
         expression = expressions.last # TODO: 途中の式を実行していない
-        build_lambda(params, expression, lexical_hash, stack_count, nest)
+        build_lambda(params, expression, lexical_hash, "lambdaで定義した関数")
       elsif function == :defun # 関数定義
         func_name = params.shift
         params, expression = params
         puts "#{nest}#{function}(params: #{params}, expression: #{expression})"
         # 関数定義
-        func_hash[func_name] = build_lambda(params, expression, lexical_hash, stack_count, nest)
+        func_hash[func_name] = build_lambda(params, expression, lexical_hash, func_name)
         puts "#{nest}func_hash: #{@func_hash}"
         func_name # 定義した関数名のシンボルを返す
       elsif function == :function
@@ -675,11 +675,11 @@ module Rubi
     private
 
     # 関数定義
-    def build_lambda(params, expression, build_lexical_hash, stack_count, nest)
+    def build_lambda(params, expression, build_lexical_hash, func_name)
       Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         lexical_hash.merge!(build_lexical_hash) # 関数の引数を引き継ぐ
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
-        puts "#{nest}lambdaの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        puts "#{nest}lambda(#{func_name})の中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
 
         # オプショナル引数を分ける
         optional_index = params.index(:"&optional")
