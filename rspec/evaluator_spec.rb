@@ -1322,6 +1322,40 @@ describe Rubi::Evaluator do
       end
     end
 
+    describe '#push' do
+      context '戻り値の確認' do
+        let(:str) do
+          <<~LISP
+            (setq lst `(2 3 4))
+            (push 1 lst)
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3, 4] }
+      end
+
+      context '変数の確認' do
+        let(:str) do
+          <<~LISP
+            (setq lst `(2 3 4))
+            (push 1 lst)
+            lst
+          LISP
+        end
+        it { is_expected.to eq [1, 2, 3, 4] }
+      end
+
+      context '式の場合' do
+        let(:str) do
+          <<~LISP
+            (setq lst `(2 3 4))
+            (push (+ 1 2) lst)
+            lst
+          LISP
+        end
+        it { is_expected.to eq [3, 2, 3, 4] }
+      end
+    end
+
     describe '#car' do
       let(:str) do
         <<~LISP
@@ -4606,16 +4640,6 @@ describe Rubi::Evaluator do
           let(:str) do
             <<~LISP
               (setq x (nconc x y))
-            LISP
-          end
-          it { is_expected.to eq 99999999999 }
-        end
-
-        context "set setq setf psetf psetq incf decf push pop pushnew" do
-          let(:str) do
-            <<~LISP
-              set setq setf psetf psetq incf decf push pop pushnew
-              rplaca rplacd rotatef shiftf remf remprop remhash
             LISP
           end
           it { is_expected.to eq 99999999999 }

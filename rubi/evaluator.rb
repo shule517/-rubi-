@@ -56,6 +56,12 @@ module Rubi
         end
       end
 
+      func_hash[:push] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+        puts "#{nest}push(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        newvalue, array = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }
+        array.unshift(newvalue)
+      end
+
       func_hash[:mapcar] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         # TODO: Lispのcarで実装した方がよいのでは？
         puts "#{nest}mapcar(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
