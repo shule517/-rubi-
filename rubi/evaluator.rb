@@ -466,7 +466,7 @@ module Rubi
       elsif function == :quote
         expressions = params[0] # quoteは評価しない
         puts "#{nest}#{function}(expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        if expressions[1] == :'.'
+        if expressions[1] == :"."
           raise "引数が多いです#{expressions}" if expressions.size != 3
           cons = Rubi::Cons.new(car: expressions[0], cdr: expressions[2])
           puts "#{nest}-> #{cons}"
