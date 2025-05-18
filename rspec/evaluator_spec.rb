@@ -1263,7 +1263,7 @@ describe Rubi::Evaluator do
 
       # context "(mapcar #'cons '(a b c) '(1 2)) ; => ((a . 1) (b . 2))" do
       #   let(:str) { "(mapcar #'cons '(a b c) '(1 2)) ; => ((a . 1) (b . 2))" }
-      #   it { is_expected.to eq [5, 7, 9] }
+      #   it { is_expected.to eq [[:a, :".", 1], [:b, :".", 2]] }
       # end
     end
 

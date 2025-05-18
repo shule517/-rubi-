@@ -43,6 +43,21 @@ module Rubi
         a ** b
       end
 
+      func_hash[:cons] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
+        puts "#{nest}cons(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        a = eval(proc_params[0], lexical_hash, stack_count + 1)
+        b = eval(proc_params[1], lexical_hash, stack_count + 1)
+        if b.nil?
+          [a] # 末がnilのものは、配列
+        elsif atom?(b)
+          Cons.new(car: a, cdr: b) # 末がnilじゃないものは、cons
+        elsif atom?(a) && list?(b)
+          [a] + b
+        elsif list?(a) && list?(b)
+          a + b
+        end
+      end
+
       func_hash[:consp] = Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         puts "#{nest}push(proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         value = proc_params.map { |a| eval(a, lexical_hash, stack_count + 1) }.first
@@ -435,19 +450,6 @@ module Rubi
         eval_b = eval(b, lexical_hash, stack_count + 1)
         puts "#{nest}(eval_a: #{eval_a}, eval_b: #{eval_b}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         eval_b.find { |c| puts "#{nest}ループ -> c: #{c}"; car(c) == eval_a }
-      elsif function == :cons
-        puts "#{nest}#{function}(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        a = eval(params[0], lexical_hash, stack_count + 1)
-        b = eval(params[1], lexical_hash, stack_count + 1)
-        if b.nil?
-          [a] # 末がnilのものは、配列
-        elsif atom?(b)
-          Cons.new(car: a, cdr: b) # 末がnilじゃないものは、cons
-        elsif atom?(a) && list?(b)
-          [a] + b
-        elsif list?(a) && list?(b)
-          a + b
-        end
       elsif function == :sort
         a, func = params
         list = eval(a, lexical_hash, stack_count + 1)
