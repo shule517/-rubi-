@@ -729,8 +729,34 @@ module Rubi
 
     # 関数定義
     def build_lambda(params, expression, build_lexical_hash, func_name)
+      # クロージャ：環境(レキシカルスコープ)をキャプチャした関数オブジェクトのこと
+
+      # 例)
+      # (defun make-adder (n)
+      #   (lambda (x) (+ x n)))
+      #
+      # (setq add2 (make-adder 2))   ; n=2 をキャプチャ
+      # (setq add10 (make-adder 10)) ; n=10 をキャプチャ
+      #
+      # (funcall add2 5) ; => 7
+      # (funcall add10 5) ; => 15
+
+      captured_lexical_env = build_lexical_hash.dup # 関数オブジェクトを生成したタイミングの環境を保持する（キャプチャする）
+      # 他のクロージャと変数が共有されてしまうのを防ぐために、環境を複製する
+      # 例)
+      # add2のnは2
+      # add10のnは10
+
       Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
-        lexical_hash.merge!(build_lexical_hash) # 関数の引数を引き継ぐ
+        # 1. build_lexical_hash は、setqで変数を変更して、引き継がないといけない → build_lexical_hashはdupしちゃいけない
+        # local_lexical_hash = build_lexical_hash # build_lexical_hashはdupしちゃいけない
+        # local_lexical_hash = local_lexical_hash.merge(lexical_hash) # 関数の引数を引き継ぐ(関数の引数: lexical_hash, 関数の関数の引数: build_lexical_hash)
+
+        # local_lexical_hash = build_lexical_hash
+
+        # 引数の値だけを新しくスコープに追加（上書き）
+        local_lexical_hash = captured_lexical_env#.dup
+
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
         puts "#{nest}lambda(#{func_name})の中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
 
@@ -744,32 +770,32 @@ module Rubi
         end
 
         # 通常引数の対応
-        puts "#{nest}1. lexical_hashに通常引数を展開していく(normal_params: #{normal_params}, proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        puts "#{nest}1. local_lexical_hashに通常引数を展開していく(normal_params: #{normal_params}, proc_params: #{proc_params}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
         normal_params.each.with_index do |param, index|
-          puts "#{nest}  1.1(#{index}ループ目) 変数を展開するために、評価する(param: #{param}, proc_params[index]: #{proc_params[index]}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-          lexical_hash[param] = eval(proc_params[index], lexical_hash, stack_count + 2)
+          puts "#{nest}  1.1(#{index}ループ目) 変数を展開するために、評価する(param: #{param}, proc_params[index]: #{proc_params[index]}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
+          local_lexical_hash[param] = eval(proc_params[index], local_lexical_hash, stack_count + 2)
         end
-        puts "#{nest}-> 1. lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
+        puts "#{nest}-> 1. local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash}"
 
         # オプショナル引数の対応
-        puts "#{nest}2. lexical_hashにオプショナル引数を展開していく(optional_params: #{optional_params}, proc_params: #{proc_params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        puts "#{nest}2. local_lexical_hashにオプショナル引数を展開していく(optional_params: #{optional_params}, proc_params: #{proc_params}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
         Array(optional_params).each.with_index do |param, index|
           proc_params_index = index + normal_params.size
           value = proc_params[proc_params_index]
           var_name, default_value = param
           puts "#{nest}オプショナル引数(#{optional_params})を設定する(var_name: #{var_name}, value: #{value}, default_value: #{default_value})"
           if value
-            puts "#{nest}  2.1 変数を展開するために、評価する lexical_hash[#{var_name}] = (value: #{value}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-            lexical_hash[var_name] = eval(value, lexical_hash, stack_count + 2)
+            puts "#{nest}  2.1 変数を展開するために、評価する local_lexical_hash[#{var_name}] = (value: #{value}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
+            local_lexical_hash[var_name] = eval(value, local_lexical_hash, stack_count + 2)
           else
-            puts "#{nest}  2.2 引数の指定がないため、デフォルト値を採用する lexical_hash[#{var_name}] = (value: #{value}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-            lexical_hash[var_name] = default_value
+            puts "#{nest}  2.2 引数の指定がないため、デフォルト値を採用する local_lexical_hash[#{var_name}] = (value: #{value}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
+            local_lexical_hash[var_name] = default_value
           end
         end
 
-        puts "#{nest}-> 2. lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash}"
-        puts "#{nest}3. lambdaを実行する(expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        eval(expression, lexical_hash, stack_count + 1)
+        puts "#{nest}-> 2. local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash}"
+        puts "#{nest}3. lambdaを実行する(expression: #{expression}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
+        eval(expression, local_lexical_hash, stack_count + 1)
       end
     end
 
