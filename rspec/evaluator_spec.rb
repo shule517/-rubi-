@@ -62,39 +62,40 @@ describe Rubi::Evaluator do
         it { is_expected.to eq 3 }
       end
 
-      context "TODO: レキシカルスコープ系の問題なのかな？(setq add2 (make-adder 2) add10 (make-adder 10))" do
-        let(:str) do
-          <<~LISP
-            (defun make-adder (n)
-              #'(lambda (x) (+ x n)))
-            (setq add2 (make-adder 2)
-              add10 (make-adder 10))
-            (funcall add2 5)
-          LISP
-        end
-        it { is_expected.to eq 7 }
-      end
-
-      context "TODO: レキシカルスコープ系の問題なのかな？(funcall addx 3) (funcall addx 100 t) (funcall addx 3)" do
-        let(:str) do
-          <<~LISP
-              (defun make-adderb (n)
-                #'(lambda (x &optional change)
-                    (if change
-                        (setq n x)
-                        (+ x n))))
-              (setq addx (make-adderb 1))
-              (funcall addx 3) ; => 4
-              (funcall addx 100 t) ; => 100
-              (funcall addx 3) ; => 103
+      context 'レキシカルスコープ系の問題' do
+        context "(setq add2 (make-adder 2) add10 (make-adder 10))" do
+          let(:str) do
+            <<~LISP
+              (defun make-adder (n)
+                #'(lambda (x) (+ x n)))
+              (setq add2 (make-adder 2)
+                add10 (make-adder 10))
+              (funcall add2 5)
             LISP
+          end
+          it { is_expected.to eq 7 }
         end
-        it { is_expected.to eq 103 }
-      end
 
-      context "TODO: レキシカルスコープがおかしい？pushが呼ばれてない？(funcall (car cities) 'london) ; => england" do
-        let(:str) do
-          <<~LISP
+        context "(funcall addx 3) (funcall addx 100 t) (funcall addx 3)" do
+          let(:str) do
+            <<~LISP
+                (defun make-adderb (n)
+                  #'(lambda (x &optional change)
+                      (if change
+                          (setq n x)
+                          (+ x n))))
+                (setq addx (make-adderb 1))
+                (funcall addx 3) ; => 4 (n=1)
+                (funcall addx 100 t) ; => 100 (n=1 → n=100 に変更する)
+                (funcall addx 3) ; => 103 (n=100)
+              LISP
+          end
+          it { is_expected.to eq 103 }
+        end
+
+        context "(funcall (car cities) 'london) ; => nil" do
+          let(:str) do
+            <<~LISP
               (defun make-dbms (db)
                 (list
                   #'(lambda (key)
@@ -105,17 +106,105 @@ describe Rubi::Evaluator do
                   #'(lambda (key)
                       (setf db (delete key db :key #'car))
                       key)))
-
-              (setq cities (make-dbms '((boston . us) (paris . france))))
-
-              (funcall (car cities) 'boston) ; => us
-
-              (funcall (second cities) 'london 'england) ; => london
-
-              (funcall (car cities) 'london) ; => england
+  
+              (setq cities (make-dbms '((boston . us) (paris . france)))) ; dbを登録
+  
+              (funcall (car cities) 'boston) ; => us (dbのbostonを取得)
+  
+              (funcall (car cities) 'london) ; => nil (dbのlondonを取得)
             LISP
+          end
+          it { is_expected.to eq nil }
         end
-        it { is_expected.to eq :england }
+
+        context "pushの破壊的操作の部分だけ抜き出し" do
+          let(:str) do
+            <<~LISP
+              (setq db '()) ; 空のリストをグローバル変数 db に定義
+              
+              (push '(a . 1) db) ; db にペア (a . 1) を追加
+              
+              db ; => ((a . 1))
+              
+              (push '(b . 2) db)
+              
+              db ; => ((b . 2) (a . 1))
+            LISP
+          end
+          it do
+            a, b = subject
+            expect(a.car).to eq :b
+            expect(a.cdr).to eq 2
+            expect(b.car).to eq :a
+            expect(b.cdr).to eq 1
+          end
+        end
+
+        context "dbの設定部分だけ抜き出し" do
+          let(:str) do
+            <<~LISP
+              (setq db '()) ; 空のデータベース
+  
+              ((lambda (key val)
+                 (push (cons key val) db)
+                 key)
+               'name "シュール")
+  
+              db
+            LISP
+          end
+          it { is_expected.to eq [:name, :".", 'シュール'] }
+        end
+
+        context "TODO: レキシカルスコープがおかしい？(funcall (car cities) 'london) ; => england" do
+          let(:str) do
+            <<~LISP
+              (defun make-dbms (db)
+                (list
+                  #'(lambda (key)
+                      (cdr (assoc key db)))
+                  #'(lambda (key val)
+                      (push (cons key val) db)
+                      key)
+                  #'(lambda (key)
+                      (setf db (delete key db :key #'car))
+                      key)))
+  
+              (setq cities (make-dbms '((boston . us) (paris . france)))) ; dbを登録
+  
+              (funcall (car cities) 'boston) ; => us (dbのbostonを取得)
+  
+              (funcall (second cities) 'london 'england) ; => london (dbのlondonにenglandを設定)
+            LISP
+          end
+          it { is_expected.to eq :london }
+        end
+
+        context "TODO: レキシカルスコープがおかしい？pushが呼ばれてない？(funcall (car cities) 'london) ; => england" do
+          let(:str) do
+            <<~LISP
+              (defun make-dbms (db)
+                (list
+                  #'(lambda (key)
+                      (cdr (assoc key db)))
+                  #'(lambda (key val)
+                      (push (cons key val) db)
+                      key)
+                  #'(lambda (key)
+                      (setf db (delete key db :key #'car))
+                      key)))
+  
+              (setq cities (make-dbms '((boston . us) (paris . france)))) ; dbを登録
+  
+              (funcall (car cities) 'boston) ; => us (dbのbostonを取得)
+  
+              (funcall (second cities) 'london 'england) ; => london (dbのlondonにenglandを設定)
+  
+              (funcall (car cities) 'london) ; => england (dbのlondonを取得)
+            LISP
+          end
+          it { is_expected.to eq :england }
+        end
       end
 
       context "(defun list+ (lst n) (mapcar #'(lambda (x) (+ x n)) lst))" do
