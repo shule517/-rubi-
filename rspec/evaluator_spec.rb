@@ -203,10 +203,9 @@ describe Rubi::Evaluator do
             <<~LISP
               (setq db '())
 
-              ((lambda (key val)
-                 (setq db '(1))
-                 key)
-               'name "シュール")
+              (
+                (lambda (key val) (setq db '(1)) key)
+                'name "シュール")
         
               db
             LISP
@@ -266,7 +265,14 @@ describe Rubi::Evaluator do
               db
             LISP
           end
-          it { is_expected.to eq [:name, :".", 'シュール'] }
+          it "db に (name . シュール) が入っていること" do
+            result = subject
+            expect(result).to be_a Array
+            expect(result.size).to eq 1
+            pair = result.first
+            expect(pair.car).to eq :name
+            expect(pair.cdr).to eq "シュール"
+          end
         end
 
         context "TODO: レキシカルスコープがおかしい？(funcall (car cities) 'london) ; => england" do
