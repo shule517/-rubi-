@@ -183,6 +183,39 @@ describe Rubi::Evaluator do
           end
         end
 
+        context "mypushマクロを展開した場合を確認する" do
+          let(:str) do
+            <<~LISP
+              ;(defmacro mypush (item lst)
+              ;  (list 'setq lst (list 'cons item lst)))
+
+              (setq db '())
+
+              ; ((lambda (key val)
+              ;   (mypush (cons key val) db)
+              ;   key)
+              ; 'name "シュール")
+
+              ; ↑のマクロを展開する
+              ((lambda (key val)
+                 (setq db (cons (cons key val) db))
+                 key)
+               'name "シュール")
+        
+              db
+            LISP
+          end
+
+          it "db に (name . シュール) が入っていること" do
+            result = subject
+            expect(result).to be_a Array
+            expect(result.size).to eq 1
+            pair = result.first
+            expect(pair.car).to eq :name
+            expect(pair.cdr).to eq "シュール"
+          end
+        end
+
         context "TODO: dbの設定部分だけ抜き出し" do
           let(:str) do
             <<~LISP
