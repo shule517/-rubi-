@@ -186,17 +186,19 @@ describe Rubi::Evaluator do
         context "mypushマクロを展開した場合を確認する" do
           let(:str) do
             <<~LISP
-              ;(defmacro mypush (item lst)
-              ;  (list 'setq lst (list 'cons item lst)))
+              ; (defmacro mypush (item lst)
+              ;   (list 'setq lst (list 'cons item lst)))
 
-              (setq db '())
+              ; (setq db '())
 
               ; ((lambda (key val)
               ;   (mypush (cons key val) db)
               ;   key)
               ; 'name "シュール")
 
-              ; ↑のマクロを展開する
+              ; ↑のマクロを展開した
+              (setq db '())
+
               ((lambda (key val)
                  (setq db (cons (cons key val) db))
                  key)
