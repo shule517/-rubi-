@@ -666,7 +666,7 @@ module Rubi
         # (apply #'+ (append '(1) '(2)))
         eval_params = params.map { |param| Array(eval(param, lexical_hash, stack_count + 1)) }.reduce(&:+)
         puts "#{nest}-> (eval_params: #{eval_params})"
-        func.call(proc_params: eval_params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
+        func.call(proc_params: eval_params, lexical_hash: lexical_hash, stack_count: stack_count + 1, nest: nest)
       elsif function.instance_of?(Array) # lambdaを実行する
         # 関数を返す式 を評価して、実行する
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
@@ -688,7 +688,7 @@ module Rubi
       elsif macro_hash.key?(function)
         # 登録されているマクロを呼び出す
         puts "#{nest}#{function}マクロが見つかった(params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
-        expanded = macro_hash[function].call(*params)
+        expanded = macro_hash[function].call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count + 1, nest: nest)
         puts "#{nest}マクロで展開された式を実行する(expanded: #{expanded}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         eval(expanded, lexical_hash, stack_count + 1)
       elsif lexical_hash.key?(function)
