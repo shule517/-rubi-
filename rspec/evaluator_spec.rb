@@ -249,7 +249,7 @@ describe Rubi::Evaluator do
           end
         end
 
-        context "TODO: dbの設定部分だけ抜き出し" do
+        context "dbの設定部分だけ抜き出し" do
           let(:str) do
             <<~LISP
               (defmacro mypush (item lst)
@@ -275,7 +275,7 @@ describe Rubi::Evaluator do
           end
         end
 
-        context "TODO: レキシカルスコープがおかしい？(funcall (car cities) 'london) ; => england" do
+        context "(funcall (car cities) 'london) ; => england" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)
@@ -299,7 +299,7 @@ describe Rubi::Evaluator do
           it { is_expected.to eq :london }
         end
 
-        context "TODO: レキシカルスコープがおかしい？pushが呼ばれてない？(funcall (car cities) 'london) ; => england" do
+        context "(funcall (car cities) 'london) ; => england" do
           let(:str) do
             <<~LISP
               (defun make-dbms (db)

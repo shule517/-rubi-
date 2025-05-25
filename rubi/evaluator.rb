@@ -759,8 +759,8 @@ module Rubi
         # local_lexical_hash = build_lexical_hash
 
         # 引数の値だけを新しくスコープに追加（上書き）
-        local_lexical_hash = captured_lexical_env#.dup
-
+        # TODO: local_lexical_hash = captured_lexical_env#.dup
+        local_lexical_hash = lexical_hash.merge!(build_lexical_hash)
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
         puts "#{nest}lambda(#{func_name})の中(expressions: #{expressions}, params: #{params}, proc_params: #{proc_params}, expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
 
