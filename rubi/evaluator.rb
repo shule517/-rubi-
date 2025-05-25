@@ -325,7 +325,7 @@ module Rubi
           else
             # ローカル変数がない場合は、グローバル変数を定義する
             var_hash[var_name] = newvalue
-            puts "#{nest}ローカル変数がない場合は、グローバル変数を定義する(#{var_name} = #{newvalue}) => var_hash: #{var_hash}"
+            puts "#{nest}ローカル変数がない場合は、グローバル変数を定義する(#{var_name} = #{newvalue}(object_id: #{var_hash[var_name].object_id})) => var_hash: #{var_hash}"
             puts "#{nest}-> var_hash: #{var_hash}"
             var_hash[var_name]
           end
@@ -758,7 +758,7 @@ module Rubi
         local_lexical_hash = captured_lexical_env#.dup
 
         raise "proc_paramsは配列のみです！" unless proc_params.is_a?(Array)
-        puts "#{nest}lambda(#{func_name})の中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        puts "#{nest}lambda(#{func_name})の中(expression: #{expression}, params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
 
         # オプショナル引数を分ける
         optional_index = params.index(:"&optional")
@@ -775,7 +775,7 @@ module Rubi
           puts "#{nest}  1.1(#{index}ループ目) 変数を展開するために、評価する(param: #{param}, proc_params[index]: #{proc_params[index]}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
           local_lexical_hash[param] = eval(proc_params[index], local_lexical_hash, stack_count + 2)
         end
-        puts "#{nest}-> 1. local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash}"
+        puts "#{nest}-> local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash}"
 
         # オプショナル引数の対応
         puts "#{nest}2. local_lexical_hashにオプショナル引数を展開していく(optional_params: #{optional_params}, proc_params: #{proc_params}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
@@ -793,15 +793,17 @@ module Rubi
           end
         end
 
-        puts "#{nest}-> 2. local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash}"
+        puts "#{nest}-> local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash}"
         puts "#{nest}3. lambdaを実行する(expression: #{expression}, local_lexical_hash(object_id: #{local_lexical_hash.object_id}): #{local_lexical_hash})"
-        eval(expression, local_lexical_hash, stack_count + 1)
+        result = eval(expression, local_lexical_hash, stack_count + 1)
+        puts "#{nest}-> #{result}"
+        result
       end
     end
 
     # マクロ定義
     def build_macro(params, expression, lexical_hash, stack_count, nest)
-      Proc.new do |*proc_params|
+      Proc.new do |proc_params:, lexical_hash:, stack_count:, nest:|
         puts "#{nest}macroの中(params: #{params}, proc_params: #{proc_params}, expression: #{expression}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         puts "#{nest}1. lexical_hashに変数を展開していく(params: #{params}, proc_params: #{proc_params})"
         params.each.with_index do |param, index|
@@ -825,7 +827,7 @@ module Rubi
         puts "#{nest}-> ローカル変数を返す(#{ast}) #{lexical_hash[ast]}"
         lexical_hash[ast] # レキシカルスコープの変数を参照する
       elsif var_hash.key?(ast)
-        puts "#{nest}-> グローバル変数を返す(#{ast}) #{var_hash[ast]}"
+        puts "#{nest}-> グローバル変数を返す(#{ast}) #{var_hash[ast]}(object_id: #{var_hash[ast].object_id})"
         var_hash[ast] # グローバル変数を参照する
       elsif ast == :t
         true
@@ -836,6 +838,8 @@ module Rubi
         if str.start_with?('"') && str.end_with?('"')
           # 文字列の場合 例: "あ"
           return str[1...-1]
+        elsif str.start_with?(':')
+          return ast # シンボルとして返す
         end
         raise "#{ast}の値を評価できません"
       else

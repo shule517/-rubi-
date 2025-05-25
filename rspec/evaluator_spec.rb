@@ -120,6 +120,9 @@ describe Rubi::Evaluator do
         context "pushの破壊的操作の部分だけ抜き出し" do
           let(:str) do
             <<~LISP
+              ;(defmacro push (item lst)
+              ;  (list 'setq lst (list 'cons item lst)))
+
               (setq db '()) ; 空のリストをグローバル変数 db に定義
               
               (push '(a . 1) db) ; db にペア (a . 1) を追加
@@ -140,13 +143,32 @@ describe Rubi::Evaluator do
           end
         end
 
-        context "dbの設定部分だけ抜き出し" do
+        context "pushの確認" do
           let(:str) do
             <<~LISP
+              (setq db '())
+              (push (cons :name "シュール") db)
+              db
+            LISP
+          end
+          it do
+            result = subject
+            expect(result).to be_instance_of Rubi::Cons
+            expect(result.car).to eq :":name"
+            expect(result.cdr).to eq 'シュール'
+          end
+        end
+
+        context "TODO: dbの設定部分だけ抜き出し" do
+          let(:str) do
+            <<~LISP
+              (defmacro mypush (item lst)
+                (list 'setq lst (list 'cons item lst)))
+
               (setq db '()) ; 空のデータベース
   
               ((lambda (key val)
-                 (push (cons key val) db)
+                 (mypush (cons key val) db)
                  key)
                'name "シュール")
   
