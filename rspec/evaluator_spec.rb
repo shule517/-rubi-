@@ -172,8 +172,7 @@ describe Rubi::Evaluator do
               db                          ; 最終的な db の中身を評価
             LISP
           end
-
-          it "db should contain the pushed pair" do
+          it do
             result = subject
             expect(result).to be_a Array
             expect(result.size).to eq 1
