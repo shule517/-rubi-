@@ -161,6 +161,29 @@ describe Rubi::Evaluator do
           end
         end
 
+        context "mypushマクロが正しく評価されることを検証" do
+          let(:str) do
+            <<~LISP
+              (defmacro mypush (item lst)
+                (list 'setq lst (list 'cons item lst))) ; → (setq db (cons item db))
+        
+              (setq db '())               ; 空のリストをセット
+              (mypush '(a . 1) db)        ; db にペアを追加
+              db                          ; 最終的な db の中身を評価
+            LISP
+          end
+
+          it "db should contain the pushed pair" do
+            result = subject
+            expect(result).to be_a Array
+            expect(result.size).to eq 1
+            cons = result.first
+            expect(cons).to be_instance_of Rubi::Cons
+            expect(cons.car).to eq :a
+            expect(cons.cdr).to eq 1
+          end
+        end
+
         context "TODO: dbの設定部分だけ抜き出し" do
           let(:str) do
             <<~LISP
