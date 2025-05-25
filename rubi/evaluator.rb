@@ -324,8 +324,9 @@ module Rubi
             lexical_hash[var_name]
           else
             # ローカル変数がない場合は、グローバル変数を定義する
+            puts "#{nest}before: ローカル変数がない場合は、グローバル変数を定義する(#{var_name}(value: #{var_hash[var_name]}, object_id: #{var_hash[var_name].object_id})) => var_hash: #{var_hash}"
             var_hash[var_name] = newvalue
-            puts "#{nest}ローカル変数がない場合は、グローバル変数を定義する(#{var_name} = #{newvalue}(object_id: #{var_hash[var_name].object_id})) => var_hash: #{var_hash}"
+            puts "#{nest}after: ローカル変数がない場合は、グローバル変数を定義する(#{var_name} = #{newvalue}(value: #{var_hash[var_name]}, object_id: #{var_hash[var_name].object_id})) => var_hash: #{var_hash}"
             puts "#{nest}-> var_hash: #{var_hash}"
             var_hash[var_name]
           end
