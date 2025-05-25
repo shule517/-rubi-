@@ -183,6 +183,38 @@ describe Rubi::Evaluator do
           end
         end
 
+        context "setqの問題を最小限で再現したい１" do
+          let(:str) do
+            <<~LISP
+              (setq db '())
+              
+              ((lambda ()
+                 (setq db '(1))))
+              
+              db
+            LISP
+          end
+
+          it { is_expected.to eq [1] }
+        end
+
+        context "setqの問題を最小限で再現したい２" do
+          let(:str) do
+            <<~LISP
+              (setq db '())
+
+              ((lambda (key val)
+                 (setq db '(1))
+                 key)
+               'name "シュール")
+        
+              db
+            LISP
+          end
+
+          it { is_expected.to eq [1] }
+        end
+
         context "mypushマクロを展開した場合を確認する" do
           let(:str) do
             <<~LISP
