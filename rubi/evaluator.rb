@@ -283,7 +283,7 @@ module Rubi
           puts "#{nest}-> #{result}(next_lexical_hash(object_id: #{next_lexical_hash.object_id}): #{next_lexical_hash})"
           result
         end.last
-      elsif function == :'let*' # TODO: letをコピーしただけ
+      elsif function == :'let*'
         var_params = params.shift
         expression = params
         puts "#{nest}#{function}(var_params: #{var_params}, expression: #{expression})"
@@ -723,7 +723,7 @@ module Rubi
         puts "-> #{x.cdr} ※consの場合"
         x.cdr
       elsif x[1] == :"."
-        puts "-> #{x[2]} ※a . b形式の場合" # TODO: consに変換して対応できないのか？
+        puts "-> #{x[2]} ※a . b形式の場合"
         x[2]
       else
         puts "-> #{x[1..]} ※配列の場合"
