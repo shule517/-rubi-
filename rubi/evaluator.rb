@@ -672,10 +672,12 @@ module Rubi
         # 例: ((lambda (x) (* 2 x)) 3) → (関数 3)
         # まずは第１引数を評価してから、実行する
         expression = function
-        puts "#{nest}関数の実行(expression: #{expression}, (params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
+        puts "#{nest}1. 関数を評価する(expression: #{expression}, (params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         proc = eval(expression, lexical_hash, stack_count + 1)
-        puts "#{nest}関数の実行:#{expression}(proc: #{proc}, params: #{params})"
-        proc.call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
+        puts "#{nest}2. 関数を実行する:(expression: #{expression}, proc: #{proc}, params: #{params})"
+        result = proc.call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
+        puts "#{nest}-> #{result}"
+        result
       elsif function.instance_of?(Proc) # funcallで関数を実行する
         puts "#{nest}関数の実行(function: #{function}, (params: #{params}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         function.call(proc_params: params, lexical_hash: lexical_hash, stack_count: stack_count, nest: nest)
