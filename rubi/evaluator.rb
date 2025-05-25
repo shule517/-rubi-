@@ -380,7 +380,7 @@ module Rubi
         params, *expressions = params
         puts "#{nest}#{function}(params: #{params}, expressions: #{expressions}, lexical_hash(object_id: #{lexical_hash.object_id}): #{lexical_hash})"
         # 関数定義
-        expression = expressions.last # TODO: 途中の式を実行していない
+        expression = expressions.last # TODO: 途中の式を実行していない ＆ 途中の式は、lambdaの実行時に評価する必要がある
         build_lambda(params, expression, lexical_hash, "lambdaで定義した関数")
       elsif function == :defun # 関数定義
         func_name = params.shift
