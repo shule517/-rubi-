@@ -152,7 +152,7 @@ describe Rubi::Evaluator do
             LISP
           end
           it do
-            result = subject
+            result = subject.first
             expect(result).to be_instance_of Rubi::Cons
             expect(result.car).to eq :":name"
             expect(result.cdr).to eq 'シュール'
